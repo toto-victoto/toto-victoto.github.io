@@ -7,8 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+#. js-lingui-explicit-id
 msgid "home.title"
 msgstr "toto-victoto"
 
+#. js-lingui-explicit-id
 msgid "home.subtitle"
 msgstr "Tap an app to play."

@@ -5,7 +5,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
-"Language: fr\n"
+"Language: zh-CN\n"
 
 #. js-lingui-explicit-id
 msgid "home.title"
@@ -13,4 +13,4 @@ msgstr "toto-victoto"
 
 #. js-lingui-explicit-id
 msgid "home.subtitle"
-msgstr "Tape sur une app pour jouer."
+msgstr "点击应用开始游戏。"
