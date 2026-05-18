@@ -14,3 +14,31 @@ msgstr "toto-victoto"
 #. js-lingui-explicit-id
 msgid "home.subtitle"
 msgstr "Tap an app to play."
+
+#. js-lingui-explicit-id
+msgid "home.app.about"
+msgstr "About"
+
+#. js-lingui-explicit-id
+msgid "about.title"
+msgstr "About"
+
+#. js-lingui-explicit-id
+msgid "about.section.built_with"
+msgstr "Built with"
+
+#. js-lingui-explicit-id
+msgid "about.section.source"
+msgstr "Source code"
+
+#. js-lingui-explicit-id
+msgid "about.section.legal"
+msgstr "Legal"
+
+#. js-lingui-explicit-id
+msgid "about.legal.body"
+msgstr "Personal non-commercial site published by toto-victoto. Hosted by GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107, USA). No analytics, no cookies, no third-party tracking."
+
+#. js-lingui-explicit-id
+msgid "about.back"
+msgstr "← Back to home"

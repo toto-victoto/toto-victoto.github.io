@@ -14,3 +14,31 @@ msgstr "toto-victoto"
 #. js-lingui-explicit-id
 msgid "home.subtitle"
 msgstr "点击应用开始游戏。"
+
+#. js-lingui-explicit-id
+msgid "home.app.about"
+msgstr "关于"
+
+#. js-lingui-explicit-id
+msgid "about.title"
+msgstr "关于"
+
+#. js-lingui-explicit-id
+msgid "about.section.built_with"
+msgstr "构建工具"
+
+#. js-lingui-explicit-id
+msgid "about.section.source"
+msgstr "源代码"
+
+#. js-lingui-explicit-id
+msgid "about.section.legal"
+msgstr "法律声明"
+
+#. js-lingui-explicit-id
+msgid "about.legal.body"
+msgstr "由 toto-victoto 发布的非商业个人网站。由 GitHub, Inc.（88 Colin P Kelly Jr St, San Francisco, CA 94107, 美国）托管。无分析工具、无 Cookie、无第三方跟踪。"
+
+#. js-lingui-explicit-id
+msgid "about.back"
+msgstr "← 返回首页"
