@@ -10,6 +10,7 @@ import { I18nProvider } from "@lingui/react";
 
 import type { Route } from "./+types/root";
 import { i18n } from "./i18n";
+import { LanguageSelector } from "./components/LanguageSelector";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -46,6 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <I18nProvider i18n={i18n}>
+      <LanguageSelector />
       <Outlet />
     </I18nProvider>
   );
