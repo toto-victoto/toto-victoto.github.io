@@ -11,6 +11,7 @@ import { I18nProvider } from "@lingui/react";
 import type { Route } from "./+types/root";
 import { i18n } from "./i18n";
 import { LanguageSelector } from "./components/LanguageSelector";
+import { HomeButton } from "./components/HomeButton";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -36,7 +37,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <I18nProvider i18n={i18n}>
+          <LanguageSelector />
+          {children}
+        </I18nProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -45,12 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <I18nProvider i18n={i18n}>
-      <LanguageSelector />
-      <Outlet />
-    </I18nProvider>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
@@ -70,14 +69,19 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <>
+      <HomeButton />
+      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
+        <div className="max-w-prose mx-auto">
+          <h1 className="text-3xl font-semibold tracking-tight">{message}</h1>
+          <p className="text-neutral-400 mt-2">{details}</p>
+          {stack && (
+            <pre className="w-full p-4 mt-6 overflow-x-auto bg-neutral-900 rounded-lg text-xs">
+              <code>{stack}</code>
+            </pre>
+          )}
+        </div>
+      </main>
+    </>
   );
 }

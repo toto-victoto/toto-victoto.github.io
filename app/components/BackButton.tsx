@@ -26,7 +26,7 @@ export function BackButton({ to = "/", label }: Props) {
       >
         <polyline points="15 18 9 12 15 6" />
       </svg>
-      <span>{label ?? <Trans id="nav.back" message="Back" />}</span>
+      <span>{label ?? <Trans id="nav.home" message="Home" />}</span>
     </Link>
   );
 }
