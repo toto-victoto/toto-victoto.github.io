@@ -32,6 +32,14 @@ export default function Home() {
           </AppIcon>
 
           <AppIcon
+            to="/snake"
+            label={<Trans id="snake.title" message="Snake" />}
+            tone="bg-gradient-to-br from-emerald-400 to-green-700"
+          >
+            <span aria-hidden="true">🐍</span>
+          </AppIcon>
+
+          <AppIcon
             to="/about"
             label={<Trans id="home.app.about" message="About" />}
             tone="bg-gradient-to-br from-sky-400 to-sky-600"

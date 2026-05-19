@@ -40,6 +40,27 @@ msgstr "Ordi"
 msgid "rps.reset"
 msgstr "Réinitialiser"
 
+msgid "snake.title"
+msgstr "Serpent"
+
+msgid "snake.score"
+msgstr "Score"
+
+msgid "snake.best"
+msgstr "Record"
+
+msgid "snake.start"
+msgstr "Glisse ou utilise les flèches pour démarrer"
+
+msgid "snake.gameover"
+msgstr "Perdu !"
+
+msgid "snake.reset"
+msgstr "Rejouer"
+
+msgid "snake.hint"
+msgstr "Glisse sur le plateau · flèches ou ZQSD sur ordi"
+
 msgid "about.title"
 msgstr "À propos"
 

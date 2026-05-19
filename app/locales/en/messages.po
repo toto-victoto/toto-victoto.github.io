@@ -40,6 +40,27 @@ msgstr "CPU"
 msgid "rps.reset"
 msgstr "Reset"
 
+msgid "snake.title"
+msgstr "Snake"
+
+msgid "snake.score"
+msgstr "Score"
+
+msgid "snake.best"
+msgstr "Best"
+
+msgid "snake.start"
+msgstr "Swipe or use arrow keys to start"
+
+msgid "snake.gameover"
+msgstr "Game over"
+
+msgid "snake.reset"
+msgstr "Play again"
+
+msgid "snake.hint"
+msgstr "Swipe on the board · arrow keys or WASD on desktop"
+
 msgid "about.title"
 msgstr "About"
 

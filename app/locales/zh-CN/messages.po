@@ -40,6 +40,27 @@ msgstr "电脑"
 msgid "rps.reset"
 msgstr "重置"
 
+msgid "snake.title"
+msgstr "贪吃蛇"
+
+msgid "snake.score"
+msgstr "分数"
+
+msgid "snake.best"
+msgstr "最高"
+
+msgid "snake.start"
+msgstr "滑动屏幕或使用方向键开始"
+
+msgid "snake.gameover"
+msgstr "游戏结束"
+
+msgid "snake.reset"
+msgstr "再玩一次"
+
+msgid "snake.hint"
+msgstr "在棋盘上滑动 · 电脑端方向键或 WASD"
+
 msgid "about.title"
 msgstr "关于"
 

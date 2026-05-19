@@ -5,6 +5,7 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   --animate-rps-tick: rps-tick 200ms ease-out;
+  --animate-snake-food: snake-food 900ms ease-in-out infinite;
 
   @keyframes rps-tick {
     0% {
@@ -14,6 +15,18 @@
     100% {
       transform: scale(1);
       opacity: 1;
+    }
+  }
+
+  @keyframes snake-food {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(0.7);
+      opacity: 0.75;
     }
   }
 }
