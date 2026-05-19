@@ -31,5 +31,5 @@ msgstr "Mentions légales"
 msgid "about.legal.body"
 msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis). Aucune collecte de données, aucun cookie, aucun tracker tiers."
 
-msgid "about.back"
-msgstr "← Retour à l'accueil"
+msgid "nav.back"
+msgstr "Accueil"

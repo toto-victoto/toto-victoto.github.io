@@ -31,5 +31,5 @@ msgstr "法律声明"
 msgid "about.legal.body"
 msgstr "由 toto-victoto 发布的非商业个人网站。由 GitHub, Inc.（88 Colin P Kelly Jr St, San Francisco, CA 94107, 美国）托管。无分析工具、无 Cookie、无第三方跟踪。"
 
-msgid "about.back"
-msgstr "← 返回首页"
+msgid "nav.back"
+msgstr "首页"

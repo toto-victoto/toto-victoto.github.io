@@ -31,5 +31,5 @@ msgstr "Legal"
 msgid "about.legal.body"
 msgstr "Personal non-commercial site published by toto-victoto. Hosted by GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107, USA). No analytics, no cookies, no third-party tracking."
 
-msgid "about.back"
-msgstr "← Back to home"
+msgid "nav.back"
+msgstr "Home"
