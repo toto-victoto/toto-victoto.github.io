@@ -7,38 +7,29 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: fr\n"
 
-#. js-lingui-explicit-id
 msgid "home.title"
 msgstr "toto-victoto"
 
-#. js-lingui-explicit-id
 msgid "home.subtitle"
 msgstr "Tape sur une app pour jouer."
 
-#. js-lingui-explicit-id
 msgid "home.app.about"
 msgstr "À propos"
 
-#. js-lingui-explicit-id
 msgid "about.title"
 msgstr "À propos"
 
-#. js-lingui-explicit-id
 msgid "about.section.built_with"
 msgstr "Réalisé avec"
 
-#. js-lingui-explicit-id
 msgid "about.section.source"
 msgstr "Code source"
 
-#. js-lingui-explicit-id
 msgid "about.section.legal"
 msgstr "Mentions légales"
 
-#. js-lingui-explicit-id
 msgid "about.legal.body"
 msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis). Aucune collecte de données, aucun cookie, aucun tracker tiers."
 
-#. js-lingui-explicit-id
 msgid "about.back"
 msgstr "← Retour à l'accueil"
