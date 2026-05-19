@@ -16,6 +16,30 @@ msgstr "点击应用开始游戏。"
 msgid "home.app.about"
 msgstr "关于"
 
+msgid "rps.title"
+msgstr "石头剪刀布"
+
+msgid "rps.choose"
+msgstr "选择你的出招"
+
+msgid "rps.win"
+msgstr "你赢了！"
+
+msgid "rps.lose"
+msgstr "你输了。"
+
+msgid "rps.draw"
+msgstr "平局"
+
+msgid "rps.score.you"
+msgstr "你"
+
+msgid "rps.score.cpu"
+msgstr "电脑"
+
+msgid "rps.reset"
+msgstr "重置"
+
 msgid "about.title"
 msgstr "关于"
 

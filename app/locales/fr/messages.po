@@ -16,6 +16,30 @@ msgstr "Tape sur une app pour jouer."
 msgid "home.app.about"
 msgstr "À propos"
 
+msgid "rps.title"
+msgstr "Pierre Feuille Ciseaux"
+
+msgid "rps.choose"
+msgstr "Choisis ton coup"
+
+msgid "rps.win"
+msgstr "Gagné !"
+
+msgid "rps.lose"
+msgstr "Perdu."
+
+msgid "rps.draw"
+msgstr "Égalité"
+
+msgid "rps.score.you"
+msgstr "Toi"
+
+msgid "rps.score.cpu"
+msgstr "Ordi"
+
+msgid "rps.reset"
+msgstr "Réinitialiser"
+
 msgid "about.title"
 msgstr "À propos"
 

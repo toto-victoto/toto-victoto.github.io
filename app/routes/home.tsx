@@ -24,6 +24,14 @@ export default function Home() {
 
         <div className="grid grid-cols-4 gap-x-4 gap-y-6">
           <AppIcon
+            to="/rps"
+            label={<Trans id="rps.title" message="Rock Paper Scissors" />}
+            tone="bg-gradient-to-br from-amber-400 to-orange-600"
+          >
+            <span aria-hidden="true">✊</span>
+          </AppIcon>
+
+          <AppIcon
             to="/about"
             label={<Trans id="home.app.about" message="About" />}
             tone="bg-gradient-to-br from-sky-400 to-sky-600"

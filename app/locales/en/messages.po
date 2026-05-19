@@ -16,6 +16,30 @@ msgstr "Tap an app to play."
 msgid "home.app.about"
 msgstr "About"
 
+msgid "rps.title"
+msgstr "Rock Paper Scissors"
+
+msgid "rps.choose"
+msgstr "Choose your move"
+
+msgid "rps.win"
+msgstr "You win!"
+
+msgid "rps.lose"
+msgstr "You lose."
+
+msgid "rps.draw"
+msgstr "Draw"
+
+msgid "rps.score.you"
+msgstr "You"
+
+msgid "rps.score.cpu"
+msgstr "CPU"
+
+msgid "rps.reset"
+msgstr "Reset"
+
 msgid "about.title"
 msgstr "About"
 

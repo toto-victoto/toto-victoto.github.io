@@ -15,7 +15,7 @@ export function AppIcon({ label, children, tone, ...link }: Props) {
     <span className={`${tileBase} ${tone ?? "bg-neutral-800"}`}>{children}</span>
   );
   const text = (
-    <span className="text-xs text-neutral-200 text-center max-w-16 truncate">
+    <span className="text-xs text-neutral-200 text-center leading-tight max-w-16 break-words">
       {label}
     </span>
   );

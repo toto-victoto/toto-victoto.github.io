@@ -3,6 +3,19 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --animate-rps-tick: rps-tick 200ms ease-out;
+
+  @keyframes rps-tick {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 }
 
 html,
