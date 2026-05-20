@@ -31,9 +31,14 @@ export function LanguageSelector() {
     const initial = resolveInitialLocale();
     if (initial !== i18n.locale) activate(initial);
 
-    const fromQuery = new URL(window.location.href).searchParams.get(LANG_KEY);
+    const url = new URL(window.location.href);
+    const fromQuery = url.searchParams.get(LANG_KEY);
     if (isSupported(fromQuery)) {
       window.localStorage.setItem(LANG_KEY, fromQuery);
+    }
+    if (url.searchParams.has(LANG_KEY)) {
+      url.searchParams.delete(LANG_KEY);
+      window.history.replaceState({}, "", url.toString());
     }
   }, []);
 
@@ -43,9 +48,6 @@ export function LanguageSelector() {
 
   const select = (locale: Locale) => (e: React.MouseEvent) => {
     e.preventDefault();
-    const url = new URL(window.location.href);
-    url.searchParams.set(LANG_KEY, locale);
-    window.history.replaceState({}, "", url.toString());
     window.localStorage.setItem(LANG_KEY, locale);
     activate(locale);
   };
