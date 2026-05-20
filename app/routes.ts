@@ -5,4 +5,5 @@ export default [
   route("about", "routes/about.tsx"),
   route("rps", "routes/rps.tsx"),
   route("snake", "routes/snake.tsx"),
+  route("flappy", "routes/flappy.tsx"),
 ] satisfies RouteConfig;

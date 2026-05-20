@@ -61,6 +61,21 @@ msgstr "Play again"
 msgid "snake.hint"
 msgstr "Swipe on the board · arrow keys or WASD on desktop"
 
+msgid "flappy.title"
+msgstr "Flappy"
+
+msgid "flappy.start"
+msgstr "Tap or press Space to start"
+
+msgid "flappy.gameover"
+msgstr "Game over"
+
+msgid "flappy.best"
+msgstr "Best"
+
+msgid "flappy.reset"
+msgstr "Play again"
+
 msgid "about.title"
 msgstr "About"
 

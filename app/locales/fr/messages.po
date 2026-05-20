@@ -61,6 +61,21 @@ msgstr "Rejouer"
 msgid "snake.hint"
 msgstr "Glisse sur le plateau · flèches ou ZQSD sur ordi"
 
+msgid "flappy.title"
+msgstr "Flappy"
+
+msgid "flappy.start"
+msgstr "Tape ou appuie sur Espace pour démarrer"
+
+msgid "flappy.gameover"
+msgstr "Perdu !"
+
+msgid "flappy.best"
+msgstr "Record"
+
+msgid "flappy.reset"
+msgstr "Rejouer"
+
 msgid "about.title"
 msgstr "À propos"
 

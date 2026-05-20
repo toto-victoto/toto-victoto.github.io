@@ -40,6 +40,14 @@ export default function Home() {
           </AppIcon>
 
           <AppIcon
+            to="/flappy"
+            label={<Trans id="flappy.title" message="Flappy" />}
+            tone="bg-gradient-to-br from-sky-400 to-blue-600"
+          >
+            <span aria-hidden="true">🐤</span>
+          </AppIcon>
+
+          <AppIcon
             to="/about"
             label={<Trans id="home.app.about" message="About" />}
             tone="bg-gradient-to-br from-sky-400 to-sky-600"

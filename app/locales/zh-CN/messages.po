@@ -61,6 +61,21 @@ msgstr "再玩一次"
 msgid "snake.hint"
 msgstr "在棋盘上滑动 · 电脑端方向键或 WASD"
 
+msgid "flappy.title"
+msgstr "飞翔的小鸟"
+
+msgid "flappy.start"
+msgstr "点击或按空格开始"
+
+msgid "flappy.gameover"
+msgstr "游戏结束"
+
+msgid "flappy.best"
+msgstr "最高"
+
+msgid "flappy.reset"
+msgstr "再玩一次"
+
 msgid "about.title"
 msgstr "关于"
 
