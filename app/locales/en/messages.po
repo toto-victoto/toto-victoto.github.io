@@ -7,6 +7,12 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+msgid "common.best"
+msgstr "Best"
+
+msgid "common.play_again"
+msgstr "Play again"
+
 msgid "home.title"
 msgstr "toto-victoto"
 
@@ -46,17 +52,11 @@ msgstr "Snake"
 msgid "snake.score"
 msgstr "Score"
 
-msgid "snake.best"
-msgstr "Best"
-
 msgid "snake.start"
 msgstr "Swipe or use arrow keys to start"
 
 msgid "snake.gameover"
 msgstr "Game over"
-
-msgid "snake.reset"
-msgstr "Play again"
 
 msgid "snake.hint"
 msgstr "Swipe on the board · arrow keys or WASD on desktop"
@@ -70,11 +70,56 @@ msgstr "Tap or press Space to start"
 msgid "flappy.gameover"
 msgstr "Game over"
 
-msgid "flappy.best"
-msgstr "Best"
+msgid "roulette.title"
+msgstr "Roulette"
 
-msgid "flappy.reset"
-msgstr "Play again"
+msgid "roulette.balance"
+msgstr "Balance"
+
+msgid "roulette.red"
+msgstr "Red"
+
+msgid "roulette.black"
+msgstr "Black"
+
+msgid "roulette.even"
+msgstr "Even"
+
+msgid "roulette.odd"
+msgstr "Odd"
+
+msgid "roulette.wagered"
+msgstr "In play"
+
+msgid "roulette.chip"
+msgstr "Chip"
+
+msgid "roulette.clear"
+msgstr "Clear bets"
+
+msgid "roulette.spin"
+msgstr "Spin"
+
+msgid "roulette.broke"
+msgstr "Out of chips"
+
+msgid "roulette.place_bets"
+msgstr "Place your bets"
+
+msgid "roulette.no_more_bets"
+msgstr "The bets are placed, no more bets"
+
+msgid "roulette.stats_title"
+msgstr "Statistics"
+
+msgid "roulette.spins"
+msgstr "Spins"
+
+msgid "roulette.hot"
+msgstr "Hot"
+
+msgid "roulette.cold"
+msgstr "Cold"
 
 msgid "about.title"
 msgstr "About"

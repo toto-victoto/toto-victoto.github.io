@@ -120,7 +120,12 @@ after each step.
 
 - **i18n**: explicit-id mode (`explicitIdAsDefault`). The `id` prop is the
   catalog key; the `message` prop is the English source/fallback. Always provide
-  both, and add the key to all three `.po` files.
+  both, and add the key to all three `.po` files. For strings that are identical
+  across games (e.g. "Best", "Play again"), reuse a shared `common.*` id rather
+  than a per-game key — the catalog is flat, so one entry serves every game.
+- **Page titles**: keep `meta()` titles hardcoded (brand-style, e.g.
+  "Snake — toto-victoto"). Don't translate them via Lingui: `meta()` returns
+  descriptors (no `<Trans>`), and prerender would bake the default locale only.
 - **Theme**: dark — `bg-neutral-950 text-neutral-100`. Mobile-first.
 - **Game positioning**: express positions/sizes in % of the playfield so the
   game is resolution-independent and scales with its responsive container.

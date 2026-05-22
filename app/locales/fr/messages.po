@@ -7,6 +7,12 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: fr\n"
 
+msgid "common.best"
+msgstr "Record"
+
+msgid "common.play_again"
+msgstr "Rejouer"
+
 msgid "home.title"
 msgstr "toto-victoto"
 
@@ -46,17 +52,11 @@ msgstr "Serpent"
 msgid "snake.score"
 msgstr "Score"
 
-msgid "snake.best"
-msgstr "Record"
-
 msgid "snake.start"
 msgstr "Glisse ou utilise les flèches pour démarrer"
 
 msgid "snake.gameover"
 msgstr "Perdu !"
-
-msgid "snake.reset"
-msgstr "Rejouer"
 
 msgid "snake.hint"
 msgstr "Glisse sur le plateau · flèches ou ZQSD sur ordi"
@@ -70,11 +70,56 @@ msgstr "Tape ou appuie sur Espace pour démarrer"
 msgid "flappy.gameover"
 msgstr "Perdu !"
 
-msgid "flappy.best"
-msgstr "Record"
+msgid "roulette.title"
+msgstr "Roulette"
 
-msgid "flappy.reset"
-msgstr "Rejouer"
+msgid "roulette.balance"
+msgstr "Solde"
+
+msgid "roulette.red"
+msgstr "Rouge"
+
+msgid "roulette.black"
+msgstr "Noir"
+
+msgid "roulette.even"
+msgstr "Pair"
+
+msgid "roulette.odd"
+msgstr "Impair"
+
+msgid "roulette.wagered"
+msgstr "En jeu"
+
+msgid "roulette.chip"
+msgstr "Jeton"
+
+msgid "roulette.clear"
+msgstr "Annuler les mises"
+
+msgid "roulette.spin"
+msgstr "Tirer"
+
+msgid "roulette.broke"
+msgstr "Plus de jetons"
+
+msgid "roulette.place_bets"
+msgstr "Faites vos jeux"
+
+msgid "roulette.no_more_bets"
+msgstr "Les jeux sont faits, rien ne va plus"
+
+msgid "roulette.stats_title"
+msgstr "Statistiques"
+
+msgid "roulette.spins"
+msgstr "Tirages"
+
+msgid "roulette.hot"
+msgstr "Chauds"
+
+msgid "roulette.cold"
+msgstr "Froids"
 
 msgid "about.title"
 msgstr "À propos"

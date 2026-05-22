@@ -7,6 +7,12 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: zh-CN\n"
 
+msgid "common.best"
+msgstr "最高"
+
+msgid "common.play_again"
+msgstr "再玩一次"
+
 msgid "home.title"
 msgstr "toto-victoto"
 
@@ -46,17 +52,11 @@ msgstr "贪吃蛇"
 msgid "snake.score"
 msgstr "分数"
 
-msgid "snake.best"
-msgstr "最高"
-
 msgid "snake.start"
 msgstr "滑动屏幕或使用方向键开始"
 
 msgid "snake.gameover"
 msgstr "游戏结束"
-
-msgid "snake.reset"
-msgstr "再玩一次"
 
 msgid "snake.hint"
 msgstr "在棋盘上滑动 · 电脑端方向键或 WASD"
@@ -70,11 +70,56 @@ msgstr "点击或按空格开始"
 msgid "flappy.gameover"
 msgstr "游戏结束"
 
-msgid "flappy.best"
-msgstr "最高"
+msgid "roulette.title"
+msgstr "轮盘"
 
-msgid "flappy.reset"
-msgstr "再玩一次"
+msgid "roulette.balance"
+msgstr "余额"
+
+msgid "roulette.red"
+msgstr "红"
+
+msgid "roulette.black"
+msgstr "黑"
+
+msgid "roulette.even"
+msgstr "双"
+
+msgid "roulette.odd"
+msgstr "单"
+
+msgid "roulette.wagered"
+msgstr "下注中"
+
+msgid "roulette.chip"
+msgstr "筹码"
+
+msgid "roulette.clear"
+msgstr "清除"
+
+msgid "roulette.spin"
+msgstr "开始"
+
+msgid "roulette.broke"
+msgstr "筹码用尽"
+
+msgid "roulette.place_bets"
+msgstr "请下注"
+
+msgid "roulette.no_more_bets"
+msgstr "买定离手，停止下注"
+
+msgid "roulette.stats_title"
+msgstr "统计"
+
+msgid "roulette.spins"
+msgstr "次数"
+
+msgid "roulette.hot"
+msgstr "热门"
+
+msgid "roulette.cold"
+msgstr "冷门"
 
 msgid "about.title"
 msgstr "关于"

@@ -211,7 +211,7 @@ export default function Snake() {
               ·
             </span>
             <ScoreCell
-              label={<Trans id="snake.best" message="Best" />}
+              label={<Trans id="common.best" message="Best" />}
               value={best}
             />
           </section>
@@ -264,7 +264,7 @@ export default function Snake() {
                         onClick={reset}
                         className="text-sm text-sky-400 hover:underline"
                       >
-                        <Trans id="snake.reset" message="Play again" />
+                        <Trans id="common.play_again" message="Play again" />
                       </button>
                     </>
                   )}

@@ -245,14 +245,14 @@ export default function Flappy() {
                         <Trans id="flappy.gameover" message="Game over" />
                       </p>
                       <p className="text-sm text-white/90">
-                        <Trans id="flappy.best" message="Best" />{" "}
+                        <Trans id="common.best" message="Best" />{" "}
                         <span className="font-bold tabular-nums">{best}</span>
                       </p>
                       <button
                         onClick={reset}
                         className="rounded-full bg-white/90 px-8 py-3 text-lg font-semibold text-neutral-900 hover:bg-white"
                       >
-                        <Trans id="flappy.reset" message="Play again" />
+                        <Trans id="common.play_again" message="Play again" />
                       </button>
                     </>
                   )}
