@@ -8,3 +8,6 @@
 
 # Claude Code (local-only)
 .claude/
+
+# Lingui (catalogs are compiled by the Vite plugin at build time)
+app/locales/*/messages.js
