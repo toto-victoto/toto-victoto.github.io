@@ -52,14 +52,22 @@ function wins(key: string, r: number): boolean {
       return r <= 18;
     case "high":
       return r >= 19;
+    case "d1":
+      return r <= 12;
+    case "d2":
+      return r >= 13 && r <= 24;
+    case "d3":
+      return r >= 25;
     default:
       return false;
   }
 }
 
-// Profit per unit staked: straight up pays 35:1, even-money bets 1:1.
+// Profit per unit staked: straight up pays 35:1, dozens 2:1, even-money 1:1.
 function payoutOf(key: string): number {
-  return key.startsWith("n:") ? 35 : 1;
+  if (key.startsWith("n:")) return 35;
+  if (key.startsWith("d")) return 2;
+  return 1;
 }
 
 const NUMBERS = Array.from({ length: 36 }, (_, i) => i + 1);
@@ -84,13 +92,22 @@ const SPIN_MS = 4000;
 const SPIN_EASING = "cubic-bezier(0.16, 0.84, 0.3, 1)";
 const BETTING_SECONDS = 10; // betting window before the wheel auto-spins
 
+// Top-to-bottom ordering so the side strip reads roughly low → high,
+// matching the numbers grid that runs 1 (top) to 36 (bottom).
 const OUTSIDE: { key: string; id?: string; label: string; tone: string }[] = [
+  { key: "low", label: "1–18", tone: "bg-neutral-700" },
+  { key: "even", id: "roulette.even", label: "Even", tone: "bg-neutral-700" },
   { key: "red", id: "roulette.red", label: "Red", tone: "bg-red-600" },
   { key: "black", id: "roulette.black", label: "Black", tone: "bg-neutral-800" },
-  { key: "even", id: "roulette.even", label: "Even", tone: "bg-neutral-700" },
   { key: "odd", id: "roulette.odd", label: "Odd", tone: "bg-neutral-700" },
-  { key: "low", label: "1–18", tone: "bg-neutral-700" },
   { key: "high", label: "19–36", tone: "bg-neutral-700" },
+];
+
+// Dozens are aligned with 4-row blocks of the numbers grid on the left strip.
+const DOZENS: { key: string; label: string }[] = [
+  { key: "d1", label: "1–12" },
+  { key: "d2", label: "13–24" },
+  { key: "d3", label: "25–36" },
 ];
 
 export function meta({}: Route.MetaArgs) {
@@ -426,40 +443,60 @@ export default function Roulette() {
             <div
               className={`space-y-1 transition ${spinning ? "pointer-events-none opacity-40" : ""}`}
             >
-              <div className="grid grid-cols-3 gap-1">
-                <BetCell
-                  onPlace={() => placeBet("n:0")}
-                  onRemove={() => removeBet("n:0")}
-                  amount={bets["n:0"]}
-                  className={`col-span-3 py-2 ${colorClass("green")}`}
-                >
-                  0
-                </BetCell>
-                {NUMBERS.map((n) => (
-                  <BetCell
-                    key={n}
-                    onPlace={() => placeBet(`n:${n}`)}
-                    onRemove={() => removeBet(`n:${n}`)}
-                    amount={bets[`n:${n}`]}
-                    className={`h-9 ${colorClass(colorOf(n))}`}
-                  >
-                    {n}
-                  </BetCell>
-                ))}
-              </div>
+              <BetCell
+                onPlace={() => placeBet("n:0")}
+                onRemove={() => removeBet("n:0")}
+                amount={bets["n:0"]}
+                className={`w-full py-2 ${colorClass("green")}`}
+              >
+                0
+              </BetCell>
 
-              <div className="grid grid-cols-3 gap-1 text-xs font-medium">
-                {OUTSIDE.map((o) => (
-                  <BetCell
-                    key={o.key}
-                    onPlace={() => placeBet(o.key)}
-                    onRemove={() => removeBet(o.key)}
-                    amount={bets[o.key]}
-                    className={`py-2 ${o.tone}`}
-                  >
-                    {o.id ? <Trans id={o.id} message={o.label} /> : o.label}
-                  </BetCell>
-                ))}
+              <div className="flex gap-1">
+                {/* Left strip: dozens — each cell stretches over 4 number rows. */}
+                <div className="flex flex-1 flex-col gap-1">
+                  {DOZENS.map((d) => (
+                    <BetCell
+                      key={d.key}
+                      onPlace={() => placeBet(d.key)}
+                      onRemove={() => removeBet(d.key)}
+                      amount={bets[d.key]}
+                      className="flex-1 bg-neutral-700 text-xs"
+                    >
+                      {d.label}
+                    </BetCell>
+                  ))}
+                </div>
+
+                {/* Center: numbers 1–36, rotated-classic 3-column pattern. */}
+                <div className="grid flex-[3] grid-cols-3 gap-1">
+                  {NUMBERS.map((n) => (
+                    <BetCell
+                      key={n}
+                      onPlace={() => placeBet(`n:${n}`)}
+                      onRemove={() => removeBet(`n:${n}`)}
+                      amount={bets[`n:${n}`]}
+                      className={`h-9 ${colorClass(colorOf(n))}`}
+                    >
+                      {n}
+                    </BetCell>
+                  ))}
+                </div>
+
+                {/* Right strip: even-money bets — each over 2 number rows. */}
+                <div className="flex flex-1 flex-col gap-1">
+                  {OUTSIDE.map((o) => (
+                    <BetCell
+                      key={o.key}
+                      onPlace={() => placeBet(o.key)}
+                      onRemove={() => removeBet(o.key)}
+                      amount={bets[o.key]}
+                      className={`flex-1 text-[11px] font-medium ${o.tone}`}
+                    >
+                      {o.id ? <Trans id={o.id} message={o.label} /> : o.label}
+                    </BetCell>
+                  ))}
+                </div>
               </div>
             </div>
 
