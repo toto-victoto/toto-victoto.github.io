@@ -379,7 +379,7 @@ export default function Roulette() {
               onClick={() => history.length > 0 && setStatsOpen(true)}
               disabled={history.length === 0}
               aria-label="Show statistics"
-              className="flex w-8 flex-col items-center gap-1 transition active:scale-95 disabled:opacity-30"
+              className="flex flex-row-reverse items-center gap-1 transition active:scale-95 disabled:opacity-30"
             >
               {recent.length > 0 ? (
                 recent.map((n, i) => (

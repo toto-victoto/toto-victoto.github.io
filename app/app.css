@@ -49,3 +49,11 @@ body {
     color-scheme: dark;
   }
 }
+
+/* Reserve room for the scrollbar even when content fits the viewport. Without
+   this, sub-pixel layout shifts during the roulette spin can flip the scrollbar
+   on and off every frame, which makes the fixed-position LanguageSelector
+   jiggle horizontally. */
+html {
+  scrollbar-gutter: stable;
+}
