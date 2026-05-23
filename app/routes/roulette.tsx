@@ -426,12 +426,12 @@ export default function Roulette() {
             <div
               className={`space-y-1 transition ${spinning ? "pointer-events-none opacity-40" : ""}`}
             >
-              <div className="grid grid-cols-6 gap-1">
+              <div className="grid grid-cols-3 gap-1">
                 <BetCell
                   onPlace={() => placeBet("n:0")}
                   onRemove={() => removeBet("n:0")}
                   amount={bets["n:0"]}
-                  className={`col-span-6 py-2 ${colorClass("green")}`}
+                  className={`col-span-3 py-2 ${colorClass("green")}`}
                 >
                   0
                 </BetCell>
@@ -441,7 +441,7 @@ export default function Roulette() {
                     onPlace={() => placeBet(`n:${n}`)}
                     onRemove={() => removeBet(`n:${n}`)}
                     amount={bets[`n:${n}`]}
-                    className={`aspect-square ${colorClass(colorOf(n))}`}
+                    className={`h-9 ${colorClass(colorOf(n))}`}
                   >
                     {n}
                   </BetCell>
