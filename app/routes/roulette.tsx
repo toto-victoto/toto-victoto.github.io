@@ -127,9 +127,14 @@ export default function Roulette() {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [countdown, setCountdown] = useState(BETTING_SECONDS);
-  const [liveNum, setLiveNum] = useState<number | null>(null);
   const [history, setHistory] = useState<number[]>([]); // most recent first
   const [statsOpen, setStatsOpen] = useState(false);
+  // The live number under the pointer updates on every animation frame. We
+  // mutate the DOM directly via this ref instead of going through React state
+  // so the whole component doesn't reconcile 60 times per second during the
+  // spin — that reconciliation churn was triggering sub-pixel layout shifts
+  // that toggled the scrollbar on and off and jiggled the LanguageSelector.
+  const liveSpanRef = useRef<HTMLSpanElement>(null);
   const rotationRef = useRef(0);
   const wheelRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<Animation | null>(null);
@@ -317,27 +322,39 @@ export default function Roulette() {
   }, [spinning, countdown, gameOver, statsOpen]);
 
   // While the wheel turns, sample the animation's eased progress (cheap — no
-  // style flush) and map it to the number currently under the pointer.
+  // style flush) and write the pocket currently under the pointer directly to
+  // the span. When not spinning, sync the span to the last result (or "?")
+  // since React's render path can't see our manual mutations.
   useEffect(() => {
+    const span = liveSpanRef.current;
     if (!spinning) {
-      setLiveNum(null);
+      if (span) {
+        span.textContent = result !== null ? String(result) : "?";
+        span.className =
+          result !== null ? textClass(colorOf(result)) : "text-neutral-600";
+      }
       return;
     }
     let raf = 0;
     const tick = () => {
       const anim = animRef.current;
-      if (anim?.effect) {
+      if (anim?.effect && span) {
         const progress = anim.effect.getComputedTiming().progress ?? 1;
         const { from, to } = spinRangeRef.current;
         const angle = from + progress * (to - from);
         const norm = ((-angle % 360) + 360) % 360;
-        setLiveNum(WHEEL_ORDER[Math.round(norm / STEP) % 37]);
+        const n = WHEEL_ORDER[Math.round(norm / STEP) % 37];
+        const next = String(n);
+        if (span.textContent !== next) {
+          span.textContent = next;
+          span.className = textClass(colorOf(n));
+        }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [spinning]);
+  }, [spinning, result]);
 
   // Displayed score snaps down instantly (bets) but counts up over time (wins).
   useEffect(() => {
@@ -416,14 +433,14 @@ export default function Roulette() {
             </div>
           </section>
 
-          <section className="flex min-h-16 flex-col items-center justify-center text-center">
+          <section className="flex min-h-10 flex-col items-center justify-center text-center">
             {spinning ? (
-              <p className="text-2xl font-bold text-amber-200 motion-safe:animate-fade-in">
+              <p className="text-xl font-bold text-amber-200 motion-safe:animate-fade-in">
                 <Trans id="roulette.no_more_bets" message="No more bets" />
               </p>
             ) : gameOver ? null : (
               <div className="flex items-center justify-center gap-3">
-                <p className="text-2xl font-bold text-amber-200">
+                <p className="text-xl font-bold text-amber-200">
                   <Trans id="roulette.place_bets" message="Place your bets" />
                 </p>
                 <div
@@ -531,13 +548,16 @@ export default function Roulette() {
                   ))}
                 </div>
                 <div className="absolute left-1/2 top-1/2 z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-neutral-950 text-2xl font-bold tabular-nums ring-2 ring-neutral-700">
-                  {liveNum !== null ? (
-                    <span className={textClass(colorOf(liveNum))}>{liveNum}</span>
-                  ) : result !== null ? (
-                    <span className={textClass(colorOf(result))}>{result}</span>
-                  ) : (
-                    <span className="text-neutral-600">?</span>
-                  )}
+                  <span
+                    ref={liveSpanRef}
+                    className={
+                      result !== null
+                        ? textClass(colorOf(result))
+                        : "text-neutral-600"
+                    }
+                  >
+                    {result !== null ? result : "?"}
+                  </span>
                 </div>
               </div>
             </div>
