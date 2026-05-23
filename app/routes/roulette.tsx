@@ -72,6 +72,10 @@ function payoutOf(key: string): number {
 
 const NUMBERS = Array.from({ length: 36 }, (_, i) => i + 1);
 
+// Two-character display for the live wheel readout so swapping 1↔2 digit
+// numbers under the pointer doesn't reflow the central badge.
+const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
+
 // Physical pocket order on a European wheel (not sequential). Used to map a
 // result number to its angular position so the wheel lands under the pointer.
 const WHEEL_ORDER = [
@@ -323,13 +327,15 @@ export default function Roulette() {
 
   // While the wheel turns, sample the animation's eased progress (cheap — no
   // style flush) and write the pocket currently under the pointer directly to
-  // the span. When not spinning, sync the span to the last result (or "?")
-  // since React's render path can't see our manual mutations.
+  // the span. Zero-pad to two characters so the digit count never flips
+  // between 1 and 2 mid-spin — which is what was nudging the page height by
+  // a sub-pixel and toggling the scrollbar. When not spinning, sync the span
+  // to the last result since React's render path can't see our manual writes.
   useEffect(() => {
     const span = liveSpanRef.current;
     if (!spinning) {
       if (span) {
-        span.textContent = result !== null ? String(result) : "?";
+        span.textContent = result !== null ? pad2(result) : "??";
         span.className =
           result !== null ? textClass(colorOf(result)) : "text-neutral-600";
       }
@@ -344,7 +350,7 @@ export default function Roulette() {
         const angle = from + progress * (to - from);
         const norm = ((-angle % 360) + 360) % 360;
         const n = WHEEL_ORDER[Math.round(norm / STEP) % 37];
-        const next = String(n);
+        const next = pad2(n);
         if (span.textContent !== next) {
           span.textContent = next;
           span.className = textClass(colorOf(n));
@@ -556,7 +562,7 @@ export default function Roulette() {
                         : "text-neutral-600"
                     }
                   >
-                    {result !== null ? result : "?"}
+                    {result !== null ? pad2(result) : "??"}
                   </span>
                 </div>
               </div>
