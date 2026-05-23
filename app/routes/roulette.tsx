@@ -425,7 +425,10 @@ export default function Roulette() {
               <div className="text-xs uppercase tracking-wide text-neutral-500">
                 <Trans id="roulette.balance" message="Balance" />
               </div>
-              <div ref={scoreRef} className="text-3xl font-bold tabular-nums">
+              <div
+                ref={scoreRef}
+                className="min-w-[3ch] text-3xl font-bold tabular-nums"
+              >
                 {displayBalance}
               </div>
             </div>
@@ -433,7 +436,7 @@ export default function Roulette() {
               <div className="text-xs uppercase tracking-wide text-neutral-500">
                 <Trans id="common.best" message="Best" />
               </div>
-              <div className="text-3xl font-bold tabular-nums text-amber-400">
+              <div className="min-w-[3ch] text-3xl font-bold tabular-nums text-amber-400">
                 {best}
               </div>
             </div>
