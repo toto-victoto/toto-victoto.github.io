@@ -207,7 +207,7 @@ export default function Flappy() {
             })}
 
             <div
-              className="absolute text-5xl"
+              className="absolute text-4xl"
               style={{
                 left: `${BIRD_X}%`,
                 top: `${birdY}%`,
