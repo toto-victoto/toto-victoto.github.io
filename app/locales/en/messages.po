@@ -143,7 +143,7 @@ msgid "morpion.title"
 msgstr "Tic-Tac-Toe XTreme 🔥"
 
 msgid "morpion.rules"
-msgstr "3 pieces max — line up 3 to win"
+msgstr "Line up 4 to win"
 
 msgid "morpion.turn"
 msgstr "Turn:"
