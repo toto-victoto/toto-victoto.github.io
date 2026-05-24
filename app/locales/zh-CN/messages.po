@@ -138,3 +138,21 @@ msgstr "由 toto-victoto 发布的非商业个人网站。由 GitHub, Inc.（88 
 
 msgid "nav.home"
 msgstr "首页"
+
+msgid "morpion.title"
+msgstr "井字棋"
+
+msgid "morpion.turn"
+msgstr "轮到"
+
+msgid "morpion.wins"
+msgstr "获胜!"
+
+msgid "morpion.draw"
+msgstr "平局"
+
+msgid "morpion.draws"
+msgstr "平局数"
+
+msgid "morpion.reset_scores"
+msgstr "重置比分"

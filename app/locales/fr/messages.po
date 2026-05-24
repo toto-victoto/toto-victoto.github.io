@@ -138,3 +138,21 @@ msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par Gi
 
 msgid "nav.home"
 msgstr "Accueil"
+
+msgid "morpion.title"
+msgstr "Morpion"
+
+msgid "morpion.turn"
+msgstr "Au tour de"
+
+msgid "morpion.wins"
+msgstr "gagne !"
+
+msgid "morpion.draw"
+msgstr "Match nul"
+
+msgid "morpion.draws"
+msgstr "Nuls"
+
+msgid "morpion.reset_scores"
+msgstr "Réinitialiser"

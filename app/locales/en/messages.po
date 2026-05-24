@@ -138,3 +138,21 @@ msgstr "Personal non-commercial site published by toto-victoto. Hosted by GitHub
 
 msgid "nav.home"
 msgstr "Home"
+
+msgid "morpion.title"
+msgstr "Tic-Tac-Toe"
+
+msgid "morpion.turn"
+msgstr "Turn:"
+
+msgid "morpion.wins"
+msgstr "wins!"
+
+msgid "morpion.draw"
+msgstr "Draw"
+
+msgid "morpion.draws"
+msgstr "Draws"
+
+msgid "morpion.reset_scores"
+msgstr "Reset scores"

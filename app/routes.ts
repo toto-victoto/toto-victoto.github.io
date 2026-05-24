@@ -7,4 +7,5 @@ export default [
   route("snake", "routes/snake.tsx"),
   route("flappy", "routes/flappy.tsx"),
   route("roulette", "routes/roulette.tsx"),
+  route("morpion", "routes/morpion.tsx"),
 ] satisfies RouteConfig;
