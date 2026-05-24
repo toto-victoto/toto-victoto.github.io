@@ -142,6 +142,9 @@ msgstr "首页"
 msgid "morpion.title"
 msgstr "井字棋 XTreme 🔥"
 
+msgid "morpion.rules"
+msgstr "最多 3 个棋子 — 连成 3 个即胜"
+
 msgid "morpion.turn"
 msgstr "轮到"
 
