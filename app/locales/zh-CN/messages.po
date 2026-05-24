@@ -140,7 +140,7 @@ msgid "nav.home"
 msgstr "首页"
 
 msgid "morpion.title"
-msgstr "井字棋"
+msgstr "井字棋 XTreme 🔥"
 
 msgid "morpion.turn"
 msgstr "轮到"

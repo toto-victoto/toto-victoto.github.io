@@ -6,24 +6,46 @@ import { BackButton } from "../components/BackButton";
 type Player = "X" | "O";
 type Cell = Player | null;
 
-// Every winning triple on a 3×3 board: the three rows, three columns and
-// both diagonals. Indices are 0–8, row-major.
-const LINES: number[][] = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
+const BOARD_SIZE = 5;
+const WIN_LEN = 3; // three in a row on a 5×5 board — more space, more openings
+const CELL_COUNT = BOARD_SIZE * BOARD_SIZE;
+
+// Every straight WIN_LEN-in-a-row line that fits on the board: the rows, the
+// columns and both diagonal directions. Indices are 0–24, row-major.
+function buildLines(): number[][] {
+  const lines: number[][] = [];
+  const idx = (r: number, c: number) => r * BOARD_SIZE + c;
+  const max = BOARD_SIZE - WIN_LEN;
+  for (let r = 0; r < BOARD_SIZE; r++) {
+    for (let c = 0; c <= max; c++) {
+      lines.push(Array.from({ length: WIN_LEN }, (_, k) => idx(r, c + k)));
+    }
+  }
+  for (let c = 0; c < BOARD_SIZE; c++) {
+    for (let r = 0; r <= max; r++) {
+      lines.push(Array.from({ length: WIN_LEN }, (_, k) => idx(r + k, c)));
+    }
+  }
+  for (let r = 0; r <= max; r++) {
+    for (let c = 0; c <= max; c++) {
+      lines.push(Array.from({ length: WIN_LEN }, (_, k) => idx(r + k, c + k)));
+    }
+  }
+  for (let r = 0; r <= max; r++) {
+    for (let c = WIN_LEN - 1; c < BOARD_SIZE; c++) {
+      lines.push(Array.from({ length: WIN_LEN }, (_, k) => idx(r + k, c - k)));
+    }
+  }
+  return lines;
+}
+
+const LINES = buildLines();
 
 function checkWin(b: Cell[]): { winner: Player; line: number[] } | null {
   for (const line of LINES) {
-    const [a, c, d] = line;
-    if (b[a] && b[a] === b[c] && b[a] === b[d]) {
-      return { winner: b[a] as Player, line };
+    const first = b[line[0]];
+    if (first && line.every((i) => b[i] === first)) {
+      return { winner: first as Player, line };
     }
   }
   return null;
@@ -35,20 +57,21 @@ const colorFor = (p: Player) =>
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Morpion — toto-victoto" },
+    { title: "Morpion XTreme 🔥 — toto-victoto" },
     {
       name: "description",
-      content: "A two-player tic-tac-toe game on the same device.",
+      content: "Two-player tic-tac-toe on a 5×5 grid — line up three to win.",
     },
   ];
 }
 
 export default function Morpion() {
-  const [board, setBoard] = useState<Cell[]>(() => Array(9).fill(null));
+  const [board, setBoard] = useState<Cell[]>(() =>
+    Array(CELL_COUNT).fill(null),
+  );
   const [turn, setTurn] = useState<Player>("X");
   // Who opened the current round — flipped at every reset so the starter
-  // alternates between rounds (neither side gets the first-move advantage
-  // every time).
+  // alternates between rounds (neither side keeps the first-move advantage).
   const [startedBy, setStartedBy] = useState<Player>("X");
   const [winner, setWinner] = useState<Player | null>(null);
   const [winLine, setWinLine] = useState<number[] | null>(null);
@@ -82,7 +105,7 @@ export default function Morpion() {
     const next = other(startedBy);
     setStartedBy(next);
     setTurn(next);
-    setBoard(Array(9).fill(null));
+    setBoard(Array(CELL_COUNT).fill(null));
     setWinner(null);
     setWinLine(null);
   };
@@ -91,7 +114,7 @@ export default function Morpion() {
     setScores({ X: 0, O: 0, draws: 0 });
     setStartedBy("X");
     setTurn("X");
-    setBoard(Array(9).fill(null));
+    setBoard(Array(CELL_COUNT).fill(null));
     setWinner(null);
     setWinLine(null);
   };
@@ -102,8 +125,8 @@ export default function Morpion() {
       <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
         <div className="max-w-sm mx-auto space-y-5">
           <header className="text-center">
-            <h1 className="text-3xl font-semibold tracking-tight">
-              <Trans id="morpion.title" message="Tic-Tac-Toe" />
+            <h1 className="bg-gradient-to-r from-red-400 via-amber-300 to-red-500 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+              <Trans id="morpion.title" message="Tic-Tac-Toe XTreme 🔥" />
             </h1>
           </header>
 
@@ -156,7 +179,7 @@ export default function Morpion() {
             )}
           </section>
 
-          <section className="grid grid-cols-3 gap-2">
+          <section className="grid grid-cols-5 gap-1.5">
             {board.map((cell, i) => {
               const isWinning = winLine?.includes(i) ?? false;
               const canPlay = !cell && phase === "playing";
@@ -165,7 +188,7 @@ export default function Morpion() {
                   key={i}
                   onClick={() => play(i)}
                   disabled={!canPlay}
-                  className={`aspect-square select-none rounded-xl text-6xl font-bold transition active:scale-95 disabled:active:scale-100 ${
+                  className={`aspect-square select-none rounded-lg text-4xl font-bold transition active:scale-95 disabled:active:scale-100 ${
                     isWinning
                       ? "bg-neutral-800 ring-2 ring-emerald-500"
                       : "bg-neutral-800 hover:bg-neutral-700"

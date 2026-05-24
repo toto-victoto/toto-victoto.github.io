@@ -140,7 +140,7 @@ msgid "nav.home"
 msgstr "Accueil"
 
 msgid "morpion.title"
-msgstr "Morpion"
+msgstr "Morpion XTreme 🔥"
 
 msgid "morpion.turn"
 msgstr "Au tour de"
