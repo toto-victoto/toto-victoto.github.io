@@ -410,11 +410,11 @@ export default function Morpion() {
             )}
           </section>
 
-          {/* Board fills the remaining vertical space and stays square: the
-              wrapper flex-1 absorbs leftover height, the grid inside is
-              aspect-square so it's the largest square that fits. */}
+          {/* Board: wrapper flex absorbs the leftover height; the grid inside
+              is aspect-square (so the whole 5×5 stays a square) and each cell
+              has its own aspect-square as a belt-and-suspenders guarantee. */}
           <section className="flex min-h-0 flex-1 items-center justify-center">
-            <div className="grid aspect-square h-full max-w-full grid-cols-5 grid-rows-5 gap-1.5">
+            <div className="grid aspect-square h-full max-w-full grid-cols-5 gap-1.5">
             {board.map((cell, i) => {
               const isWinning = winLine?.includes(i) ?? false;
               const canPlay = !cell && phase === "playing" && !isAiTurn;
@@ -424,7 +424,7 @@ export default function Morpion() {
                   key={i}
                   onClick={() => play(i)}
                   disabled={!canPlay}
-                  className={`select-none rounded-lg text-4xl font-bold transition active:scale-95 disabled:active:scale-100 ${
+                  className={`aspect-square select-none rounded-lg text-4xl font-bold transition active:scale-95 disabled:active:scale-100 ${
                     isWinning
                       ? "bg-neutral-800 ring-2 ring-emerald-500"
                       : "bg-neutral-800 hover:bg-neutral-700"

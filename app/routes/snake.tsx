@@ -232,7 +232,6 @@ export default function Snake() {
                 className="grid h-full w-full rounded-2xl bg-neutral-900 p-1 gap-px"
                 style={{
                   gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
-                  gridTemplateRows: `repeat(${ROWS}, minmax(0, 1fr))`,
                 }}
                 role="grid"
                 aria-label="Snake board"
@@ -241,7 +240,9 @@ export default function Snake() {
                   const x = i % COLS;
                   const y = Math.floor(i / COLS);
                   const state = cellState.get(`${x},${y}`);
-                  let cls = "rounded-[2px]";
+                  // aspect-square per cell guarantees each tile is square
+                  // even if the grid container's aspect drifts a hair.
+                  let cls = "aspect-square rounded-[2px]";
                   if (state === "head") cls += " bg-emerald-300";
                   else if (state === "body") cls += " bg-emerald-500";
                   else if (state === "food")
