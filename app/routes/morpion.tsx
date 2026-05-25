@@ -412,8 +412,10 @@ export default function Morpion() {
 
           {/* Board: wrapper flex absorbs the leftover height; the grid inside
               is aspect-square (so the whole 5×5 stays a square) and each cell
-              has its own aspect-square as a belt-and-suspenders guarantee. */}
-          <section className="flex min-h-0 flex-1 items-center justify-center">
+              has its own aspect-square as a belt-and-suspenders guarantee.
+              Top-aligned so any leftover vertical space falls to the bottom
+              of the screen rather than padding awkwardly above the board. */}
+          <section className="flex min-h-0 flex-1 items-start justify-center">
             <div className="grid aspect-square h-full max-w-full grid-cols-5 gap-1.5">
             {board.map((cell, i) => {
               const isWinning = winLine?.includes(i) ?? false;
