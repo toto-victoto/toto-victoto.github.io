@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/morpion";
 import { BackButton } from "../components/BackButton";
+import { GameLayout } from "../components/GameLayout";
 import { loadGame, saveGame } from "../storage";
 
 type Player = "X" | "O";
@@ -321,8 +322,7 @@ export default function Morpion() {
   return (
     <>
       <BackButton />
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
-        <div className="max-w-sm mx-auto space-y-5">
+      <GameLayout>
           <header className="space-y-2 text-center">
             <h1 className="bg-gradient-to-r from-red-400 via-amber-300 to-red-500 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
               <Trans id="morpion.title" message="Tic-Tac-Toe XTreme 🔥" />
@@ -410,7 +410,11 @@ export default function Morpion() {
             )}
           </section>
 
-          <section className="grid grid-cols-5 gap-1.5">
+          {/* Board fills the remaining vertical space and stays square: the
+              wrapper flex-1 absorbs leftover height, the grid inside is
+              aspect-square so it's the largest square that fits. */}
+          <section className="flex min-h-0 flex-1 items-center justify-center">
+            <div className="grid aspect-square h-full max-w-full grid-cols-5 grid-rows-5 gap-1.5">
             {board.map((cell, i) => {
               const isWinning = winLine?.includes(i) ?? false;
               const canPlay = !cell && phase === "playing" && !isAiTurn;
@@ -420,7 +424,7 @@ export default function Morpion() {
                   key={i}
                   onClick={() => play(i)}
                   disabled={!canPlay}
-                  className={`aspect-square select-none rounded-lg text-4xl font-bold transition active:scale-95 disabled:active:scale-100 ${
+                  className={`select-none rounded-lg text-4xl font-bold transition active:scale-95 disabled:active:scale-100 ${
                     isWinning
                       ? "bg-neutral-800 ring-2 ring-emerald-500"
                       : "bg-neutral-800 hover:bg-neutral-700"
@@ -438,6 +442,7 @@ export default function Morpion() {
                 </button>
               );
             })}
+            </div>
           </section>
 
           {phase !== "playing" && (
@@ -454,11 +459,10 @@ export default function Morpion() {
               onClick={resetAll}
               className="text-sm text-neutral-500 hover:text-neutral-300 transition"
             >
-              <Trans id="morpion.reset_scores" message="Reset scores" />
+              <Trans id="common.reset" message="Reset" />
             </button>
           </div>
-        </div>
-      </main>
+      </GameLayout>
     </>
   );
 }

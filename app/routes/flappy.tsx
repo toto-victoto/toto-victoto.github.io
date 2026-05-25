@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/flappy";
 import { BackButton } from "../components/BackButton";
+import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
 
 // All positions are expressed in % of the playfield, so the game is
@@ -169,18 +170,20 @@ export default function Flappy() {
   return (
     <>
       <BackButton />
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
-        <div className="max-w-sm mx-auto space-y-6">
+      <GameLayout>
           <header className="text-center">
             <h1 className="text-3xl font-semibold tracking-tight">
               <Trans id="flappy.title" message="Flappy" />
             </h1>
           </header>
 
-          <div
-            onPointerDown={flap}
-            className="relative w-full aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-b from-sky-400 to-sky-200 select-none touch-none cursor-pointer"
-          >
+          {/* Playfield keeps its 3:4 portrait ratio and fits the largest box
+              that fits both the remaining height and the column width. */}
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <div
+              onPointerDown={flap}
+              className="relative aspect-[3/4] h-full max-h-full w-auto max-w-full overflow-hidden rounded-2xl bg-gradient-to-b from-sky-400 to-sky-200 select-none touch-none cursor-pointer"
+            >
             {pipes.map((p) => {
               const gapTop = p.gapY - p.gap / 2;
               const gapBottom = p.gapY + p.gap / 2;
@@ -261,9 +264,9 @@ export default function Flappy() {
                 </div>
               </div>
             )}
+            </div>
           </div>
-        </div>
-      </main>
+      </GameLayout>
     </>
   );
 }

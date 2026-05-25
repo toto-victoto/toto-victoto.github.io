@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/snake";
 import { BackButton } from "../components/BackButton";
+import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
 
 const COLS = 15;
@@ -196,8 +197,7 @@ export default function Snake() {
   return (
     <>
       <BackButton />
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
-        <div className="max-w-md mx-auto space-y-8">
+      <GameLayout>
           <header className="text-center">
             <h1 className="text-3xl font-semibold tracking-tight">
               <Trans id="snake.title" message="Snake" />
@@ -222,33 +222,37 @@ export default function Snake() {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="relative touch-none select-none"
+            className="flex min-h-0 flex-1 items-center justify-center touch-none select-none"
           >
-            <div
-              className="grid w-full aspect-square rounded-2xl bg-neutral-900 p-1 gap-px"
-              style={{
-                gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
-                gridTemplateRows: `repeat(${ROWS}, minmax(0, 1fr))`,
-              }}
-              role="grid"
-              aria-label="Snake board"
-            >
-              {Array.from({ length: ROWS * COLS }).map((_, i) => {
-                const x = i % COLS;
-                const y = Math.floor(i / COLS);
-                const state = cellState.get(`${x},${y}`);
-                let cls = "rounded-[2px]";
-                if (state === "head") cls += " bg-emerald-300";
-                else if (state === "body") cls += " bg-emerald-500";
-                else if (state === "food")
-                  cls += " bg-rose-400 motion-safe:animate-snake-food";
-                else cls += " bg-neutral-950/40";
-                return <div key={i} className={cls} />;
-              })}
-            </div>
+            {/* Square that fits the remaining area. The overlay sits inside
+                this wrapper so the dark game-over panel only covers the board
+                itself, never the surrounding gutter. */}
+            <div className="relative aspect-square h-full max-h-full max-w-full">
+              <div
+                className="grid h-full w-full rounded-2xl bg-neutral-900 p-1 gap-px"
+                style={{
+                  gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
+                  gridTemplateRows: `repeat(${ROWS}, minmax(0, 1fr))`,
+                }}
+                role="grid"
+                aria-label="Snake board"
+              >
+                {Array.from({ length: ROWS * COLS }).map((_, i) => {
+                  const x = i % COLS;
+                  const y = Math.floor(i / COLS);
+                  const state = cellState.get(`${x},${y}`);
+                  let cls = "rounded-[2px]";
+                  if (state === "head") cls += " bg-emerald-300";
+                  else if (state === "body") cls += " bg-emerald-500";
+                  else if (state === "food")
+                    cls += " bg-rose-400 motion-safe:animate-snake-food";
+                  else cls += " bg-neutral-950/40";
+                  return <div key={i} className={cls} />;
+                })}
+              </div>
 
-            {phase !== "playing" && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-neutral-950/70 backdrop-blur-[2px]">
+              {phase !== "playing" && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-neutral-950/70 backdrop-blur-[2px]">
                 <div className="text-center space-y-3 px-6">
                   {phase === "idle" ? (
                     <p className="text-neutral-200">
@@ -272,7 +276,8 @@ export default function Snake() {
                   )}
                 </div>
               </div>
-            )}
+              )}
+            </div>
           </section>
 
           <p className="text-center text-xs text-neutral-500">
@@ -281,8 +286,7 @@ export default function Snake() {
               message="Swipe on the board · arrow keys or WASD on desktop"
             />
           </p>
-        </div>
-      </main>
+      </GameLayout>
     </>
   );
 }

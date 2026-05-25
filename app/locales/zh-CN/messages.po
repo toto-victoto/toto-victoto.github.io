@@ -13,6 +13,9 @@ msgstr "最高"
 msgid "common.play_again"
 msgstr "再玩一次"
 
+msgid "common.reset"
+msgstr "重置"
+
 msgid "home.title"
 msgstr "toto-victoto"
 
@@ -42,9 +45,6 @@ msgstr "你"
 
 msgid "rps.score.cpu"
 msgstr "电脑"
-
-msgid "rps.reset"
-msgstr "重置"
 
 msgid "snake.title"
 msgstr "贪吃蛇"
@@ -121,9 +121,6 @@ msgstr "热门"
 msgid "roulette.cold"
 msgstr "冷门"
 
-msgid "roulette.reset"
-msgstr "重置"
-
 msgid "about.title"
 msgstr "关于"
 
@@ -159,9 +156,6 @@ msgstr "平局"
 
 msgid "morpion.draws"
 msgstr "平局数"
-
-msgid "morpion.reset_scores"
-msgstr "重置比分"
 
 msgid "morpion.mode.2p"
 msgstr "双人"

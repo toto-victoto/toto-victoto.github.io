@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
+import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
 
 type Move = "rock" | "paper" | "scissors";
@@ -100,8 +101,7 @@ export default function RPS() {
   return (
     <>
       <BackButton />
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
-        <div className="max-w-md mx-auto space-y-10">
+      <GameLayout>
           <header className="text-center">
             <h1 className="text-3xl font-semibold tracking-tight">
               <Trans id="rps.title" message="Rock Paper Scissors" />
@@ -166,12 +166,11 @@ export default function RPS() {
                 disabled={isCounting}
                 className="text-sm text-sky-400 hover:underline disabled:opacity-50"
               >
-                <Trans id="rps.reset" message="Reset" />
+                <Trans id="common.reset" message="Reset" />
               </button>
             </div>
           )}
-        </div>
-      </main>
+      </GameLayout>
     </>
   );
 }

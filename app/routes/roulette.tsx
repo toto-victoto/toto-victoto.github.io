@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/roulette";
 import { BackButton } from "../components/BackButton";
+import { GameLayout } from "../components/GameLayout";
 import { loadGame, saveGame } from "../storage";
 
 const START_BALANCE = 100;
@@ -415,8 +416,7 @@ export default function Roulette() {
   return (
     <>
       <BackButton />
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-20 pb-4">
-        <div className="max-w-sm mx-auto space-y-2">
+      <GameLayout>
           <header className="text-center">
             <h1 className="text-3xl font-semibold tracking-tight">
               <Trans id="roulette.title" message="Roulette" />
@@ -492,20 +492,20 @@ export default function Roulette() {
             )}
           </section>
 
-          <section ref={boardRef} className="relative">
+          <section ref={boardRef} className="relative flex min-h-0 flex-1 flex-col">
             <div
-              className={`space-y-1 transition ${spinning ? "pointer-events-none opacity-40" : ""}`}
+              className={`flex min-h-0 flex-1 flex-col gap-1 transition ${spinning ? "pointer-events-none opacity-40" : ""}`}
             >
               <BetCell
                 onPlace={() => placeBet("n:0")}
                 onRemove={() => removeBet("n:0")}
                 amount={bets["n:0"]}
-                className={`w-full py-1.5 ${colorClass("green")}`}
+                className={`shrink-0 w-full py-1.5 ${colorClass("green")}`}
               >
                 0
               </BetCell>
 
-              <div className="flex gap-1">
+              <div className="flex min-h-0 flex-1 gap-1">
                 {/* Left strip: dozens — each cell stretches over 4 number rows. */}
                 <div className="flex flex-1 flex-col gap-1">
                   {DOZENS.map((d) => (
@@ -521,15 +521,17 @@ export default function Roulette() {
                   ))}
                 </div>
 
-                {/* Center: numbers 1–36, rotated-classic 3-column pattern. */}
-                <div className="grid flex-[3] grid-cols-3 gap-1">
+                {/* Center: numbers 1–36, rotated-classic 3-column pattern.
+                    grid-rows-12 splits the available height into 12 equal
+                    tracks so cells stretch with the viewport. */}
+                <div className="grid flex-[3] grid-cols-3 grid-rows-12 gap-1">
                   {NUMBERS.map((n) => (
                     <BetCell
                       key={n}
                       onPlace={() => placeBet(`n:${n}`)}
                       onRemove={() => removeBet(`n:${n}`)}
                       amount={bets[`n:${n}`]}
-                      className={`h-8 ${colorClass(colorOf(n))}`}
+                      className={colorClass(colorOf(n))}
                     >
                       {n}
                     </BetCell>
@@ -561,7 +563,7 @@ export default function Roulette() {
               }`}
             >
               <div className="absolute inset-0 bg-neutral-950/80" />
-              <div className="relative aspect-square w-[92%] max-w-sm">
+              <div className="relative aspect-square w-[92%] max-h-[92%] max-w-sm">
                 <div className="absolute left-1/2 top-0 z-20 h-0 w-0 -translate-x-1/2 border-x-8 border-t-[14px] border-x-transparent border-t-amber-300" />
                 <div
                   ref={wheelRef}
@@ -662,11 +664,10 @@ export default function Roulette() {
               onClick={replay}
               className="text-sm text-neutral-500 transition hover:text-neutral-300"
             >
-              <Trans id="roulette.reset" message="Reset" />
+              <Trans id="common.reset" message="Reset" />
             </button>
           </div>
-        </div>
-      </main>
+      </GameLayout>
       {statsOpen && (
         <StatsOverlay
           history={history}

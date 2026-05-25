@@ -13,6 +13,9 @@ msgstr "Best"
 msgid "common.play_again"
 msgstr "Play again"
 
+msgid "common.reset"
+msgstr "Reset"
+
 msgid "home.title"
 msgstr "toto-victoto"
 
@@ -42,9 +45,6 @@ msgstr "You"
 
 msgid "rps.score.cpu"
 msgstr "CPU"
-
-msgid "rps.reset"
-msgstr "Reset"
 
 msgid "snake.title"
 msgstr "Snake"
@@ -121,9 +121,6 @@ msgstr "Hot"
 msgid "roulette.cold"
 msgstr "Cold"
 
-msgid "roulette.reset"
-msgstr "Reset"
-
 msgid "about.title"
 msgstr "About"
 
@@ -159,9 +156,6 @@ msgstr "Draw"
 
 msgid "morpion.draws"
 msgstr "Draws"
-
-msgid "morpion.reset_scores"
-msgstr "Reset scores"
 
 msgid "morpion.mode.2p"
 msgstr "2 Players"
