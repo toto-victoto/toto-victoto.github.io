@@ -162,3 +162,12 @@ msgstr "2 joueurs"
 
 msgid "morpion.mode.ai"
 msgstr "vs Ordi"
+
+msgid "colorswitch.title"
+msgstr "Color Switch"
+
+msgid "colorswitch.start"
+msgstr "Tapez pour rebondir — touchez la bonne couleur"
+
+msgid "colorswitch.gameover"
+msgstr "Perdu !"

@@ -162,3 +162,12 @@ msgstr "双人"
 
 msgid "morpion.mode.ai"
 msgstr "对战电脑"
+
+msgid "colorswitch.title"
+msgstr "颜色切换"
+
+msgid "colorswitch.start"
+msgstr "点击弹跳 — 匹配颜色"
+
+msgid "colorswitch.gameover"
+msgstr "游戏结束"

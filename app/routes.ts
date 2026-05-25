@@ -8,4 +8,5 @@ export default [
   route("flappy", "routes/flappy.tsx"),
   route("roulette", "routes/roulette.tsx"),
   route("morpion", "routes/morpion.tsx"),
+  route("colorswitch", "routes/colorswitch.tsx"),
 ] satisfies RouteConfig;

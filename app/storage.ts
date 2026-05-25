@@ -16,6 +16,7 @@ type Player = "X" | "O";
 export type Persisted = {
   snake: { best: number };
   flappy: { best: number };
+  colorswitch: { best: number };
   rps: { player: number; cpu: number };
   roulette: { best: number; balance: number; history: number[] };
   morpion: {

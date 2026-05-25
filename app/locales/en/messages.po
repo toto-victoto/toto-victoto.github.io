@@ -162,3 +162,12 @@ msgstr "2 Players"
 
 msgid "morpion.mode.ai"
 msgstr "vs CPU"
+
+msgid "colorswitch.title"
+msgstr "Color Switch"
+
+msgid "colorswitch.start"
+msgstr "Tap to bounce — match the color"
+
+msgid "colorswitch.gameover"
+msgstr "Game over"
