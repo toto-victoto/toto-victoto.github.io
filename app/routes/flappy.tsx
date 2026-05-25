@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/flappy";
 import { BackButton } from "../components/BackButton";
+import { useStoredGame } from "../storage";
 
 // All positions are expressed in % of the playfield, so the game is
 // resolution-independent and scales with the responsive container.
@@ -52,7 +53,7 @@ export default function Flappy() {
   const [birdY, setBirdY] = useState(START_Y);
   const [pipes, setPipes] = useState<Pipe[]>([]);
   const [score, setScore] = useState(0);
-  const [best, setBest] = useState(0);
+  const [{ best }, setBestState] = useStoredGame("flappy", { best: 0 });
   const [phase, setPhase] = useState<Phase>("idle");
   const [rotation, setRotation] = useState(0);
 
@@ -161,8 +162,9 @@ export default function Flappy() {
 
   // Track the best score of the session.
   useEffect(() => {
-    if (phase === "gameover") setBest((b) => Math.max(b, score));
-  }, [phase, score]);
+    if (phase === "gameover")
+      setBestState((s) => ({ best: Math.max(s.best, score) }));
+  }, [phase, score, setBestState]);
 
   return (
     <>

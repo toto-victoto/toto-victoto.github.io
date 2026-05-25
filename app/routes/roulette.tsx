@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/roulette";
 import { BackButton } from "../components/BackButton";
+import { loadGame, saveGame } from "../storage";
 
 const START_BALANCE = 100;
 const STAKES = [1, 5, 10, 25];
@@ -148,10 +149,36 @@ export default function Roulette() {
   const boardRef = useRef<HTMLDivElement>(null);
   const fxRef = useRef<HTMLDivElement>(null);
   const wageredRef = useRef<HTMLSpanElement>(null);
+  const [hydrated, setHydrated] = useState(false);
   displayRef.current = displayBalance;
 
   const wagered = Object.values(bets).reduce((sum, n) => sum + n, 0);
   const gameOver = balance === 0 && wagered === 0;
+
+  // Hydrate from localStorage on mount. Setting displayBalance + displayRef
+  // alongside balance avoids the count-up animation triggering for the
+  // initial jump from default to restored value.
+  useEffect(() => {
+    const saved = loadGame("roulette", {
+      best: START_BALANCE,
+      balance: START_BALANCE,
+      history: [],
+    });
+    setBalance(saved.balance);
+    setDisplayBalance(saved.balance);
+    displayRef.current = saved.balance;
+    setBest(saved.best);
+    setHistory(saved.history);
+    setHydrated(true);
+  }, []);
+
+  // Persist effective balance (chips owned, including any currently wagered),
+  // best, and history. Refunding the wager into the saved balance means a
+  // mid-bet refresh simply puts the chips back in the player's pocket.
+  useEffect(() => {
+    if (!hydrated) return;
+    saveGame("roulette", { best, balance: balance + wagered, history });
+  }, [hydrated, balance, wagered, best, history]);
 
   const replay = () => {
     setBalance(START_BALANCE);

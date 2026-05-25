@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
+import { useStoredGame } from "../storage";
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
@@ -57,7 +58,7 @@ type Phase =
 
 export default function RPS() {
   const [phase, setPhase] = useState<Phase>({ type: "idle" });
-  const [score, setScore] = useState({ player: 0, cpu: 0 });
+  const [score, setScore] = useStoredGame("rps", { player: 0, cpu: 0 });
 
   useEffect(() => {
     if (phase.type !== "counting") return;

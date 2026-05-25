@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/snake";
 import { BackButton } from "../components/BackButton";
+import { useStoredGame } from "../storage";
 
 const COLS = 15;
 const ROWS = 15;
@@ -82,7 +83,7 @@ export default function Snake() {
   const [food, setFood] = useState<Cell>(() => randomFood(makeInitialSnake()));
   const [phase, setPhase] = useState<Phase>("idle");
   const [score, setScore] = useState(0);
-  const [best, setBest] = useState(0);
+  const [{ best }, setBestState] = useStoredGame("snake", { best: 0 });
 
   const dirRef = useRef<Dir>("right");
   const dirQueueRef = useRef<Dir[]>([]);
@@ -156,8 +157,9 @@ export default function Snake() {
   }, [phase]);
 
   useEffect(() => {
-    if (phase === "gameover") setBest((b) => Math.max(b, score));
-  }, [phase, score]);
+    if (phase === "gameover")
+      setBestState((s) => ({ best: Math.max(s.best, score) }));
+  }, [phase, score, setBestState]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];

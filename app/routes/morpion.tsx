@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/morpion";
 import { BackButton } from "../components/BackButton";
+import { loadGame, saveGame } from "../storage";
 
 type Player = "X" | "O";
 type Cell = Player | null;
@@ -169,6 +170,60 @@ export default function Morpion() {
   const [winLine, setWinLine] = useState<number[] | null>(null);
   const [scores, setScores] = useState({ X: 0, O: 0, draws: 0 });
   const [mode, setMode] = useState<Mode>("2p");
+  const [hydrated, setHydrated] = useState(false);
+
+  // Hydrate from localStorage on mount. The board is derived from placements
+  // rather than persisted separately — single source of truth, smaller blob.
+  useEffect(() => {
+    const saved = loadGame("morpion", {
+      mode: "2p" as Mode,
+      scores: { X: 0, O: 0, draws: 0 },
+      placements: [] as Placement[],
+      turn: "X" as Player,
+      startedBy: "X" as Player,
+      turnCount: 0,
+      winner: null as Player | null,
+      winLine: null as number[] | null,
+    });
+    setMode(saved.mode);
+    setScores(saved.scores);
+    setPlacements(saved.placements);
+    setTurn(saved.turn);
+    setStartedBy(saved.startedBy);
+    setTurnCount(saved.turnCount);
+    setWinner(saved.winner);
+    setWinLine(saved.winLine);
+    const restored: Cell[] = Array(CELL_COUNT).fill(null);
+    for (const p of saved.placements) restored[p.index] = p.player;
+    setBoard(restored);
+    setHydrated(true);
+  }, []);
+
+  // Save the whole in-progress round plus cumulative scores and mode on any
+  // change. Cheap because the blob is small.
+  useEffect(() => {
+    if (!hydrated) return;
+    saveGame("morpion", {
+      mode,
+      scores,
+      placements,
+      turn,
+      startedBy,
+      turnCount,
+      winner,
+      winLine,
+    });
+  }, [
+    hydrated,
+    mode,
+    scores,
+    placements,
+    turn,
+    startedBy,
+    turnCount,
+    winner,
+    winLine,
+  ]);
 
   const isDraw = !winner && turnCount >= MAX_TURNS;
   const phase: "playing" | "win" | "draw" = winner
