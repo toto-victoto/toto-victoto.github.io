@@ -159,3 +159,9 @@ msgstr "Draws"
 
 msgid "morpion.reset_scores"
 msgstr "Reset scores"
+
+msgid "morpion.mode.2p"
+msgstr "2 Players"
+
+msgid "morpion.mode.ai"
+msgstr "vs CPU"

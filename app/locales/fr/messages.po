@@ -159,3 +159,9 @@ msgstr "Nuls"
 
 msgid "morpion.reset_scores"
 msgstr "Réinitialiser"
+
+msgid "morpion.mode.2p"
+msgstr "2 joueurs"
+
+msgid "morpion.mode.ai"
+msgstr "vs Ordi"

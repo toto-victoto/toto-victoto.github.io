@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/morpion";
 import { BackButton } from "../components/BackButton";
@@ -6,21 +6,15 @@ import { BackButton } from "../components/BackButton";
 type Player = "X" | "O";
 type Cell = Player | null;
 type Placement = { player: Player; index: number };
+type Mode = "2p" | "ai";
 
 const BOARD_SIZE = 5;
-// Four in a row on a 5×5 board — the attacker needs an open-three before
-// completing four, which takes long enough to set up that the defender has
-// real chances to block.
 const WIN_LEN = 4;
-// Each side may hold this many pieces on the board at once. Once at the cap,
-// placing a new piece rolls out the player's chronologically oldest one
-// (FIFO), so the late game shifts as defenders rotate out.
 const PIECES_PER_PLAYER = 8;
-// Safety cap. Once both sides are at the piece limit, the board can never
-// fill up, so without this the game could loop indefinitely. After this many
-// total placements without a winner we declare a draw.
 const MAX_TURNS = 50;
 const CELL_COUNT = BOARD_SIZE * BOARD_SIZE;
+const AI_DELAY_MS = 500;
+const AI_PLAYER: Player = "O";
 
 // Every straight WIN_LEN-in-a-row line that fits on the board: rows, columns,
 // and both diagonal directions. Indices are 0–24, row-major.
@@ -67,13 +61,98 @@ const other = (p: Player): Player => (p === "X" ? "O" : "X");
 const colorFor = (p: Player) =>
   p === "X" ? "text-sky-400" : "text-amber-400";
 
+// Apply a placement the same way play() does, including the FIFO eviction
+// when the acting player is already at the piece cap. Used by the AI to
+// look one move ahead.
+function simulatePlay(
+  board: Cell[],
+  placements: Placement[],
+  player: Player,
+  index: number,
+): { board: Cell[]; placements: Placement[] } {
+  const nextBoard = [...board];
+  const nextPlacements = [...placements];
+  const owned = nextPlacements.filter((p) => p.player === player);
+  if (owned.length >= PIECES_PER_PLAYER) {
+    const oldest = owned[0];
+    nextBoard[oldest.index] = null;
+    const removeAt = nextPlacements.findIndex(
+      (p) => p.player === oldest.player && p.index === oldest.index,
+    );
+    nextPlacements.splice(removeAt, 1);
+  }
+  nextBoard[index] = player;
+  nextPlacements.push({ player, index });
+  return { board: nextBoard, placements: nextPlacements };
+}
+
+// Heuristic value of every line passing through `cell`, scored from `player`'s
+// perspective. Lines already contested by both sides are dead and ignored.
+// Extending an own line is weighted slightly higher than blocking an opponent
+// line of the same length, so the AI leans offensive at equal opportunity.
+function scoreCell(board: Cell[], cell: number, player: Player): number {
+  const lineValue = [0, 1, 10, 100]; // 0/1/2/3 same-colour pieces in a 4-cell line
+  const opponent = other(player);
+  let score = 0;
+  for (const line of LINES) {
+    if (!line.includes(cell)) continue;
+    let mine = 0;
+    let opp = 0;
+    for (const j of line) {
+      if (j === cell) continue;
+      if (board[j] === player) mine++;
+      else if (board[j] === opponent) opp++;
+    }
+    if (opp === 0) score += lineValue[mine + 1] ?? 1000;
+    if (mine === 0) score += (lineValue[opp] ?? 1000) * 0.7;
+  }
+  // Slight centrality bias — break ties toward the middle of the board.
+  const row = Math.floor(cell / BOARD_SIZE);
+  const col = cell % BOARD_SIZE;
+  score -= (Math.abs(row - 2) + Math.abs(col - 2)) * 0.5;
+  return score;
+}
+
+function chooseAIMove(
+  board: Cell[],
+  placements: Placement[],
+  player: Player,
+): number {
+  const empty: number[] = [];
+  for (let i = 0; i < CELL_COUNT; i++) if (!board[i]) empty.push(i);
+  if (empty.length === 0) return -1;
+  const opponent = other(player);
+
+  // Win immediately if there's a winning placement.
+  for (const i of empty) {
+    const sim = simulatePlay(board, placements, player, i);
+    if (checkWin(sim.board)?.winner === player) return i;
+  }
+  // Otherwise block any immediate threat from the opponent.
+  for (const i of empty) {
+    const sim = simulatePlay(board, placements, opponent, i);
+    if (checkWin(sim.board)?.winner === opponent) return i;
+  }
+  // Fall back to the line-based heuristic.
+  let bestI = empty[0];
+  let bestScore = -Infinity;
+  for (const i of empty) {
+    const s = scoreCell(board, i, player);
+    if (s > bestScore) {
+      bestScore = s;
+      bestI = i;
+    }
+  }
+  return bestI;
+}
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Morpion XTreme 🔥 — toto-victoto" },
     {
       name: "description",
       content:
-        "Two-player tic-tac-toe on a 5×5 grid with rolling pieces — 8 pieces max per side, line up four to win.",
+        "Two-player tic-tac-toe on a 5×5 grid with rolling pieces — 8 pieces max per side, line up four to win. Play locally or against the CPU.",
     },
   ];
 }
@@ -83,18 +162,13 @@ export default function Morpion() {
     Array(CELL_COUNT).fill(null),
   );
   const [turn, setTurn] = useState<Player>("X");
-  // Who opened the current round — flipped at every reset so the starter
-  // alternates between rounds (neither side keeps the first-move advantage).
   const [startedBy, setStartedBy] = useState<Player>("X");
-  // Chronological list of every piece still on the board. Each player's
-  // oldest entry is what rolls out when they place their next piece.
   const [placements, setPlacements] = useState<Placement[]>([]);
-  // Total placements ever in this round. Needed for the draw cap because
-  // `placements.length` plateaus once both sides hit the piece limit.
   const [turnCount, setTurnCount] = useState(0);
   const [winner, setWinner] = useState<Player | null>(null);
   const [winLine, setWinLine] = useState<number[] | null>(null);
   const [scores, setScores] = useState({ X: 0, O: 0, draws: 0 });
+  const [mode, setMode] = useState<Mode>("2p");
 
   const isDraw = !winner && turnCount >= MAX_TURNS;
   const phase: "playing" | "win" | "draw" = winner
@@ -103,8 +177,6 @@ export default function Morpion() {
       ? "draw"
       : "playing";
 
-  // Each player's oldest piece, but only revealed once they're already at the
-  // cap — that's the one the board will eat next time they place.
   const xOldest =
     placements.filter((p) => p.player === "X").length >= PIECES_PER_PLAYER
       ? (placements.find((p) => p.player === "X")?.index ?? null)
@@ -114,6 +186,8 @@ export default function Morpion() {
       ? (placements.find((p) => p.player === "O")?.index ?? null)
       : null;
 
+  const isAiTurn = mode === "ai" && turn === AI_PLAYER && phase === "playing";
+
   const play = (i: number) => {
     if (phase !== "playing" || board[i]) return;
     const nextBoard = [...board];
@@ -121,7 +195,6 @@ export default function Morpion() {
 
     const owned = nextPlacements.filter((p) => p.player === turn);
     if (owned.length >= PIECES_PER_PLAYER) {
-      // Drop this player's chronologically first piece off the board.
       const oldest = owned[0];
       nextBoard[oldest.index] = null;
       const removeAt = nextPlacements.findIndex(
@@ -150,10 +223,24 @@ export default function Morpion() {
     }
   };
 
-  const nextRound = () => {
-    const next = other(startedBy);
-    setStartedBy(next);
-    setTurn(next);
+  // Let the AI take its turn after a short delay so the move doesn't feel
+  // instantaneous. The cleanup cancels the timer if anything relevant changes
+  // (mode toggled, round reset, game ended) before the AI got to play.
+  useEffect(() => {
+    if (!isAiTurn) return;
+    const id = window.setTimeout(() => {
+      const move = chooseAIMove(board, placements, AI_PLAYER);
+      if (move >= 0) play(move);
+    }, AI_DELAY_MS);
+    return () => clearTimeout(id);
+    // play() depends on the latest closure, so re-run whenever board state
+    // changes — board/placements are already in the deps via isAiTurn's data.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAiTurn, board, placements]);
+
+  const startNewRound = (starter: Player) => {
+    setStartedBy(starter);
+    setTurn(starter);
     setBoard(Array(CELL_COUNT).fill(null));
     setPlacements([]);
     setTurnCount(0);
@@ -161,15 +248,19 @@ export default function Morpion() {
     setWinLine(null);
   };
 
+  const nextRound = () => startNewRound(other(startedBy));
+
   const resetAll = () => {
     setScores({ X: 0, O: 0, draws: 0 });
-    setStartedBy("X");
-    setTurn("X");
-    setBoard(Array(CELL_COUNT).fill(null));
-    setPlacements([]);
-    setTurnCount(0);
-    setWinner(null);
-    setWinLine(null);
+    startNewRound("X");
+  };
+
+  // Switching mode wipes the current round (mixing a half-played human round
+  // into the AI mid-game would be confusing) but keeps the running score.
+  const switchMode = (m: Mode) => {
+    if (m === mode) return;
+    setMode(m);
+    startNewRound("X");
   };
 
   return (
@@ -177,16 +268,38 @@ export default function Morpion() {
       <BackButton />
       <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
         <div className="max-w-sm mx-auto space-y-5">
-          <header className="text-center">
+          <header className="space-y-2 text-center">
             <h1 className="bg-gradient-to-r from-red-400 via-amber-300 to-red-500 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
               <Trans id="morpion.title" message="Tic-Tac-Toe XTreme 🔥" />
             </h1>
-            <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
+            <p className="text-xs uppercase tracking-wider text-neutral-500">
               <Trans
                 id="morpion.rules"
                 message="8 pieces max — line up 4 to win"
               />
             </p>
+            <div className="inline-flex rounded-full bg-neutral-900 p-1 text-xs font-medium ring-1 ring-neutral-800">
+              <button
+                onClick={() => switchMode("2p")}
+                className={`rounded-full px-3 py-1.5 transition ${
+                  mode === "2p"
+                    ? "bg-neutral-700 text-white"
+                    : "text-neutral-400 hover:text-neutral-200"
+                }`}
+              >
+                <Trans id="morpion.mode.2p" message="2 Players" />
+              </button>
+              <button
+                onClick={() => switchMode("ai")}
+                className={`rounded-full px-3 py-1.5 transition ${
+                  mode === "ai"
+                    ? "bg-neutral-700 text-white"
+                    : "text-neutral-400 hover:text-neutral-200"
+                }`}
+              >
+                <Trans id="morpion.mode.ai" message="vs CPU" />
+              </button>
+            </div>
           </header>
 
           <section className="flex items-end justify-center gap-8 text-center">
@@ -233,7 +346,11 @@ export default function Morpion() {
             ) : (
               <p className="text-xl font-bold">
                 <Trans id="morpion.turn" message="Turn:" />{" "}
-                <span className={colorFor(turn)}>{turn}</span>
+                <span
+                  className={`${colorFor(turn)} ${isAiTurn ? "motion-safe:animate-pulse" : ""}`}
+                >
+                  {turn}
+                </span>
               </p>
             )}
           </section>
@@ -241,7 +358,7 @@ export default function Morpion() {
           <section className="grid grid-cols-5 gap-1.5">
             {board.map((cell, i) => {
               const isWinning = winLine?.includes(i) ?? false;
-              const canPlay = !cell && phase === "playing";
+              const canPlay = !cell && phase === "playing" && !isAiTurn;
               const willFade = i === xOldest || i === oOldest;
               return (
                 <button
