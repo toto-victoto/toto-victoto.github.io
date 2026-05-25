@@ -121,6 +121,9 @@ msgstr "Hot"
 msgid "roulette.cold"
 msgstr "Cold"
 
+msgid "roulette.reset"
+msgstr "Reset"
+
 msgid "about.title"
 msgstr "About"
 

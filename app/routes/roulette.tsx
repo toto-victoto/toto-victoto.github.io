@@ -415,8 +415,8 @@ export default function Roulette() {
   return (
     <>
       <BackButton />
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
-        <div className="max-w-sm mx-auto space-y-4">
+      <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-20 pb-4">
+        <div className="max-w-sm mx-auto space-y-2">
           <header className="text-center">
             <h1 className="text-3xl font-semibold tracking-tight">
               <Trans id="roulette.title" message="Roulette" />
@@ -469,7 +469,7 @@ export default function Roulette() {
             </div>
           </section>
 
-          <section className="flex min-h-10 flex-col items-center justify-center text-center">
+          <section className="flex min-h-8 flex-col items-center justify-center text-center">
             {spinning ? (
               <p className="text-xl font-bold text-amber-200 motion-safe:animate-fade-in">
                 <Trans id="roulette.no_more_bets" message="No more bets" />
@@ -500,7 +500,7 @@ export default function Roulette() {
                 onPlace={() => placeBet("n:0")}
                 onRemove={() => removeBet("n:0")}
                 amount={bets["n:0"]}
-                className={`w-full py-2 ${colorClass("green")}`}
+                className={`w-full py-1.5 ${colorClass("green")}`}
               >
                 0
               </BetCell>
@@ -529,7 +529,7 @@ export default function Roulette() {
                       onPlace={() => placeBet(`n:${n}`)}
                       onRemove={() => removeBet(`n:${n}`)}
                       amount={bets[`n:${n}`]}
-                      className={`h-9 ${colorClass(colorOf(n))}`}
+                      className={`h-8 ${colorClass(colorOf(n))}`}
                     >
                       {n}
                     </BetCell>
@@ -612,7 +612,7 @@ export default function Roulette() {
                         key={s}
                         onClick={() => setStake(s)}
                         disabled={spinning}
-                        className={`h-9 w-9 rounded-full text-sm font-bold tabular-nums ring-2 transition disabled:opacity-50 ${
+                        className={`h-8 w-8 rounded-full text-sm font-bold tabular-nums ring-2 transition disabled:opacity-50 ${
                           stake === s
                             ? "bg-amber-400 text-neutral-900 ring-amber-200"
                             : "bg-neutral-800 text-neutral-200 ring-transparent hover:bg-neutral-700"
@@ -656,6 +656,15 @@ export default function Roulette() {
               </div>
             )}
           </section>
+
+          <div className="text-center">
+            <button
+              onClick={replay}
+              className="text-sm text-neutral-500 transition hover:text-neutral-300"
+            >
+              <Trans id="roulette.reset" message="Reset" />
+            </button>
+          </div>
         </div>
       </main>
       {statsOpen && (

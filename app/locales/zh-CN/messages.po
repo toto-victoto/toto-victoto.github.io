@@ -121,6 +121,9 @@ msgstr "热门"
 msgid "roulette.cold"
 msgstr "冷门"
 
+msgid "roulette.reset"
+msgstr "重置"
+
 msgid "about.title"
 msgstr "关于"
 

@@ -121,6 +121,9 @@ msgstr "Chauds"
 msgid "roulette.cold"
 msgstr "Froids"
 
+msgid "roulette.reset"
+msgstr "Réinitialiser"
+
 msgid "about.title"
 msgstr "À propos"
 
