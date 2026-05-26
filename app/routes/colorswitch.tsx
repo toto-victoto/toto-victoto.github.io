@@ -7,28 +7,22 @@ import { useStoredGame } from "../storage";
 
 // All positions are expressed in % of the playfield so the game is
 // resolution-independent and scales with its responsive container.
-const BALL_X = 50; // % from the left edge — fixed horizontally
-const BALL_RADIUS = 3; // % vertical half-size of the ball's hitbox
-const FLOOR_Y = 88; // % — ball auto-bounces back up when it reaches this
-const START_Y = 50;
+const BALL_X = 50; // % from the left edge
+const BALL_Y = 72; // % — ball sits at a fixed line near the bottom
+const BALL_RADIUS = 3.2; // % vertical half-size of the ball's hitbox
 
-// Physics in %-of-field per second. Multiplying by dt keeps the motion
-// identical regardless of the screen's refresh rate.
-const GRAVITY = 460; // %/s² downward acceleration
-const TAP_VELOCITY = -90; // %/s upward impulse on tap (replaces velocity)
-const BOUNCE_VELOCITY = -55; // %/s automatic bounce off the floor
-const MAX_DT = 0.05; // clamp dt so a backgrounded tab can't teleport the ball
+const BAR_HEIGHT = 3; // % thickness of a colored bar
+// The window between consecutive bars. The faster the game runs, the less
+// time the player has to plan their colour-cycle taps.
+const BAR_SPACING_START = 40; // % between consecutive bars at score 0
+const BAR_SPACING_MIN = 24; // % at high scores
+const BAR_SPEED_START = 22; // %/s at score 0
+const BAR_SPEED_MAX = 40; // %/s at high scores
+const RAMP_SCORE = 30; // score at which the game reaches max speed
+const MAX_DT = 0.05; // clamp dt so a backgrounded tab can't teleport bars
 
-// Obstacles scroll down past the ball.
-const OBSTACLE_SPEED = 24; // %/s scroll velocity
-const OBSTACLE_SPACING = 32; // % vertical gap between consecutive obstacles
-const BAR_HEIGHT = 2.5; // % thickness of a colored bar
-const STAR_RADIUS = 2.8; // % half-size of a color-changing star
-const STAR_FREQUENCY = 2; // every Nth obstacle (including id 0) is a star
-
-type Color = "red" | "blue" | "green" | "yellow";
-
-const COLORS: Color[] = ["red", "blue", "green", "yellow"];
+const COLORS = ["red", "blue", "green", "yellow"] as const;
+type Color = (typeof COLORS)[number];
 
 const COLOR_BG: Record<Color, string> = {
   red: "bg-rose-500",
@@ -37,24 +31,30 @@ const COLOR_BG: Record<Color, string> = {
   yellow: "bg-amber-400",
 };
 
-type Obstacle = {
-  id: number;
-  type: "bar" | "star";
-  color: Color;
-  y: number;
-};
-
+type Bar = { id: number; color: Color; y: number };
 type Phase = "idle" | "playing" | "gameover";
 
 function randomColor(): Color {
   return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
 
-// Pick a colour different from `not` so collecting a star always changes
-// the ball's hue (otherwise the pickup feels invisible).
+// Pick a colour different from `not` so consecutive bars never repeat the
+// same colour — otherwise the player can score multiple bars in a row
+// without cycling, which kills the rhythm.
 function randomColorExcept(not: Color): Color {
   const choices = COLORS.filter((c) => c !== not);
   return choices[Math.floor(Math.random() * choices.length)];
+}
+
+// Difficulty ramps with score: bars get a bit faster and a bit closer
+// together. Caps so it never becomes literally impossible.
+function speedFor(score: number): number {
+  const t = Math.min(score / RAMP_SCORE, 1);
+  return BAR_SPEED_START + (BAR_SPEED_MAX - BAR_SPEED_START) * t;
+}
+function spacingFor(score: number): number {
+  const t = Math.min(score / RAMP_SCORE, 1);
+  return BAR_SPACING_START + (BAR_SPACING_MIN - BAR_SPACING_START) * t;
 }
 
 export function meta({}: Route.MetaArgs) {
@@ -63,51 +63,48 @@ export function meta({}: Route.MetaArgs) {
     {
       name: "description",
       content:
-        "Bounce a colored ball through matching bars — collect stars to swap colors.",
+        "Tap to cycle your color — match each bar before it reaches you.",
     },
   ];
 }
 
 export default function ColorSwitch() {
-  const [ballY, setBallY] = useState(START_Y);
-  const [ballColor, setBallColor] = useState<Color>("red");
-  const [obstacles, setObstacles] = useState<Obstacle[]>([]);
+  const [ballColor, setBallColor] = useState<Color>(COLORS[0]);
+  const [bars, setBars] = useState<Bar[]>([]);
   const [score, setScore] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [{ best }, setStored] = useStoredGame("colorswitch", { best: 0 });
 
-  const velocityRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
-  const obstacleIdRef = useRef(0);
-  // Once an obstacle has been resolved against the ball (passed cleanly or
-  // collected as a star) we don't want to re-trigger on subsequent frames.
+  const barIdRef = useRef(0);
+  // We resolve each bar against the ball at most once.
   const handledRef = useRef<Set<number>>(new Set());
   const phaseRef = useRef<Phase>(phase);
+  const scoreRef = useRef(0);
   phaseRef.current = phase;
+  scoreRef.current = score;
 
-  function makeObstacle(y: number): Obstacle {
-    const id = obstacleIdRef.current++;
-    // Star at id 0 too, so the very first obstacle teaches the mechanic
-    // (otherwise the player tends to die on a wrong-color bar before they
-    // ever see a star).
-    const isStar = id % STAR_FREQUENCY === 0;
+  function makeBar(y: number, lastColor: Color): Bar {
     return {
-      id,
-      type: isStar ? "star" : "bar",
-      color: randomColor(),
+      id: barIdRef.current++,
+      color: randomColorExcept(lastColor),
       y,
     };
   }
 
-  function seedObstacles(): Obstacle[] {
-    obstacleIdRef.current = 0;
+  function seedBars(): Bar[] {
+    barIdRef.current = 0;
     handledRef.current = new Set();
-    const seeded: Obstacle[] = [];
-    // Seed five obstacles waiting above the screen so the very first bar
-    // doesn't drop on top of the ball at t=0.
+    const seeded: Bar[] = [];
+    let prevColor: Color = ballColor;
+    // Start the first bar far above the screen so the player has time to
+    // read it and plan their first tap.
     for (let i = 0; i < 5; i++) {
-      seeded.push(makeObstacle(-OBSTACLE_SPACING - i * OBSTACLE_SPACING));
+      const y = -BAR_SPACING_START * (i + 1);
+      const bar = makeBar(y, prevColor);
+      seeded.push(bar);
+      prevColor = bar.color;
     }
     return seeded;
   }
@@ -116,18 +113,21 @@ export default function ColorSwitch() {
     if (phaseRef.current === "gameover") return;
     if (phaseRef.current === "idle") {
       setPhase("playing");
-      setObstacles(seedObstacles());
+      setBars(seedBars());
     }
-    velocityRef.current = TAP_VELOCITY;
+    // Cycle to the next colour. The player has full control of when this
+    // happens — that's the entire skill loop.
+    setBallColor((c) => {
+      const i = COLORS.indexOf(c);
+      return COLORS[(i + 1) % COLORS.length];
+    });
   };
 
   const reset = () => {
-    setBallY(START_Y);
     setBallColor(COLORS[0]);
     setScore(0);
-    velocityRef.current = 0;
     lastTimeRef.current = null;
-    setObstacles(seedObstacles());
+    setBars(seedBars());
     setPhase("playing");
   };
 
@@ -143,33 +143,23 @@ export default function ColorSwitch() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Movement loop: gravity, floor bounce, obstacle scroll, spawn.
+  // Movement loop: scroll the bars down, spawn a new one as the topmost
+  // drifts off the spawn line. Speed and spacing both ramp with score.
   useEffect(() => {
     const step = (t: number) => {
       if (lastTimeRef.current !== null && phaseRef.current === "playing") {
         const dt = Math.min((t - lastTimeRef.current) / 1000, MAX_DT);
+        const speed = speedFor(scoreRef.current);
+        const spacing = spacingFor(scoreRef.current);
 
-        velocityRef.current += GRAVITY * dt;
-        setBallY((prev) => {
-          let next = prev + velocityRef.current * dt;
-          if (next >= FLOOR_Y) {
-            next = FLOOR_Y;
-            velocityRef.current = BOUNCE_VELOCITY;
-          }
-          return next;
-        });
-
-        setObstacles((prev) => {
+        setBars((prev) => {
           const moved = prev
-            .map((o) => ({ ...o, y: o.y + OBSTACLE_SPEED * dt }))
-            .filter((o) => o.y < 110);
-          // Topmost (last spawned) is at the end of the array. Once it has
-          // drifted past one full SPACING below its spawn point, add a new
-          // one a SPACING above so the chain stays evenly paced.
+            .map((b) => ({ ...b, y: b.y + speed * dt }))
+            .filter((b) => b.y < 110);
           const top = moved[moved.length - 1];
-          if (!top || top.y > -OBSTACLE_SPACING) {
-            const spawnY = top ? top.y - OBSTACLE_SPACING : -OBSTACLE_SPACING;
-            moved.push(makeObstacle(spawnY));
+          if (!top || top.y > -spacing) {
+            const spawnY = top ? top.y - spacing : -spacing;
+            moved.push(makeBar(spawnY, top?.color ?? ballColor));
           }
           return moved;
         });
@@ -184,37 +174,42 @@ export default function ColorSwitch() {
     };
   }, []);
 
-  // Collision + scoring + color change. Re-runs whenever the ball or the
-  // obstacle list changes; handledRef makes it idempotent so the same
-  // obstacle can't be scored or kill twice.
+  // Collision + scoring. handledRef makes it idempotent so the same bar
+  // can't be scored or kill twice across re-renders.
   useEffect(() => {
     if (phase !== "playing") return;
     let died = false;
     let gained = 0;
-    let nextColor: Color | null = null;
-    for (const o of obstacles) {
-      if (handledRef.current.has(o.id)) continue;
-      const halfH = o.type === "bar" ? BAR_HEIGHT / 2 : STAR_RADIUS;
-      if (Math.abs(o.y - ballY) < BALL_RADIUS + halfH) {
-        handledRef.current.add(o.id);
-        if (o.type === "bar") {
-          if (o.color === ballColor) gained++;
-          else died = true;
-        } else {
-          nextColor = randomColorExcept(ballColor);
-        }
+    for (const b of bars) {
+      if (handledRef.current.has(b.id)) continue;
+      if (Math.abs(b.y - BALL_Y) < BALL_RADIUS + BAR_HEIGHT / 2) {
+        handledRef.current.add(b.id);
+        if (b.color === ballColor) gained++;
+        else died = true;
       }
     }
     if (died) setPhase("gameover");
     if (gained) setScore((s) => s + gained);
-    if (nextColor) setBallColor(nextColor);
-  }, [ballY, obstacles, ballColor, phase]);
+  }, [bars, ballColor, phase]);
 
   // Track the best score of the session.
   useEffect(() => {
     if (phase === "gameover")
       setStored((s) => ({ best: Math.max(s.best, score) }));
   }, [phase, score, setStored]);
+
+  // Next-bar hint: the player needs to know what colour is coming so they
+  // can plan their taps. Compute the colour of the bar currently closest
+  // to the ball that hasn't been resolved yet.
+  const nextBar = bars
+    .filter((b) => !handledRef.current.has(b.id) && b.y < BALL_Y)
+    .reduce<Bar | null>(
+      (closest, b) =>
+        !closest || Math.abs(b.y - BALL_Y) < Math.abs(closest.y - BALL_Y)
+          ? b
+          : closest,
+      null,
+    );
 
   return (
     <>
@@ -242,52 +237,47 @@ export default function ColorSwitch() {
               phase === "gameover" ? "" : "cursor-pointer"
             }`}
           >
-            {obstacles.map((o) =>
-              handledRef.current.has(o.id) && o.type === "star" ? null : (
-                o.type === "bar" ? (
-                  <div
-                    key={o.id}
-                    className={`absolute inset-x-0 ${COLOR_BG[o.color]}`}
-                    style={{
-                      top: `${o.y - BAR_HEIGHT / 2}%`,
-                      height: `${BAR_HEIGHT}%`,
-                    }}
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <div
-                    key={o.id}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white/70 ${COLOR_BG[o.color]}`}
-                    style={{
-                      left: `${BALL_X}%`,
-                      top: `${o.y}%`,
-                      width: `${STAR_RADIUS * 2}%`,
-                      height: `${STAR_RADIUS * 2}%`,
-                    }}
-                    aria-hidden="true"
-                  />
-                )
-              ),
-            )}
-
-            {/* Floor line — visual cue for the auto-bounce surface. */}
-            <div
-              className="absolute inset-x-0 border-t border-neutral-700"
-              style={{ top: `${FLOOR_Y}%` }}
-              aria-hidden="true"
-            />
+            {bars.map((b) => (
+              <div
+                key={b.id}
+                className={`absolute inset-x-0 ${COLOR_BG[b.color]}`}
+                style={{
+                  top: `${b.y - BAR_HEIGHT / 2}%`,
+                  height: `${BAR_HEIGHT}%`,
+                }}
+                aria-hidden="true"
+              />
+            ))}
 
             {/* Ball */}
             <div
-              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white/40 transition-colors ${COLOR_BG[ballColor]}`}
+              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white/40 transition-colors duration-75 ${COLOR_BG[ballColor]}`}
               style={{
                 left: `${BALL_X}%`,
-                top: `${ballY}%`,
+                top: `${BALL_Y}%`,
                 width: `${BALL_RADIUS * 2}%`,
                 height: `${BALL_RADIUS * 2}%`,
               }}
               aria-hidden="true"
             />
+
+            {/* Aim line — a faint guide at the ball's Y so the player can
+                read incoming bars against it. */}
+            <div
+              className="absolute inset-x-0 border-t border-dashed border-white/15"
+              style={{ top: `${BALL_Y}%` }}
+              aria-hidden="true"
+            />
+
+            {/* Next-bar preview chip on the right edge: the colour of the
+                next bar the ball will cross. Helps the player plan taps. */}
+            {nextBar && phase === "playing" && (
+              <div
+                className={`absolute right-2 h-2 w-2 -translate-y-1/2 rounded-full ring-1 ring-white/40 ${COLOR_BG[nextBar.color]}`}
+                style={{ top: `${BALL_Y}%` }}
+                aria-hidden="true"
+              />
+            )}
 
             {/* Score */}
             <div className="absolute top-3 inset-x-0 text-center text-4xl font-bold tabular-nums text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
@@ -297,7 +287,7 @@ export default function ColorSwitch() {
             {phase !== "playing" && (
               <div
                 onPointerDown={(e) => e.stopPropagation()}
-                className={`absolute inset-0 flex items-center justify-center bg-neutral-950/50 backdrop-blur-[1px] ${
+                className={`absolute inset-0 flex items-center justify-center bg-neutral-950/55 backdrop-blur-[1px] ${
                   phase === "idle" ? "pointer-events-none" : ""
                 }`}
               >
@@ -306,7 +296,7 @@ export default function ColorSwitch() {
                     <p className="text-lg font-medium text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
                       <Trans
                         id="colorswitch.start"
-                        message="Tap to bounce — match the color"
+                        message="Tap to cycle color — match every bar"
                       />
                     </p>
                   ) : (

@@ -167,7 +167,7 @@ msgid "colorswitch.title"
 msgstr "Color Switch"
 
 msgid "colorswitch.start"
-msgstr "Tap to bounce — match the color"
+msgstr "Tap to cycle color — match every bar"
 
 msgid "colorswitch.gameover"
 msgstr "Game over"

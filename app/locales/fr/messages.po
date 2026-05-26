@@ -167,7 +167,7 @@ msgid "colorswitch.title"
 msgstr "Color Switch"
 
 msgid "colorswitch.start"
-msgstr "Tapez pour rebondir — touchez la bonne couleur"
+msgstr "Tapez pour changer de couleur — alignez chaque barre"
 
 msgid "colorswitch.gameover"
 msgstr "Perdu !"

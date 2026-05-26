@@ -167,7 +167,7 @@ msgid "colorswitch.title"
 msgstr "颜色切换"
 
 msgid "colorswitch.start"
-msgstr "点击弹跳 — 匹配颜色"
+msgstr "点击切换颜色 — 匹配每一条"
 
 msgid "colorswitch.gameover"
 msgstr "游戏结束"
