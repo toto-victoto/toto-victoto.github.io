@@ -224,11 +224,11 @@ export default function Snake() {
             onTouchEnd={handleTouchEnd}
             className="flex min-h-0 flex-1 items-start justify-center touch-none select-none"
           >
-            {/* Square that fits the remaining area. The overlay sits inside
-                this wrapper so the dark game-over panel only covers the board
-                itself, never the surrounding gutter. Top-aligned so leftover
-                vertical space lands below the board instead of padding above. */}
-            <div className="relative aspect-square h-full max-h-full max-w-full">
+            {/* Square sized by the column width (not h-full): h-full + max-w-full
+                breaks the aspect-ratio in portrait viewports because both
+                dimensions end up explicit. The overlay sits inside this
+                wrapper so the dark game-over panel only covers the board. */}
+            <div className="relative aspect-square w-full max-h-full">
               <div
                 className="grid h-full w-full rounded-2xl bg-neutral-900 p-1 gap-px"
                 style={{

@@ -24,7 +24,7 @@ const OBSTACLE_SPEED = 24; // %/s scroll velocity
 const OBSTACLE_SPACING = 32; // % vertical gap between consecutive obstacles
 const BAR_HEIGHT = 2.5; // % thickness of a colored bar
 const STAR_RADIUS = 2.8; // % half-size of a color-changing star
-const STAR_FREQUENCY = 3; // every Nth obstacle is a color-changing star
+const STAR_FREQUENCY = 2; // every Nth obstacle (including id 0) is a star
 
 type Color = "red" | "blue" | "green" | "yellow";
 
@@ -88,7 +88,10 @@ export default function ColorSwitch() {
 
   function makeObstacle(y: number): Obstacle {
     const id = obstacleIdRef.current++;
-    const isStar = id > 0 && id % STAR_FREQUENCY === 0;
+    // Star at id 0 too, so the very first obstacle teaches the mechanic
+    // (otherwise the player tends to die on a wrong-color bar before they
+    // ever see a star).
+    const isStar = id % STAR_FREQUENCY === 0;
     return {
       id,
       type: isStar ? "star" : "bar",
