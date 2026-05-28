@@ -50,11 +50,6 @@ function randomFrom<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Background classes used when rendering a shape as a "hole" cut out of a
-// ribbon — same colour as the playfield, so the shape reads as a real hole.
-const HOLE_BG = "bg-neutral-900";
-const HOLE_FILL = "fill-neutral-900";
-
 // Reusable shape renderer: circle / square are plain divs; triangle is an SVG
 // polygon so its colour can be controlled by the same `fill-*` palette.
 // Callers pass the bg + fill classes explicitly so the same component renders
@@ -100,41 +95,73 @@ function ShapeView({
   );
 }
 
-// A ribbon: a full-width band painted in the target colour with a shape-
-// punched "hole" in the middle. The hole is rendered in the playfield's own
-// background colour so the dark shape on a coloured band reads as a real
-// cutout, and that's the form/colour combo the avatar must match.
+// A ribbon: two coloured slabs flanking a square central block that has the
+// target shape physically cut out via an SVG mask. The cutout is genuinely
+// transparent — combined with the avatar living at a lower z-index, that
+// gives the "passing through" illusion when a matching avatar lines up with
+// the hole. Using a mask instead of stacking a dark shape over a coloured
+// band also kills the sub-pixel seam that used to show at the bottom of
+// the shape.
 function RibbonView({
+  id,
   shape,
   color,
   y,
 }: {
+  id: number;
   shape: ShapeName;
   color: Color;
   y: number;
 }) {
+  const maskId = `ribbon-hole-${id}`;
   return (
     <div
-      className="absolute inset-x-0"
+      className="absolute inset-x-0 z-20 flex"
       style={{
         top: `${y - RIBBON_HEIGHT / 2}%`,
         height: `${RIBBON_HEIGHT}%`,
       }}
       aria-hidden="true"
     >
-      {/* The coloured band itself. */}
-      <div className={`absolute inset-0 ${COLOR_BG[color]}`} />
-      {/* The hole — a square (in pixels) sized to match the ribbon's height,
-          so the shape stays undistorted regardless of the playfield's
-          aspect ratio. */}
-      <div className="absolute top-1/2 left-1/2 aspect-square h-full -translate-x-1/2 -translate-y-1/2">
-        <ShapeView
-          shape={shape}
-          bgClass={HOLE_BG}
-          fillClass={HOLE_FILL}
-          className="h-full w-full"
+      {/* Left and right slabs share the colour; flex-1 makes them eat
+          whatever width is left after the central pixel-square block. */}
+      <div className={`flex-1 ${COLOR_BG[color]}`} />
+      <svg
+        className="h-full aspect-square"
+        viewBox="0 0 10 10"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <defs>
+          <mask id={maskId}>
+            {/* White = keep, black = cut out. The shape inside the block
+                becomes a real transparent hole. */}
+            <rect width="10" height="10" fill="white" />
+            {shape === "circle" && (
+              <circle cx="5" cy="5" r="4.2" fill="black" />
+            )}
+            {shape === "square" && (
+              <rect
+                x="0.8"
+                y="0.8"
+                width="8.4"
+                height="8.4"
+                rx="0.6"
+                fill="black"
+              />
+            )}
+            {shape === "triangle" && (
+              <polygon points="5,0.5 9.7,9.5 0.3,9.5" fill="black" />
+            )}
+          </mask>
+        </defs>
+        <rect
+          width="10"
+          height="10"
+          mask={`url(#${maskId})`}
+          className={COLOR_FILL[color]}
         />
-      </div>
+      </svg>
+      <div className={`flex-1 ${COLOR_BG[color]}`} />
     </div>
   );
 }
@@ -377,26 +404,28 @@ export default function ColorSwitch() {
             {ribbons.map((r) => (
               <RibbonView
                 key={r.id}
+                id={r.id}
                 shape={r.shape}
                 color={r.color}
                 y={r.y}
               />
             ))}
 
-            {/* Aim line under the avatar — gives the eye a fixed reference. */}
+            {/* Aim line — z-30 to ride above the ribbons so the player can
+                always see the collision line, even when one is crossing it. */}
             <div
-              className="absolute inset-x-0 border-t border-dashed border-white/15"
+              className="absolute inset-x-0 z-30 border-t border-dashed border-white/15"
               style={{ top: `${AVATAR_Y}%` }}
               aria-hidden="true"
             />
 
             {/* Avatar — sized by playfield height so its pixel dimensions
                 match the ribbon's hole (both AVATAR_SIZE % of height with
-                aspect-square forcing a true pixel-square). Width-based
-                sizing would distort the shape because the playfield is
-                aspect-[3/4]. */}
+                aspect-square forcing a true pixel-square). Sits at z-10,
+                below the ribbons' z-20, so a matching avatar shows through
+                the cutout for a "thread the needle" effect. */}
             <div
-              className="absolute aspect-square -translate-x-1/2 -translate-y-1/2"
+              className="absolute z-10 aspect-square -translate-x-1/2 -translate-y-1/2"
               style={{
                 left: `${AVATAR_X}%`,
                 top: `${AVATAR_Y}%`,
@@ -430,7 +459,7 @@ export default function ColorSwitch() {
             )}
 
             {/* Score + ramp flash */}
-            <div className="absolute top-3 inset-x-0 flex items-center justify-center gap-2 text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
+            <div className="absolute top-3 inset-x-0 z-30 flex items-center justify-center gap-2 text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
               <span
                 key={lastRamp?.key ?? "stable"}
                 className={`inline-block text-4xl font-bold tabular-nums ${
@@ -457,7 +486,7 @@ export default function ColorSwitch() {
             {phase !== "playing" && (
               <div
                 onPointerDown={(e) => e.stopPropagation()}
-                className={`absolute inset-0 flex items-center justify-center bg-neutral-950/55 backdrop-blur-[1px] ${
+                className={`absolute inset-0 z-40 flex items-center justify-center bg-neutral-950/55 backdrop-blur-[1px] ${
                   phase === "idle" ? "pointer-events-none" : ""
                 }`}
               >
