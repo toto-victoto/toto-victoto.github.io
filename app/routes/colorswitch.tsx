@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/colorswitch";
 import { BackButton } from "../components/BackButton";
@@ -7,159 +7,265 @@ import { useStoredGame } from "../storage";
 
 // All positions are expressed in % of the playfield so the game is
 // resolution-independent and scales with its responsive container.
-const BALL_X = 50; // % from the left edge
-const BALL_Y = 72; // % — ball sits at a fixed line near the bottom
-const BALL_RADIUS = 3.2; // % vertical half-size of the ball's hitbox
+const AVATAR_X = 50; // % from the left edge
+const AVATAR_Y = 72; // % — avatar sits on a fixed aim line
+const AVATAR_SIZE = 9; // % side length of the avatar's bounding box
+const RIBBON_HEIGHT = AVATAR_SIZE; // matches the avatar so a perfect pass aligns
+const HOLE_WIDTH = 18; // % of playfield width occupied by the hole's shape
+const COLLISION_HALF = AVATAR_SIZE / 2; // collide when ribbon Y is within this of the avatar
 
-const BAR_HEIGHT = 3; // % thickness of a colored bar
-// The window between consecutive bars. The faster the game runs, the less
-// time the player has to plan their colour-cycle taps.
-const BAR_SPACING_START = 40; // % between consecutive bars at score 0
-const BAR_SPACING_MIN = 24; // % at high scores
-const BAR_SPEED_START = 22; // %/s at score 0
-const BAR_SPEED_MAX = 40; // %/s at high scores
-const RAMP_SCORE = 30; // score at which the game reaches max speed
+// Difficulty ramps with score: bars either get faster or pack closer
+// together. Each ramp is one of the two, drawn at random.
+const SPEED_START = 22; // %/s
+const SPEED_MAX = 42;
+const SPEED_STEP = 3;
+const SPACING_START = 42; // % between consecutive ribbons
+const SPACING_MIN = 24;
+const SPACING_STEP = 3;
+const RAMP_EVERY = 10; // points per difficulty step
 const MAX_DT = 0.05; // clamp dt so a backgrounded tab can't teleport bars
 
-const COLORS = ["red", "blue", "green", "yellow"] as const;
+const SHAPES = ["circle", "triangle", "square"] as const;
+type ShapeName = (typeof SHAPES)[number];
+
+const COLORS = ["green", "blue", "red"] as const;
 type Color = (typeof COLORS)[number];
 
 const COLOR_BG: Record<Color, string> = {
-  red: "bg-rose-500",
-  blue: "bg-sky-500",
   green: "bg-emerald-500",
-  yellow: "bg-amber-400",
+  blue: "bg-sky-500",
+  red: "bg-rose-500",
 };
 
-type Bar = { id: number; color: Color; y: number };
+const COLOR_FILL: Record<Color, string> = {
+  green: "fill-emerald-500",
+  blue: "fill-sky-500",
+  red: "fill-rose-500",
+};
+
+type Ribbon = { id: number; shape: ShapeName; color: Color; y: number };
 type Phase = "idle" | "playing" | "gameover";
+type RampType = "speed" | "spacing";
 
-function randomColor(): Color {
-  return COLORS[Math.floor(Math.random() * COLORS.length)];
+function randomFrom<T>(arr: readonly T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Pick a colour different from `not` so consecutive bars never repeat the
-// same colour — otherwise the player can score multiple bars in a row
-// without cycling, which kills the rhythm.
-function randomColorExcept(not: Color): Color {
-  const choices = COLORS.filter((c) => c !== not);
-  return choices[Math.floor(Math.random() * choices.length)];
+// Reusable shape renderer: circle / square are plain divs; triangle is an SVG
+// polygon so its colour can be controlled by the same `fill-*` palette.
+// The shape always fills a square container — render it inside an aspect-
+// square wrapper so a non-square parent doesn't distort it.
+function ShapeView({
+  shape,
+  color,
+  className,
+  style,
+}: {
+  shape: ShapeName;
+  color: Color;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const base = `${COLOR_BG[color]} ${className ?? ""}`;
+  if (shape === "circle")
+    return <div className={`rounded-full ${base}`} style={style} />;
+  if (shape === "square")
+    return <div className={`rounded-sm ${base}`} style={style} />;
+  return (
+    <svg
+      viewBox="0 0 10 10"
+      className={`${COLOR_FILL[color]} ${className ?? ""}`}
+      style={style}
+      aria-hidden="true"
+    >
+      {/* Triangle fills the viewBox so it matches the visual weight of the
+          circle and square at the same container size. */}
+      <polygon points="5,0 10,10 0,10" />
+    </svg>
+  );
 }
 
-// Difficulty ramps with score: bars get a bit faster and a bit closer
-// together. Caps so it never becomes literally impossible.
-function speedFor(score: number): number {
-  const t = Math.min(score / RAMP_SCORE, 1);
-  return BAR_SPEED_START + (BAR_SPEED_MAX - BAR_SPEED_START) * t;
-}
-function spacingFor(score: number): number {
-  const t = Math.min(score / RAMP_SCORE, 1);
-  return BAR_SPACING_START + (BAR_SPACING_MIN - BAR_SPACING_START) * t;
+// A ribbon: two grey slabs flanking a coloured, shaped hole in the middle.
+// The avatar must arrive at the hole with the matching shape and colour.
+function RibbonView({ shape, color, y }: { shape: ShapeName; color: Color; y: number }) {
+  const holeHalf = HOLE_WIDTH / 2;
+  return (
+    <div
+      className="absolute inset-x-0"
+      style={{
+        top: `${y - RIBBON_HEIGHT / 2}%`,
+        height: `${RIBBON_HEIGHT}%`,
+      }}
+      aria-hidden="true"
+    >
+      <div
+        className="absolute top-0 left-0 h-full bg-neutral-700"
+        style={{ right: `${50 + holeHalf}%` }}
+      />
+      <div
+        className="absolute top-0 right-0 h-full bg-neutral-700"
+        style={{ left: `${50 + holeHalf}%` }}
+      />
+      {/* Hole-shape container: full-height, square aspect — keeps the shape
+          undistorted regardless of how wide the gap in the ribbon is. */}
+      <div
+        className="absolute top-0 left-1/2 h-full -translate-x-1/2 flex items-center justify-center"
+        style={{ width: `${HOLE_WIDTH}%` }}
+      >
+        <div className="aspect-square h-full">
+          <ShapeView shape={shape} color={color} className="h-full w-full" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Color Switch — toto-victoto" },
+    { title: "Threader — toto-victoto" },
     {
       name: "description",
       content:
-        "Tap to cycle your color — match each bar before it reaches you.",
+        "Cycle shape on the left, colour on the right — thread each ribbon's hole.",
     },
   ];
 }
 
 export default function ColorSwitch() {
-  const [ballColor, setBallColor] = useState<Color>(COLORS[0]);
-  const [bars, setBars] = useState<Bar[]>([]);
+  const [avatarShape, setAvatarShape] = useState<ShapeName>(SHAPES[0]);
+  const [avatarColor, setAvatarColor] = useState<Color>(COLORS[0]);
+  const [ribbons, setRibbons] = useState<Ribbon[]>([]);
   const [score, setScore] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [{ best }, setStored] = useStoredGame("colorswitch", { best: 0 });
 
+  // Difficulty: live, since ramps mutate them. Stored in refs too so the
+  // animation loop reads the latest without re-creating itself.
+  const [speed, setSpeed] = useState(SPEED_START);
+  const [spacing, setSpacing] = useState(SPACING_START);
+  const speedRef = useRef(speed);
+  const spacingRef = useRef(spacing);
+  speedRef.current = speed;
+  spacingRef.current = spacing;
+
+  // Brief visual flash on the score whenever a ramp fires.
+  const [lastRamp, setLastRamp] = useState<{ type: RampType; key: number } | null>(
+    null,
+  );
+  const prevTierRef = useRef(0);
+
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
-  const barIdRef = useRef(0);
-  // We resolve each bar against the ball at most once.
+  const idRef = useRef(0);
+  // Each ribbon is resolved against the avatar at most once.
   const handledRef = useRef<Set<number>>(new Set());
   const phaseRef = useRef<Phase>(phase);
-  const scoreRef = useRef(0);
   phaseRef.current = phase;
-  scoreRef.current = score;
 
-  function makeBar(y: number, lastColor: Color): Bar {
-    return {
-      id: barIdRef.current++,
-      color: randomColorExcept(lastColor),
-      y,
-    };
+  function makeRibbon(y: number, prev: Ribbon | null): Ribbon {
+    let shape: ShapeName;
+    let color: Color;
+    // Always differ from the previous ribbon on at least one axis so the
+    // player must input something between any two ribbons.
+    do {
+      shape = randomFrom(SHAPES);
+      color = randomFrom(COLORS);
+    } while (prev && shape === prev.shape && color === prev.color);
+    return { id: idRef.current++, shape, color, y };
   }
 
-  function seedBars(): Bar[] {
-    barIdRef.current = 0;
+  function seedRibbons(): Ribbon[] {
+    idRef.current = 0;
     handledRef.current = new Set();
-    const seeded: Bar[] = [];
-    let prevColor: Color = ballColor;
-    // Start the first bar far above the screen so the player has time to
-    // read it and plan their first tap.
+    const seeded: Ribbon[] = [];
+    let prev: Ribbon | null = null;
     for (let i = 0; i < 5; i++) {
-      const y = -BAR_SPACING_START * (i + 1);
-      const bar = makeBar(y, prevColor);
-      seeded.push(bar);
-      prevColor = bar.color;
+      const y = -SPACING_START * (i + 1);
+      const r = makeRibbon(y, prev);
+      seeded.push(r);
+      prev = r;
     }
     return seeded;
   }
 
-  const tap = () => {
+  const cycleShape = () =>
+    setAvatarShape((s) => SHAPES[(SHAPES.indexOf(s) + 1) % SHAPES.length]);
+  const cycleColor = () =>
+    setAvatarColor((c) => COLORS[(COLORS.indexOf(c) + 1) % COLORS.length]);
+
+  // Left half cycles shape, right half cycles colour. The very first input
+  // also starts the round (and re-seeds the ribbons).
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (phaseRef.current === "gameover") return;
+    e.preventDefault();
     if (phaseRef.current === "idle") {
       setPhase("playing");
-      setBars(seedBars());
+      setRibbons(seedRibbons());
     }
-    // Cycle to the next colour. The player has full control of when this
-    // happens — that's the entire skill loop.
-    setBallColor((c) => {
-      const i = COLORS.indexOf(c);
-      return COLORS[(i + 1) % COLORS.length];
-    });
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (e.clientX - rect.left < rect.width / 2) cycleShape();
+    else cycleColor();
   };
 
   const reset = () => {
-    setBallColor(COLORS[0]);
+    setAvatarShape(SHAPES[0]);
+    setAvatarColor(COLORS[0]);
     setScore(0);
+    setSpeed(SPEED_START);
+    setSpacing(SPACING_START);
+    prevTierRef.current = 0;
     lastTimeRef.current = null;
-    setBars(seedBars());
+    setRibbons(seedRibbons());
     setPhase("playing");
   };
 
-  // Keyboard: spacebar mirrors a tap (and restarts on game-over).
+  // Keyboard: ArrowLeft cycles shape, ArrowRight cycles colour. Restart on
+  // game-over with any key.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== " ") return;
-      e.preventDefault();
-      if (phaseRef.current === "gameover") reset();
-      else tap();
+      if (phaseRef.current === "gameover") {
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          reset();
+        }
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (phaseRef.current === "idle") {
+          setPhase("playing");
+          setRibbons(seedRibbons());
+        }
+        cycleShape();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        if (phaseRef.current === "idle") {
+          setPhase("playing");
+          setRibbons(seedRibbons());
+        }
+        cycleColor();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Movement loop: scroll the bars down, spawn a new one as the topmost
-  // drifts off the spawn line. Speed and spacing both ramp with score.
+  // Movement loop: scroll ribbons down at the current speed, spawn fresh
+  // ones to keep the chain evenly paced.
   useEffect(() => {
     const step = (t: number) => {
       if (lastTimeRef.current !== null && phaseRef.current === "playing") {
         const dt = Math.min((t - lastTimeRef.current) / 1000, MAX_DT);
-        const speed = speedFor(scoreRef.current);
-        const spacing = spacingFor(scoreRef.current);
-
-        setBars((prev) => {
+        const v = speedRef.current;
+        const gap = spacingRef.current;
+        setRibbons((prev) => {
           const moved = prev
-            .map((b) => ({ ...b, y: b.y + speed * dt }))
-            .filter((b) => b.y < 110);
+            .map((r) => ({ ...r, y: r.y + v * dt }))
+            .filter((r) => r.y < 110);
           const top = moved[moved.length - 1];
-          if (!top || top.y > -spacing) {
-            const spawnY = top ? top.y - spacing : -spacing;
-            moved.push(makeBar(spawnY, top?.color ?? ballColor));
+          if (!top || top.y > -gap) {
+            const spawnY = top ? top.y - gap : -gap;
+            moved.push(makeRibbon(spawnY, top ?? null));
           }
           return moved;
         });
@@ -174,23 +280,48 @@ export default function ColorSwitch() {
     };
   }, []);
 
-  // Collision + scoring. handledRef makes it idempotent so the same bar
-  // can't be scored or kill twice across re-renders.
+  // Collision + scoring. handledRef makes this idempotent across re-renders.
   useEffect(() => {
     if (phase !== "playing") return;
     let died = false;
     let gained = 0;
-    for (const b of bars) {
-      if (handledRef.current.has(b.id)) continue;
-      if (Math.abs(b.y - BALL_Y) < BALL_RADIUS + BAR_HEIGHT / 2) {
-        handledRef.current.add(b.id);
-        if (b.color === ballColor) gained++;
+    for (const r of ribbons) {
+      if (handledRef.current.has(r.id)) continue;
+      if (Math.abs(r.y - AVATAR_Y) < COLLISION_HALF) {
+        handledRef.current.add(r.id);
+        if (r.shape === avatarShape && r.color === avatarColor) gained++;
         else died = true;
       }
     }
     if (died) setPhase("gameover");
     if (gained) setScore((s) => s + gained);
-  }, [bars, ballColor, phase]);
+  }, [ribbons, avatarShape, avatarColor, phase]);
+
+  // Every RAMP_EVERY points, randomly bump speed or shrink spacing.
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const tier = Math.floor(score / RAMP_EVERY);
+    if (tier <= prevTierRef.current) return;
+    prevTierRef.current = tier;
+    const speedCapped = speedRef.current >= SPEED_MAX;
+    const spacingCapped = spacingRef.current <= SPACING_MIN;
+    if (speedCapped && spacingCapped) return; // both maxed, nothing left
+    let type: RampType;
+    if (speedCapped) type = "spacing";
+    else if (spacingCapped) type = "speed";
+    else type = Math.random() < 0.5 ? "speed" : "spacing";
+    if (type === "speed")
+      setSpeed((s) => Math.min(s + SPEED_STEP, SPEED_MAX));
+    else setSpacing((s) => Math.max(s - SPACING_STEP, SPACING_MIN));
+    setLastRamp({ type, key: Date.now() });
+  }, [score, phase]);
+
+  // Clear the ramp flash after a moment so the icon doesn't linger.
+  useEffect(() => {
+    if (!lastRamp) return;
+    const t = setTimeout(() => setLastRamp(null), 1200);
+    return () => clearTimeout(t);
+  }, [lastRamp]);
 
   // Track the best score of the session.
   useEffect(() => {
@@ -198,90 +329,106 @@ export default function ColorSwitch() {
       setStored((s) => ({ best: Math.max(s.best, score) }));
   }, [phase, score, setStored]);
 
-  // Next-bar hint: the player needs to know what colour is coming so they
-  // can plan their taps. Compute the colour of the bar currently closest
-  // to the ball that hasn't been resolved yet.
-  const nextBar = bars
-    .filter((b) => !handledRef.current.has(b.id) && b.y < BALL_Y)
-    .reduce<Bar | null>(
-      (closest, b) =>
-        !closest || Math.abs(b.y - BALL_Y) < Math.abs(closest.y - BALL_Y)
-          ? b
-          : closest,
-      null,
-    );
-
   return (
     <>
       <BackButton />
       <GameLayout>
         <header className="text-center">
           <h1 className="text-3xl font-semibold tracking-tight">
-            <Trans id="colorswitch.title" message="Color Switch" />
+            <Trans id="colorswitch.title" message="Threader 🪡" />
           </h1>
         </header>
 
-        {/* Playfield is the largest 3:4 portrait box that fits the remaining
-            area. Top-aligned so any leftover height lands at the bottom. */}
+        {/* Playfield: largest 3:4 portrait that fits. Top-aligned so any
+            leftover height lands at the bottom. */}
         <div className="flex min-h-0 flex-1 items-start justify-center">
           <div
-            onPointerDown={
-              phase === "gameover"
-                ? undefined
-                : (e) => {
-                    e.preventDefault();
-                    tap();
-                  }
-            }
+            onPointerDown={phase === "gameover" ? undefined : handlePointerDown}
             className={`relative aspect-[3/4] h-full max-h-full w-auto max-w-full overflow-hidden rounded-2xl bg-neutral-900 select-none touch-none ${
               phase === "gameover" ? "" : "cursor-pointer"
             }`}
           >
-            {bars.map((b) => (
-              <div
-                key={b.id}
-                className={`absolute inset-x-0 ${COLOR_BG[b.color]}`}
-                style={{
-                  top: `${b.y - BAR_HEIGHT / 2}%`,
-                  height: `${BAR_HEIGHT}%`,
-                }}
-                aria-hidden="true"
+            {/* Halves: left = shape, right = colour. Faint dividers so the
+                player can see the tap zones. */}
+            <div
+              className="pointer-events-none absolute top-0 bottom-0 left-1/2 w-px bg-white/5"
+              aria-hidden="true"
+            />
+
+            {ribbons.map((r) => (
+              <RibbonView
+                key={r.id}
+                shape={r.shape}
+                color={r.color}
+                y={r.y}
               />
             ))}
 
-            {/* Ball */}
-            <div
-              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white/40 transition-colors duration-75 ${COLOR_BG[ballColor]}`}
-              style={{
-                left: `${BALL_X}%`,
-                top: `${BALL_Y}%`,
-                width: `${BALL_RADIUS * 2}%`,
-                height: `${BALL_RADIUS * 2}%`,
-              }}
-              aria-hidden="true"
-            />
-
-            {/* Aim line — a faint guide at the ball's Y so the player can
-                read incoming bars against it. */}
+            {/* Aim line under the avatar — gives the eye a fixed reference. */}
             <div
               className="absolute inset-x-0 border-t border-dashed border-white/15"
-              style={{ top: `${BALL_Y}%` }}
+              style={{ top: `${AVATAR_Y}%` }}
               aria-hidden="true"
             />
 
-            {/* Next-bar preview chip on the right edge: the colour of the
-                next bar the ball will cross. Helps the player plan taps. */}
-            {nextBar && phase === "playing" && (
-              <div
-                className={`absolute right-2 h-2 w-2 -translate-y-1/2 rounded-full ring-1 ring-white/40 ${COLOR_BG[nextBar.color]}`}
-                style={{ top: `${BALL_Y}%` }}
-                aria-hidden="true"
+            {/* Avatar */}
+            <div
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${AVATAR_X}%`,
+                top: `${AVATAR_Y}%`,
+                width: `${AVATAR_SIZE}%`,
+                height: `${AVATAR_SIZE}%`,
+              }}
+            >
+              <ShapeView
+                shape={avatarShape}
+                color={avatarColor}
+                className="h-full w-full"
               />
+            </div>
+
+            {/* Tap-zone hints — only while waiting to start. */}
+            {phase === "idle" && (
+              <>
+                <div
+                  className="pointer-events-none absolute top-1/4 left-2 text-xs uppercase tracking-wider text-white/40"
+                  aria-hidden="true"
+                >
+                  ◧ shape
+                </div>
+                <div
+                  className="pointer-events-none absolute top-1/4 right-2 text-xs uppercase tracking-wider text-white/40"
+                  aria-hidden="true"
+                >
+                  color ◨
+                </div>
+              </>
             )}
 
-            {/* Score */}
-            <div className="absolute top-3 inset-x-0 text-center text-4xl font-bold tabular-nums text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
-              {score}
+            {/* Score + ramp flash */}
+            <div className="absolute top-3 inset-x-0 flex items-center justify-center gap-2 text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
+              <span
+                key={lastRamp?.key ?? "stable"}
+                className={`inline-block text-4xl font-bold tabular-nums ${
+                  lastRamp ? "motion-safe:animate-rps-tick" : ""
+                }`}
+              >
+                {score}
+              </span>
+              {lastRamp && (
+                <span
+                  key={`badge-${lastRamp.key}`}
+                  className={`text-2xl motion-safe:animate-rps-tick ${
+                    lastRamp.type === "speed"
+                      ? "text-amber-300"
+                      : "text-sky-300"
+                  }`}
+                  aria-hidden="true"
+                >
+                  {lastRamp.type === "speed" ? "⚡" : "⇲"}
+                </span>
+              )}
             </div>
 
             {phase !== "playing" && (
@@ -296,7 +443,7 @@ export default function ColorSwitch() {
                     <p className="text-lg font-medium text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
                       <Trans
                         id="colorswitch.start"
-                        message="Tap to cycle color — match every bar"
+                        message="Left tap = shape · right tap = color"
                       />
                     </p>
                   ) : (
@@ -310,7 +457,7 @@ export default function ColorSwitch() {
                       </p>
                       <button
                         onClick={reset}
-                        className={`rounded-full px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95 ${COLOR_BG[ballColor]}`}
+                        className={`rounded-full px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95 ${COLOR_BG[avatarColor]}`}
                       >
                         <Trans id="common.play_again" message="Play again" />
                       </button>

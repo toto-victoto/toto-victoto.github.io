@@ -164,10 +164,10 @@ msgid "morpion.mode.ai"
 msgstr "vs CPU"
 
 msgid "colorswitch.title"
-msgstr "Color Switch"
+msgstr "Threader 🪡"
 
 msgid "colorswitch.start"
-msgstr "Tap to cycle color — match every bar"
+msgstr "Left tap = shape · right tap = color"
 
 msgid "colorswitch.gameover"
 msgstr "Game over"

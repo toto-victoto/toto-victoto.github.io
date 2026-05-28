@@ -164,10 +164,10 @@ msgid "morpion.mode.ai"
 msgstr "对战电脑"
 
 msgid "colorswitch.title"
-msgstr "颜色切换"
+msgstr "Threader 🪡"
 
 msgid "colorswitch.start"
-msgstr "点击切换颜色 — 匹配每一条"
+msgstr "左点击 = 形状 · 右点击 = 颜色"
 
 msgid "colorswitch.gameover"
 msgstr "游戏结束"

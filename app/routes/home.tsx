@@ -67,10 +67,10 @@ export default function Home() {
 
           <AppIcon
             to="/colorswitch"
-            label={<Trans id="colorswitch.title" message="Color Switch" />}
+            label={<Trans id="colorswitch.title" message="Threader 🪡" />}
             tone="bg-gradient-to-br from-rose-500 via-amber-400 to-emerald-500"
           >
-            <span aria-hidden="true">🎨</span>
+            <span aria-hidden="true">🪡</span>
           </AppIcon>
 
           <AppIcon

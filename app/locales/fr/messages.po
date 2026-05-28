@@ -164,10 +164,10 @@ msgid "morpion.mode.ai"
 msgstr "vs Ordi"
 
 msgid "colorswitch.title"
-msgstr "Color Switch"
+msgstr "Threader 🪡"
 
 msgid "colorswitch.start"
-msgstr "Tapez pour changer de couleur — alignez chaque barre"
+msgstr "Tap gauche = forme · tap droit = couleur"
 
 msgid "colorswitch.gameover"
 msgstr "Perdu !"
