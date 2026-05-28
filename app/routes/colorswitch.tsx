@@ -11,15 +11,14 @@ const AVATAR_X = 50; // % from the left edge
 const AVATAR_Y = 72; // % — avatar sits on a fixed aim line
 const AVATAR_SIZE = 9; // % side length of the avatar's bounding box
 const RIBBON_HEIGHT = AVATAR_SIZE; // matches the avatar so a perfect pass aligns
-const HOLE_WIDTH = 18; // % of playfield width occupied by the hole's shape
 const COLLISION_HALF = AVATAR_SIZE / 2; // collide when ribbon Y is within this of the avatar
 
 // Difficulty ramps with score: bars either get faster or pack closer
 // together. Each ramp is one of the two, drawn at random.
-const SPEED_START = 22; // %/s
+const SPEED_START = 15; // %/s
 const SPEED_MAX = 42;
 const SPEED_STEP = 3;
-const SPACING_START = 42; // % between consecutive ribbons
+const SPACING_START = 63; // % between consecutive ribbons
 const SPACING_MIN = 24;
 const SPACING_STEP = 3;
 const RAMP_EVERY = 10; // points per difficulty step
@@ -51,30 +50,46 @@ function randomFrom<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Background classes used when rendering a shape as a "hole" cut out of a
+// ribbon — same colour as the playfield, so the shape reads as a real hole.
+const HOLE_BG = "bg-neutral-900";
+const HOLE_FILL = "fill-neutral-900";
+
 // Reusable shape renderer: circle / square are plain divs; triangle is an SVG
 // polygon so its colour can be controlled by the same `fill-*` palette.
-// The shape always fills a square container — render it inside an aspect-
-// square wrapper so a non-square parent doesn't distort it.
+// Callers pass the bg + fill classes explicitly so the same component renders
+// either a coloured game piece (avatar) or a dark "hole" inside a ribbon.
 function ShapeView({
   shape,
-  color,
+  bgClass,
+  fillClass,
   className,
   style,
 }: {
   shape: ShapeName;
-  color: Color;
+  bgClass: string;
+  fillClass: string;
   className?: string;
   style?: CSSProperties;
 }) {
-  const base = `${COLOR_BG[color]} ${className ?? ""}`;
   if (shape === "circle")
-    return <div className={`rounded-full ${base}`} style={style} />;
+    return (
+      <div
+        className={`rounded-full ${bgClass} ${className ?? ""}`}
+        style={style}
+      />
+    );
   if (shape === "square")
-    return <div className={`rounded-sm ${base}`} style={style} />;
+    return (
+      <div
+        className={`rounded-sm ${bgClass} ${className ?? ""}`}
+        style={style}
+      />
+    );
   return (
     <svg
       viewBox="0 0 10 10"
-      className={`${COLOR_FILL[color]} ${className ?? ""}`}
+      className={`${fillClass} ${className ?? ""}`}
       style={style}
       aria-hidden="true"
     >
@@ -85,10 +100,19 @@ function ShapeView({
   );
 }
 
-// A ribbon: two grey slabs flanking a coloured, shaped hole in the middle.
-// The avatar must arrive at the hole with the matching shape and colour.
-function RibbonView({ shape, color, y }: { shape: ShapeName; color: Color; y: number }) {
-  const holeHalf = HOLE_WIDTH / 2;
+// A ribbon: a full-width band painted in the target colour with a shape-
+// punched "hole" in the middle. The hole is rendered in the playfield's own
+// background colour so the dark shape on a coloured band reads as a real
+// cutout, and that's the form/colour combo the avatar must match.
+function RibbonView({
+  shape,
+  color,
+  y,
+}: {
+  shape: ShapeName;
+  color: Color;
+  y: number;
+}) {
   return (
     <div
       className="absolute inset-x-0"
@@ -98,23 +122,18 @@ function RibbonView({ shape, color, y }: { shape: ShapeName; color: Color; y: nu
       }}
       aria-hidden="true"
     >
-      <div
-        className="absolute top-0 left-0 h-full bg-neutral-700"
-        style={{ right: `${50 + holeHalf}%` }}
-      />
-      <div
-        className="absolute top-0 right-0 h-full bg-neutral-700"
-        style={{ left: `${50 + holeHalf}%` }}
-      />
-      {/* Hole-shape container: full-height, square aspect — keeps the shape
-          undistorted regardless of how wide the gap in the ribbon is. */}
-      <div
-        className="absolute top-0 left-1/2 h-full -translate-x-1/2 flex items-center justify-center"
-        style={{ width: `${HOLE_WIDTH}%` }}
-      >
-        <div className="aspect-square h-full">
-          <ShapeView shape={shape} color={color} className="h-full w-full" />
-        </div>
+      {/* The coloured band itself. */}
+      <div className={`absolute inset-0 ${COLOR_BG[color]}`} />
+      {/* The hole — a square (in pixels) sized to match the ribbon's height,
+          so the shape stays undistorted regardless of the playfield's
+          aspect ratio. */}
+      <div className="absolute top-1/2 left-1/2 aspect-square h-full -translate-x-1/2 -translate-y-1/2">
+        <ShapeView
+          shape={shape}
+          bgClass={HOLE_BG}
+          fillClass={HOLE_FILL}
+          className="h-full w-full"
+        />
       </div>
     </div>
   );
@@ -371,19 +390,23 @@ export default function ColorSwitch() {
               aria-hidden="true"
             />
 
-            {/* Avatar */}
+            {/* Avatar — sized by playfield height so its pixel dimensions
+                match the ribbon's hole (both AVATAR_SIZE % of height with
+                aspect-square forcing a true pixel-square). Width-based
+                sizing would distort the shape because the playfield is
+                aspect-[3/4]. */}
             <div
-              className="absolute -translate-x-1/2 -translate-y-1/2"
+              className="absolute aspect-square -translate-x-1/2 -translate-y-1/2"
               style={{
                 left: `${AVATAR_X}%`,
                 top: `${AVATAR_Y}%`,
-                width: `${AVATAR_SIZE}%`,
                 height: `${AVATAR_SIZE}%`,
               }}
             >
               <ShapeView
                 shape={avatarShape}
-                color={avatarColor}
+                bgClass={COLOR_BG[avatarColor]}
+                fillClass={COLOR_FILL[avatarColor]}
                 className="h-full w-full"
               />
             </div>
