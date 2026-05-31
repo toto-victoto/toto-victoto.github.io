@@ -112,16 +112,18 @@ When the maintainer asks to build a **new** mini-game step by step ("guide me"),
 follow this loop for each step (palier), in order:
 
 1. **Intro** — a short message: what the step builds and the key concepts.
-2. **Quiz before editing** — multiple-choice questions derived from the intro
-   but whose answers were *not* explicitly stated, so they require inference
-   rather than recall. Vary which option is correct across questions. Keep the
-   option explanations neutral — don't telegraph the answer in them. Prefer
-   technical, code-level questions (state vs ref, data modeling, timing, edge
-   cases), and include short code excerpts when useful.
-3. **Edit** — only after the answers, write the code for that step.
+2. **Open-ended questions before editing** — ask 2–4 free-form questions that
+   force the maintainer to *reason* about the implementation, not pick from
+   options. Good shapes: "here's the start of `play()` — how would you finish
+   it so X?", "given this data model, how would you detect Y?", "what should
+   live in `useState` vs `useRef` here, and why?". Include short code excerpts
+   where they help. The maintainer can ask for hints — give a small nudge
+   without revealing the full answer and let them try again.
+3. **Edit** — only after the answers (or an explicit "go ahead"), write the
+   code for that step.
 
 This applies to the **initial build** only. Later tuning iterations (adjusting
-gravity, sizes, colors, etc.) skip the intro/quiz — just make the change.
+gravity, sizes, colors, etc.) skip the intro/questions — just make the change.
 
 Commit the whole app as **one clean commit at the end** of the build — not
 after each step.
