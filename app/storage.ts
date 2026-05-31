@@ -29,6 +29,17 @@ export type Persisted = {
     winner: Player | null;
     winLine: number[] | null;
   };
+  ultimate: {
+    mode: "2p" | "ai";
+    scores: { X: number; O: number; draws: number };
+    board: (Player | null)[];
+    subWinners: (Player | "draw" | null)[];
+    turn: Player;
+    startedBy: Player;
+    nextSub: number | null;
+    winner: Player | null;
+    winLine: number[] | null;
+  };
 };
 
 type Stored = Partial<Persisted> & { schema?: number };

@@ -163,6 +163,30 @@ msgstr "2 Players"
 msgid "morpion.mode.ai"
 msgstr "vs CPU"
 
+msgid "ultimate.title"
+msgstr "Ultimate Tic-Tac-Toe"
+
+msgid "ultimate.rules"
+msgstr "Your cell sends your rival to that sub-board"
+
+msgid "ultimate.turn"
+msgstr "Turn:"
+
+msgid "ultimate.wins"
+msgstr "wins!"
+
+msgid "ultimate.draw"
+msgstr "Draw"
+
+msgid "ultimate.draws"
+msgstr "Draws"
+
+msgid "ultimate.mode.2p"
+msgstr "2 Players"
+
+msgid "ultimate.mode.ai"
+msgstr "vs CPU"
+
 msgid "colorswitch.title"
 msgstr "Threader 🪡"
 

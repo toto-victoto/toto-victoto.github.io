@@ -163,6 +163,30 @@ msgstr "2 joueurs"
 msgid "morpion.mode.ai"
 msgstr "vs Ordi"
 
+msgid "ultimate.title"
+msgstr "Morpion Ultime"
+
+msgid "ultimate.rules"
+msgstr "Ta case envoie l'adversaire dans ce sous-plateau"
+
+msgid "ultimate.turn"
+msgstr "Au tour de"
+
+msgid "ultimate.wins"
+msgstr "gagne !"
+
+msgid "ultimate.draw"
+msgstr "Match nul"
+
+msgid "ultimate.draws"
+msgstr "Nuls"
+
+msgid "ultimate.mode.2p"
+msgstr "2 joueurs"
+
+msgid "ultimate.mode.ai"
+msgstr "vs Ordi"
+
 msgid "colorswitch.title"
 msgstr "Threader 🪡"
 

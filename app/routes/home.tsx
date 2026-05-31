@@ -66,6 +66,14 @@ export default function Home() {
           </AppIcon>
 
           <AppIcon
+            to="/ultimate"
+            label={<Trans id="ultimate.title" message="Ultimate Tic-Tac-Toe" />}
+            tone="bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-600"
+          >
+            <span aria-hidden="true">🎯</span>
+          </AppIcon>
+
+          <AppIcon
             to="/colorswitch"
             label={<Trans id="colorswitch.title" message="Threader 🪡" />}
             tone="bg-gradient-to-br from-cyan-400 via-violet-500 to-pink-500"

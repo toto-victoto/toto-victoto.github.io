@@ -163,6 +163,30 @@ msgstr "双人"
 msgid "morpion.mode.ai"
 msgstr "对战电脑"
 
+msgid "ultimate.title"
+msgstr "终极井字棋"
+
+msgid "ultimate.rules"
+msgstr "你的格子将对手送往对应的子棋盘"
+
+msgid "ultimate.turn"
+msgstr "轮到"
+
+msgid "ultimate.wins"
+msgstr "获胜!"
+
+msgid "ultimate.draw"
+msgstr "平局"
+
+msgid "ultimate.draws"
+msgstr "平局数"
+
+msgid "ultimate.mode.2p"
+msgstr "双人"
+
+msgid "ultimate.mode.ai"
+msgstr "对战电脑"
+
 msgid "colorswitch.title"
 msgstr "Threader 🪡"
 
