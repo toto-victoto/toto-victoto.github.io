@@ -19,16 +19,6 @@ export type Persisted = {
   colorswitch: { best: number };
   rps: { player: number; cpu: number };
   roulette: { best: number; balance: number; history: number[] };
-  morpion: {
-    mode: "2p" | "ai";
-    scores: { X: number; O: number; draws: number };
-    placements: { player: Player; index: number }[];
-    turn: Player;
-    startedBy: Player;
-    turnCount: number;
-    winner: Player | null;
-    winLine: number[] | null;
-  };
   ultimate: {
     mode: "2p" | "ai";
     scores: { X: number; O: number; draws: number };

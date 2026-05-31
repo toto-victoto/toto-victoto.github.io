@@ -98,7 +98,7 @@ Every game follows the same shape. To add one named `foo`:
    in-progress round), extend the `Persisted` type in `app/storage.ts` with a
    `foo` slot and use `useStoredGame("foo", defaults)` (or `loadGame`/`saveGame`
    manually for shapes that don't map 1-for-1 to component state — see roulette
-   and morpion). Bump `SCHEMA_VERSION` if you change the on-disk shape of an
+   and ultimate). Bump `SCHEMA_VERSION` if you change the on-disk shape of an
    existing slot incompatibly; older blobs are then discarded silently.
 
 6. **Optional animation** — add a keyframe in `app/app.css` inside the `@theme`
@@ -143,7 +143,7 @@ Every game shares the same chrome via `app/components/GameLayout.tsx`:
 
 Because of the constraint above, each playfield uses relative sizing:
 
-- **Cells in a fixed grid (snake, morpion)** — wrap the grid in
+- **Cells in a fixed grid (snake, ultimate)** — wrap the grid in
   `<section className="flex flex-1 min-h-0 items-center justify-center">` and
   use `aspect-square` both on the grid container *and* on each cell. The
   container gives the largest square that fits the remaining area; the per-cell
@@ -184,10 +184,8 @@ Three entry points:
 
 For games whose persisted shape doesn't match component state one-for-one
 (roulette derives the saved balance as `balance + wagered` so an in-play
-refresh refunds the wager; morpion derives `board` from `placements`), skip
-the hook and do hydration + save effects by hand. Track total moves with a
-distinct counter when `placements.length` plateaus (e.g. FIFO with a piece
-cap), otherwise the draw cap can never fire.
+refresh refunds the wager), skip the hook and do hydration + save effects
+by hand.
 
 ## Conventions
 

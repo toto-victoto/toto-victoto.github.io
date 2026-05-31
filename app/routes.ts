@@ -7,7 +7,6 @@ export default [
   route("snake", "routes/snake.tsx"),
   route("flappy", "routes/flappy.tsx"),
   route("roulette", "routes/roulette.tsx"),
-  route("morpion", "routes/morpion.tsx"),
   route("ultimate", "routes/ultimate.tsx"),
   route("colorswitch", "routes/colorswitch.tsx"),
 ] satisfies RouteConfig;

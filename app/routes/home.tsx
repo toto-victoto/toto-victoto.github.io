@@ -56,16 +56,6 @@ export default function Home() {
           </AppIcon>
 
           <AppIcon
-            to="/morpion"
-            label={<Trans id="morpion.title" message="Tic-Tac-Toe XTreme 🔥" />}
-            tone="bg-gradient-to-br from-amber-400 via-orange-500 to-red-600"
-          >
-            <span aria-hidden="true" className="font-bold text-white">
-              #
-            </span>
-          </AppIcon>
-
-          <AppIcon
             to="/ultimate"
             label={<Trans id="ultimate.title" message="Ultimate Tic-Tac-Toe" />}
             tone="bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-600"

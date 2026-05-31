@@ -139,30 +139,6 @@ msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par Gi
 msgid "nav.home"
 msgstr "Accueil"
 
-msgid "morpion.title"
-msgstr "Morpion XTreme 🔥"
-
-msgid "morpion.rules"
-msgstr "8 jetons max — alignez-en 4 pour gagner"
-
-msgid "morpion.turn"
-msgstr "Au tour de"
-
-msgid "morpion.wins"
-msgstr "gagne !"
-
-msgid "morpion.draw"
-msgstr "Match nul"
-
-msgid "morpion.draws"
-msgstr "Nuls"
-
-msgid "morpion.mode.2p"
-msgstr "2 joueurs"
-
-msgid "morpion.mode.ai"
-msgstr "vs Ordi"
-
 msgid "ultimate.title"
 msgstr "Morpion Ultime"
 
