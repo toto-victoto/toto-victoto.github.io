@@ -30,6 +30,7 @@ export type Persisted = {
     winner: Player | null;
     winLine: number[] | null;
   };
+  trias: { best: number; marathonBest: number; timeAttackBest: number };
 };
 
 type Stored = Partial<Persisted> & { schema?: number };

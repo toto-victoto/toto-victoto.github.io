@@ -163,6 +163,72 @@ msgstr "2 Players"
 msgid "ultimate.mode.ai"
 msgstr "vs CPU"
 
+msgid "trias.title"
+msgstr "Trias"
+
+msgid "trias.score"
+msgstr "Score"
+
+msgid "trias.hold"
+msgstr "Hold"
+
+msgid "trias.level"
+msgstr "Level"
+
+msgid "trias.next"
+msgstr "Next"
+
+msgid "trias.gameover"
+msgstr "Stack overflow"
+
+msgid "trias.hint"
+msgstr "Swipe ← → to move · hold ↓ to soft-drop · ↑ to drop · long-press to hold · arrows / space / C on desktop"
+
+msgid "trias.time"
+msgstr "Time"
+
+msgid "trias.modes"
+msgstr "Modes"
+
+msgid "trias.mode.choose"
+msgstr "Choose a mode"
+
+msgid "trias.mode.endless"
+msgstr "Endless"
+
+msgid "trias.mode.marathon"
+msgstr "Marathon"
+
+msgid "trias.mode.timeattack"
+msgstr "Time Attack"
+
+msgid "trias.goal.endless"
+msgstr "Climb as high as you can"
+
+msgid "trias.goal.marathon"
+msgstr "Reach level {max}"
+
+msgid "trias.goal.timeattack"
+msgstr "Reach {target} points"
+
+msgid "trias.won.marathon"
+msgstr "Marathon complete!"
+
+msgid "trias.won.timeattack"
+msgstr "Target smashed!"
+
+msgid "trias.combo"
+msgstr "Combo"
+
+msgid "trias.clear.double"
+msgstr "Double"
+
+msgid "trias.clear.triple"
+msgstr "Triple"
+
+msgid "trias.clear.perfect"
+msgstr "Perfect clear!"
+
 msgid "colorswitch.title"
 msgstr "Threader 🪡"
 

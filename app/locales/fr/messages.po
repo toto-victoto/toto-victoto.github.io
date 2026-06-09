@@ -163,6 +163,72 @@ msgstr "2 joueurs"
 msgid "ultimate.mode.ai"
 msgstr "vs Ordi"
 
+msgid "trias.title"
+msgstr "Trias"
+
+msgid "trias.score"
+msgstr "Score"
+
+msgid "trias.hold"
+msgstr "Hold"
+
+msgid "trias.level"
+msgstr "Niveau"
+
+msgid "trias.next"
+msgstr "Suite"
+
+msgid "trias.gameover"
+msgstr "Pile pleine"
+
+msgid "trias.hint"
+msgstr "Glisse ← → pour bouger · maintiens ↓ pour accélérer · ↑ pour lâcher · appui long = réserve · flèches / espace / C au clavier"
+
+msgid "trias.time"
+msgstr "Temps"
+
+msgid "trias.modes"
+msgstr "Modes"
+
+msgid "trias.mode.choose"
+msgstr "Choisis un mode"
+
+msgid "trias.mode.endless"
+msgstr "Sans fin"
+
+msgid "trias.mode.marathon"
+msgstr "Marathon"
+
+msgid "trias.mode.timeattack"
+msgstr "Contre-la-montre"
+
+msgid "trias.goal.endless"
+msgstr "Monte le plus haut possible"
+
+msgid "trias.goal.marathon"
+msgstr "Atteins le niveau {max}"
+
+msgid "trias.goal.timeattack"
+msgstr "Atteins {target} points"
+
+msgid "trias.won.marathon"
+msgstr "Marathon terminé !"
+
+msgid "trias.won.timeattack"
+msgstr "Objectif explosé !"
+
+msgid "trias.combo"
+msgstr "Combo"
+
+msgid "trias.clear.double"
+msgstr "Double"
+
+msgid "trias.clear.triple"
+msgstr "Triplé"
+
+msgid "trias.clear.perfect"
+msgstr "Grille vidée !"
+
 msgid "colorswitch.title"
 msgstr "Threader 🪡"
 

@@ -163,6 +163,72 @@ msgstr "双人"
 msgid "ultimate.mode.ai"
 msgstr "对战电脑"
 
+msgid "trias.title"
+msgstr "Trias"
+
+msgid "trias.score"
+msgstr "得分"
+
+msgid "trias.hold"
+msgstr "暂存"
+
+msgid "trias.level"
+msgstr "等级"
+
+msgid "trias.next"
+msgstr "下一个"
+
+msgid "trias.gameover"
+msgstr "堆满了"
+
+msgid "trias.hint"
+msgstr "左右滑动移动 · 按住下滑加速 · 上滑落子 · 长按暂存 · 电脑用方向键 / 空格 / C"
+
+msgid "trias.time"
+msgstr "时间"
+
+msgid "trias.modes"
+msgstr "模式"
+
+msgid "trias.mode.choose"
+msgstr "选择模式"
+
+msgid "trias.mode.endless"
+msgstr "无尽"
+
+msgid "trias.mode.marathon"
+msgstr "马拉松"
+
+msgid "trias.mode.timeattack"
+msgstr "计时赛"
+
+msgid "trias.goal.endless"
+msgstr "尽可能堆得更高"
+
+msgid "trias.goal.marathon"
+msgstr "达到第 {max} 级"
+
+msgid "trias.goal.timeattack"
+msgstr "达到 {target} 分"
+
+msgid "trias.won.marathon"
+msgstr "马拉松完成！"
+
+msgid "trias.won.timeattack"
+msgstr "目标达成！"
+
+msgid "trias.combo"
+msgstr "连击"
+
+msgid "trias.clear.double"
+msgstr "双行"
+
+msgid "trias.clear.triple"
+msgstr "三行"
+
+msgid "trias.clear.perfect"
+msgstr "完美清屏！"
+
 msgid "colorswitch.title"
 msgstr "Threader 🪡"
 

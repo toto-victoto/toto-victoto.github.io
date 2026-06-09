@@ -64,6 +64,14 @@ export default function Home() {
           </AppIcon>
 
           <AppIcon
+            to="/trias"
+            label={<Trans id="trias.title" message="Trias" />}
+            tone="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-700"
+          >
+            <span aria-hidden="true">🔻</span>
+          </AppIcon>
+
+          <AppIcon
             to="/colorswitch"
             label={<Trans id="colorswitch.title" message="Threader 🪡" />}
             tone="bg-gradient-to-br from-cyan-400 via-violet-500 to-pink-500"

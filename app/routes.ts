@@ -8,5 +8,6 @@ export default [
   route("flappy", "routes/flappy.tsx"),
   route("roulette", "routes/roulette.tsx"),
   route("ultimate", "routes/ultimate.tsx"),
+  route("trias", "routes/trias.tsx"),
   route("colorswitch", "routes/colorswitch.tsx"),
 ] satisfies RouteConfig;
