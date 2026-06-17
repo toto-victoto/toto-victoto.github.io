@@ -8,32 +8,29 @@ import { useStoredGame } from "../storage";
 // All positions are expressed in % of the playfield so the game is
 // resolution-independent and scales with its responsive container. X is % of
 // width, Y is % of height.
-const ASPECT = 3 / 4; // playfield width : height
 const AVATAR_Y = 74; // % — avatar rides a fixed aim line
 const RIBBON_HEIGHT = 11; // % of height; the hole is a square of this side
 const AVATAR_SIZE = 7; // % of height; smaller than the hole so passing has leeway
-
-// A pixel-square sized by height is wider in *width* terms by 1/ASPECT, so its
-// half-width as a % of WIDTH is derived from the fixed aspect ratio. This keeps
-// the visual hole position and the collision math in the same (width-%) space.
-const HOLE_HALF_W = RIBBON_HEIGHT / 2 / ASPECT;
-const AVATAR_HALF_W = AVATAR_SIZE / 2 / ASPECT;
-const X_MIN = HOLE_HALF_W; // keep holes fully on-screen
-const X_MAX = 100 - HOLE_HALF_W;
-const AVATAR_X_MIN = AVATAR_HALF_W;
-const AVATAR_X_MAX = 100 - AVATAR_HALF_W;
-// How far the avatar's centre may sit from the hole's centre and still thread
-// it — the gap between the (smaller) avatar and the hole. This is the leeway.
-const PASS_TOLERANCE = HOLE_HALF_W - AVATAR_HALF_W;
 const COLLISION_Y = AVATAR_Y; // resolve a ribbon as it crosses the aim line
+const DEFAULT_ASPECT = 3 / 4; // playfield width:height before it's measured
 
-// The ribbon is drawn as one full-width SVG (no slab seams). Choosing the
-// viewBox so its aspect matches the band's rendered aspect (width:band-height =
-// 100·ASPECT : RIBBON_HEIGHT) makes the SVG units square under
-// preserveAspectRatio="none", so the cut-out shape isn't distorted.
-const VB_W = 100 * ASPECT; // viewBox width in square units
-const VB_H = RIBBON_HEIGHT; // viewBox height; also the hole's side
-const HOLE_SCALE = VB_H / 10; // shapes are authored in a 0..10 box
+// The playfield's real width:height isn't guaranteed to be 3:4 — a tall, narrow
+// viewport makes it taller — so we MEASURE it and derive every width-% value
+// from the live aspect. A pixel-square sized by HEIGHT is 1/aspect as wide in
+// width-% terms, hence the `/ a` below. Keeping the hole geometry, the collision
+// test, and the cutout's viewBox all keyed to the same measured aspect is what
+// keeps the shape un-stretched and the visual hole aligned with the hit-test.
+const holeHalfW = (a: number) => RIBBON_HEIGHT / 2 / a; // %width
+const avatarHalfW = (a: number) => AVATAR_SIZE / 2 / a;
+// Leeway: how far the avatar's centre may sit from the hole's and still thread.
+const passTolerance = (a: number) => (RIBBON_HEIGHT - AVATAR_SIZE) / 2 / a;
+
+// The ribbon is one full-width SVG (no slab seams). Setting the viewBox to
+// 100·aspect × RIBBON_HEIGHT makes its units square under
+// preserveAspectRatio="none" for ANY measured aspect, so the cutout never
+// distorts; the shape is authored in a 0..10 box, hence HOLE_SCALE.
+const VB_H = RIBBON_HEIGHT;
+const HOLE_SCALE = RIBBON_HEIGHT / 10;
 
 // Difficulty ramps with score along three independent levers, one bumped at
 // random per step: ribbons fall faster, pack closer, or slide sideways faster.
@@ -96,14 +93,17 @@ function RibbonHalf({
   x,
   y,
   half,
+  aspect,
 }: {
   id: number;
   shape: ShapeName;
   x: number;
   y: number;
   half: "top" | "bottom";
+  aspect: number;
 }) {
-  const cx = x * ASPECT; // hole centre in viewBox units
+  const vbW = 100 * aspect; // viewBox width in (now square) units
+  const cx = x * aspect; // hole centre in viewBox units
   const maskId = `hole-${half}-${id}`;
   const gradId = `rib-${half}-${id}`;
   const bandTop = y - RIBBON_HEIGHT / 2;
@@ -115,7 +115,7 @@ function RibbonHalf({
       aria-hidden="true"
     >
       <svg
-        viewBox={`0 0 ${VB_W} ${VB_H}`}
+        viewBox={`0 0 ${vbW} ${VB_H}`}
         preserveAspectRatio="none"
         className="absolute inset-x-0 w-full"
         style={{ top: half === "top" ? "0" : "-100%", height: "200%" }}
@@ -127,14 +127,14 @@ function RibbonHalf({
           </linearGradient>
           <mask id={maskId}>
             {/* White keeps the ribbon; the black shape carves the hole. */}
-            <rect width={VB_W} height={VB_H} fill="white" />
+            <rect width={vbW} height={VB_H} fill="white" />
             <g transform={`translate(${cx - VB_H / 2} 0) scale(${HOLE_SCALE})`}>
               <polygon points={SHAPE_POINTS[shape]} fill="black" />
             </g>
           </mask>
         </defs>
         <rect
-          width={VB_W}
+          width={vbW}
           height={VB_H}
           fill={`url(#${gradId})`}
           mask={`url(#${maskId})`}
@@ -186,6 +186,12 @@ export default function ColorSwitch() {
   const [pass, setPass] = useState<{ key: number; x: number } | null>(null);
   const [sparks, setSparks] = useState<Spark[]>([]);
 
+  // Measured playfield aspect (width/height); geometry derives from it live.
+  const [aspect, setAspect] = useState(DEFAULT_ASPECT);
+  const aspectRef = useRef(DEFAULT_ASPECT);
+  aspectRef.current = aspect;
+  const fieldRef = useRef<HTMLDivElement | null>(null);
+
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
   const idRef = useRef(0);
@@ -202,10 +208,13 @@ export default function ColorSwitch() {
   } | null>(null);
 
   function makeRibbon(y: number): Ribbon {
+    const half = holeHalfW(aspectRef.current);
+    const lo = half;
+    const hi = 100 - half;
     return {
       id: idRef.current++,
       shape: randomFrom(SHAPES),
-      x: X_MIN + Math.random() * (X_MAX - X_MIN),
+      x: lo + Math.random() * (hi - lo),
       dir: Math.random() < 0.5 ? -1 : 1,
       y,
     };
@@ -220,7 +229,10 @@ export default function ColorSwitch() {
   const cycleShape = () =>
     setAvatarShape((s) => SHAPES[(SHAPES.indexOf(s) + 1) % SHAPES.length]);
   const moveAvatar = (dx: number) =>
-    setAvatarX((x) => clamp(x + dx, AVATAR_X_MIN, AVATAR_X_MAX));
+    setAvatarX((x) => {
+      const h = avatarHalfW(aspectRef.current);
+      return clamp(x + dx, h, 100 - h);
+    });
 
   const startGame = () => {
     setPhase("playing");
@@ -306,6 +318,22 @@ export default function ColorSwitch() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Measure the playfield's real aspect ratio — it's not reliably 3:4 (a tall
+  // viewport stretches it taller) — so the hole geometry and the cutout stay
+  // un-distorted. Re-measures on resize / rotation.
+  useEffect(() => {
+    const el = fieldRef.current;
+    if (!el) return;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) setAspect(r.width / r.height);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // Movement loop: scroll ribbons down and drift their holes sideways (bouncing
   // off the walls), spawning fresh ones to keep the chain evenly paced.
   useEffect(() => {
@@ -315,16 +343,18 @@ export default function ColorSwitch() {
         const v = speedRef.current;
         const gap = spacingRef.current;
         const hv = hspeedRef.current;
+        const xMin = holeHalfW(aspectRef.current);
+        const xMax = 100 - xMin;
         setRibbons((prev) => {
           const moved = prev
             .map((r) => {
               let x = r.x + r.dir * hv * dt;
               let dir = r.dir;
-              if (x < X_MIN) {
-                x = X_MIN;
+              if (x < xMin) {
+                x = xMin;
                 dir = 1;
-              } else if (x > X_MAX) {
-                x = X_MAX;
+              } else if (x > xMax) {
+                x = xMax;
                 dir = -1;
               }
               return { ...r, y: r.y + v * dt, x, dir };
@@ -369,11 +399,12 @@ export default function ColorSwitch() {
     if (phase !== "playing") return;
     let died = false;
     let gained = 0;
+    const tol = passTolerance(aspectRef.current);
     for (const r of ribbons) {
       if (handledRef.current.has(r.id)) continue;
       if (r.y >= COLLISION_Y) {
         handledRef.current.add(r.id);
-        const aligned = Math.abs(avatarX - r.x) <= PASS_TOLERANCE;
+        const aligned = Math.abs(avatarX - r.x) <= tol;
         if (r.shape === avatarShape && aligned) gained++;
         else died = true;
       }
@@ -450,6 +481,7 @@ export default function ColorSwitch() {
             leftover height lands at the bottom. */}
         <div className="flex min-h-0 flex-1 items-start justify-center">
           <div
+            ref={fieldRef}
             onPointerDown={phase === "gameover" ? undefined : onPointerDown}
             onPointerMove={phase === "gameover" ? undefined : onPointerMove}
             onPointerUp={phase === "gameover" ? undefined : onPointerUp}
@@ -457,10 +489,10 @@ export default function ColorSwitch() {
               phase === "gameover" ? "" : "cursor-pointer"
             }`}
           >
-            {/* Top halves — z-10, behind the avatar (the shape passes over). */}
+            {/* Bottom halves — z-10, behind the avatar (the shape passes over). */}
             <div className="absolute inset-0 z-10" aria-hidden="true">
               {ribbons.map((r) => (
-                <RibbonHalf key={r.id} id={r.id} shape={r.shape} x={r.x} y={r.y} half="top" />
+                <RibbonHalf key={r.id} id={r.id} shape={r.shape} x={r.x} y={r.y} half="bottom" aspect={aspect} />
               ))}
             </div>
 
@@ -485,10 +517,10 @@ export default function ColorSwitch() {
               </svg>
             </div>
 
-            {/* Bottom halves — z-30, in front of the avatar (it tucks under). */}
+            {/* Top halves — z-30, in front of the avatar (it tucks under). */}
             <div className="absolute inset-0 z-30" aria-hidden="true">
               {ribbons.map((r) => (
-                <RibbonHalf key={r.id} id={r.id} shape={r.shape} x={r.x} y={r.y} half="bottom" />
+                <RibbonHalf key={r.id} id={r.id} shape={r.shape} x={r.x} y={r.y} half="top" aspect={aspect} />
               ))}
             </div>
 
