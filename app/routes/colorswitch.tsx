@@ -66,6 +66,16 @@ const SHAPE_POINTS: Record<ShapeName, string> = {
   hexagon: "5,0.2 9.16,2.6 9.16,7.4 5,9.8 0.84,7.4 0.84,2.6",
 };
 
+// Each shape carries its own sleek two-stop gradient (and a glow rgb). The
+// avatar wears its current shape's gradient; a ribbon wears its hole shape's —
+// so colour reinforces shape, making the three far easier to tell apart at a
+// glance, and a matched pass lines up in colour too.
+const SHAPE_STYLE: Record<ShapeName, { from: string; to: string; glow: string }> = {
+  star: { from: "#fcd34d", to: "#f97316", glow: "251,191,36" }, // gold → orange
+  diamond: { from: "#38bdf8", to: "#4f46e5", glow: "56,189,248" }, // sky → indigo
+  hexagon: { from: "#f0abfc", to: "#c026d3", glow: "217,70,239" }, // pink → fuchsia
+};
+
 type Ribbon = { id: number; shape: ShapeName; x: number; dir: 1 | -1; y: number };
 type Phase = "idle" | "playing" | "gameover";
 type RampType = "speed" | "spacing" | "hspeed";
@@ -76,8 +86,6 @@ const RAMP_BADGE: Record<RampType, { glyph: string; color: string }> = {
   spacing: { glyph: "⇲", color: "text-sky-300" },
   hspeed: { glyph: "↔", color: "text-fuchsia-300" },
 };
-
-const SPARK_COLORS = ["#fde047", "#fb7185", "#ffffff"];
 
 const clamp = (v: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, v));
@@ -106,6 +114,7 @@ function RibbonHalf({
   half: "top" | "bottom";
 }) {
   const cx = x * ASPECT; // hole centre in viewBox units
+  const style = SHAPE_STYLE[shape];
   const maskId = `hole-${half}-${id}`;
   const gradId = `rib-${half}-${id}`;
   const bandTop = y - RIBBON_HEIGHT / 2;
@@ -124,8 +133,8 @@ function RibbonHalf({
       >
         <defs>
           <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#6366f1" />
-            <stop offset="1" stopColor="#6d28d9" />
+            <stop offset="0" stopColor={style.from} />
+            <stop offset="1" stopColor={style.to} />
           </linearGradient>
           <mask id={maskId}>
             {/* White keeps the ribbon; the black shape carves the hole. */}
@@ -184,8 +193,10 @@ export default function ColorSwitch() {
   const prevTierRef = useRef(0);
 
   // Validation burst when a shape threads its hole: a ring + radial sparks at
-  // the pass point.
-  const [pass, setPass] = useState<{ key: number; x: number } | null>(null);
+  // the pass point, tinted with the threaded shape's colour.
+  const [pass, setPass] = useState<{ key: number; x: number; color: string } | null>(
+    null,
+  );
   const [sparks, setSparks] = useState<Spark[]>([]);
 
   const lastTimeRef = useRef<number | null>(null);
@@ -349,8 +360,8 @@ export default function ColorSwitch() {
     };
   }, []);
 
-  // Fling a small radial spark burst from the pass point.
-  const burstSparks = () => {
+  // Fling a small radial spark burst from the pass point, in the given colours.
+  const burstSparks = (colors: string[]) => {
     setSparks(
       Array.from({ length: 9 }, (_, i) => {
         const a = (i / 9) * Math.PI * 2;
@@ -359,7 +370,7 @@ export default function ColorSwitch() {
           id: idRef.current * 100 + i, // unlikely to collide within a burst
           dx: Math.cos(a) * d,
           dy: Math.sin(a) * d,
-          color: SPARK_COLORS[i % SPARK_COLORS.length],
+          color: colors[i % colors.length],
         };
       }),
     );
@@ -381,9 +392,10 @@ export default function ColorSwitch() {
       }
     }
     if (gained) {
+      const st = SHAPE_STYLE[avatarShape];
       setScore((s) => s + gained);
-      setPass({ key: Date.now(), x: avatarX });
-      burstSparks();
+      setPass({ key: Date.now(), x: avatarX, color: st.from });
+      burstSparks([st.from, st.to, "#ffffff"]);
     }
     if (died) setPhase("gameover");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -431,11 +443,12 @@ export default function ColorSwitch() {
       setStored((s) => ({ best: Math.max(s.best, score) }));
   }, [phase, score, setStored]);
 
+  const avatarStyleDef = SHAPE_STYLE[avatarShape];
   const avatarStyle: CSSProperties = {
     left: `${avatarX}%`,
     top: `${AVATAR_Y}%`,
     height: `${AVATAR_SIZE}%`,
-    filter: "drop-shadow(0 0 6px rgba(251, 191, 36, 0.55))",
+    filter: `drop-shadow(0 0 6px rgba(${avatarStyleDef.glow}, 0.6))`,
   };
 
   return (
@@ -443,7 +456,7 @@ export default function ColorSwitch() {
       <BackButton />
       <GameLayout>
         <header className="text-center">
-          <h1 className="bg-gradient-to-r from-amber-300 to-rose-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
+          <h1 className="bg-gradient-to-r from-amber-300 via-sky-400 to-fuchsia-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
             <Trans id="colorswitch.title" message="Threader 🪡" />
           </h1>
         </header>
@@ -481,8 +494,8 @@ export default function ColorSwitch() {
               >
                 <defs>
                   <linearGradient id="avatar-grad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stopColor="#fde047" />
-                    <stop offset="1" stopColor="#fb7185" />
+                    <stop offset="0" stopColor={avatarStyleDef.from} />
+                    <stop offset="1" stopColor={avatarStyleDef.to} />
                   </linearGradient>
                 </defs>
                 <polygon points={SHAPE_POINTS[avatarShape]} fill="url(#avatar-grad)" />
@@ -504,7 +517,13 @@ export default function ColorSwitch() {
                 style={{ left: `${pass.x}%`, top: `${AVATAR_Y}%`, height: `${RIBBON_HEIGHT}%` }}
                 aria-hidden="true"
               >
-                <div className="h-full w-full animate-thread-ring rounded-full border-2 border-amber-300 [box-shadow:0_0_12px_rgba(251,191,36,0.7)]" />
+                <div
+                  className="h-full w-full animate-thread-ring rounded-full border-2"
+                  style={{
+                    borderColor: pass.color,
+                    boxShadow: `0 0 12px ${pass.color}`,
+                  }}
+                />
                 {sparks.map((s) => (
                   <span
                     key={s.id}
@@ -575,7 +594,7 @@ export default function ColorSwitch() {
                       </p>
                       <button
                         onClick={reset}
-                        className="rounded-full bg-gradient-to-r from-amber-300 to-rose-400 px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95"
+                        className="rounded-full bg-gradient-to-r from-amber-300 via-sky-400 to-fuchsia-500 px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95"
                       >
                         <Trans id="common.play_again" message="Play again" />
                       </button>

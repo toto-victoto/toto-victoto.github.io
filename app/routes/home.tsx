@@ -50,7 +50,7 @@ export default function Home() {
           <AppIcon
             to="/roulette"
             label={<Trans id="roulette.title" message="Roulette" />}
-            tone="bg-gradient-to-br from-red-500 to-green-800"
+            tone="bg-gradient-to-br from-rose-500 to-red-700"
           >
             <span aria-hidden="true">🎰</span>
           </AppIcon>
@@ -58,7 +58,7 @@ export default function Home() {
           <AppIcon
             to="/ultimate"
             label={<Trans id="ultimate.title" message="Ultimate Tic-Tac-Toe" />}
-            tone="bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-600"
+            tone="bg-gradient-to-br from-violet-500 to-purple-700"
           >
             <span aria-hidden="true">🎯</span>
           </AppIcon>
@@ -66,7 +66,7 @@ export default function Home() {
           <AppIcon
             to="/trias"
             label={<Trans id="trias.title" message="Trias" />}
-            tone="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-700"
+            tone="bg-gradient-to-br from-fuchsia-500 to-pink-600"
           >
             <span aria-hidden="true">🔻</span>
           </AppIcon>
@@ -74,7 +74,7 @@ export default function Home() {
           <AppIcon
             to="/colorswitch"
             label={<Trans id="colorswitch.title" message="Threader 🪡" />}
-            tone="bg-gradient-to-br from-cyan-400 via-violet-500 to-pink-500"
+            tone="bg-gradient-to-br from-amber-300 via-sky-400 to-fuchsia-500"
           >
             <span aria-hidden="true">🪡</span>
           </AppIcon>
@@ -82,7 +82,7 @@ export default function Home() {
           <AppIcon
             to="/about"
             label={<Trans id="home.app.about" message="About" />}
-            tone="bg-gradient-to-br from-sky-400 to-sky-600"
+            tone="bg-gradient-to-br from-slate-500 to-slate-700"
           >
             <span className="text-white font-light italic leading-none">i</span>
           </AppIcon>
