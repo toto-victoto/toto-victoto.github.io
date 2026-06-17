@@ -233,7 +233,7 @@ msgid "colorswitch.title"
 msgstr "Threader 🪡"
 
 msgid "colorswitch.start"
-msgstr "Tap gauche = forme · tap droit = couleur"
+msgstr "Tape pour changer de forme · glisse pour l'aligner"
 
 msgid "colorswitch.gameover"
 msgstr "Perdu !"

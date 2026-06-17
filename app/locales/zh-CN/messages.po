@@ -233,7 +233,7 @@ msgid "colorswitch.title"
 msgstr "Threader 🪡"
 
 msgid "colorswitch.start"
-msgstr "左点击 = 形状 · 右点击 = 颜色"
+msgstr "点击切换形状 · 拖动对准缺口"
 
 msgid "colorswitch.gameover"
 msgstr "游戏结束"

@@ -6,163 +6,111 @@ import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
 
 // All positions are expressed in % of the playfield so the game is
-// resolution-independent and scales with its responsive container.
-const AVATAR_X = 50; // % from the left edge
-const AVATAR_Y = 72; // % — avatar sits on a fixed aim line
-const AVATAR_SIZE = 9; // % side length of the avatar's bounding box
-const RIBBON_HEIGHT = AVATAR_SIZE; // matches the avatar so a perfect pass aligns
-const COLLISION_HALF = AVATAR_SIZE / 2; // collide when ribbon Y is within this of the avatar
+// resolution-independent and scales with its responsive container. X is % of
+// width, Y is % of height.
+const ASPECT = 3 / 4; // playfield width : height
+const AVATAR_Y = 74; // % — avatar rides a fixed aim line
+const RIBBON_HEIGHT = 11; // % of height; the hole is a square of this side
+const AVATAR_SIZE = 7; // % of height; smaller than the hole so passing has leeway
 
-// Difficulty ramps with score: bars either get faster or pack closer
-// together. Each ramp is one of the two, drawn at random.
-const SPEED_START = 15; // %/s
+// A pixel-square sized by height is wider in *width* terms by 1/ASPECT, so its
+// half-width as a % of WIDTH is derived from the fixed aspect ratio. This keeps
+// the visual hole position and the collision math in the same (width-%) space.
+const HOLE_HALF_W = RIBBON_HEIGHT / 2 / ASPECT;
+const AVATAR_HALF_W = AVATAR_SIZE / 2 / ASPECT;
+const X_MIN = HOLE_HALF_W; // keep holes fully on-screen
+const X_MAX = 100 - HOLE_HALF_W;
+const AVATAR_X_MIN = AVATAR_HALF_W;
+const AVATAR_X_MAX = 100 - AVATAR_HALF_W;
+// How far the avatar's centre may sit from the hole's centre and still thread
+// it — the gap between the (smaller) avatar and the hole. This is the leeway.
+const PASS_TOLERANCE = HOLE_HALF_W - AVATAR_HALF_W;
+const COLLISION_Y = AVATAR_Y; // resolve a ribbon as it crosses the aim line
+
+// Difficulty ramps with score along three independent levers, one bumped at
+// random per step: ribbons fall faster, pack closer, or slide sideways faster.
+const SPEED_START = 16; // vertical %/s
 const SPEED_MAX = 42;
 const SPEED_STEP = 3;
-const SPACING_START = 63; // % between consecutive ribbons
-const SPACING_MIN = 24;
+const SPACING_START = 58; // % between consecutive ribbons
+const SPACING_MIN = 26;
 const SPACING_STEP = 3;
-const RAMP_EVERY = 10; // points per difficulty step
-const MAX_DT = 0.05; // clamp dt so a backgrounded tab can't teleport bars
+const HSPEED_START = 10; // horizontal %/s of the hole's drift
+const HSPEED_MAX = 48;
+const HSPEED_STEP = 4;
+const RAMP_EVERY = 8; // points per difficulty step
+const MAX_DT = 0.05; // clamp dt so a backgrounded tab can't teleport ribbons
 
-const SHAPES = ["circle", "triangle", "square"] as const;
+const KEY_STEP = 5; // %/keypress for arrow-key avatar movement
+const TAP_SLOP = 6; // px of travel before a press counts as a drag, not a tap
+
+// Sleeker than triangle/circle/square: a five-point star, a rhombus, and a
+// hexagon — distinct silhouettes that read clearly even as small holes. Points
+// are in a 0..10 viewBox, reused for both the avatar and the ribbon's cutout.
+const SHAPES = ["star", "diamond", "hexagon"] as const;
 type ShapeName = (typeof SHAPES)[number];
 
-const COLORS = ["green", "blue", "red"] as const;
-type Color = (typeof COLORS)[number];
-
-const COLOR_BG: Record<Color, string> = {
-  green: "bg-emerald-500",
-  blue: "bg-sky-500",
-  red: "bg-rose-500",
+const SHAPE_POINTS: Record<ShapeName, string> = {
+  star: "5,0.2 6.18,3.38 9.56,3.52 6.9,5.62 7.82,8.88 5,7 2.18,8.88 3.1,5.62 0.44,3.52 3.82,3.38",
+  diamond: "5,0.3 9.7,5 5,9.7 0.3,5",
+  hexagon: "5,0.2 9.16,2.6 9.16,7.4 5,9.8 0.84,7.4 0.84,2.6",
 };
 
-const COLOR_FILL: Record<Color, string> = {
-  green: "fill-emerald-500",
-  blue: "fill-sky-500",
-  red: "fill-rose-500",
-};
-
-type Ribbon = { id: number; shape: ShapeName; color: Color; y: number };
+type Ribbon = { id: number; shape: ShapeName; x: number; dir: 1 | -1; y: number };
 type Phase = "idle" | "playing" | "gameover";
-type RampType = "speed" | "spacing";
+type RampType = "speed" | "spacing" | "hspeed";
+
+const RAMP_BADGE: Record<RampType, { glyph: string; color: string }> = {
+  speed: { glyph: "⚡", color: "text-amber-300" },
+  spacing: { glyph: "⇲", color: "text-sky-300" },
+  hspeed: { glyph: "↔", color: "text-fuchsia-300" },
+};
+
+const clamp = (v: number, lo: number, hi: number) =>
+  Math.max(lo, Math.min(hi, v));
 
 function randomFrom<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Reusable shape renderer: circle / square are plain divs; triangle is an SVG
-// polygon so its colour can be controlled by the same `fill-*` palette.
-// Callers pass the bg + fill classes explicitly so the same component renders
-// either a coloured game piece (avatar) or a dark "hole" inside a ribbon.
-function ShapeView({
-  shape,
-  bgClass,
-  fillClass,
-  className,
-  style,
-}: {
-  shape: ShapeName;
-  bgClass: string;
-  fillClass: string;
-  className?: string;
-  style?: CSSProperties;
-}) {
-  if (shape === "circle")
-    return (
-      <div
-        className={`rounded-full ${bgClass} ${className ?? ""}`}
-        style={style}
-      />
-    );
-  if (shape === "square")
-    return (
-      <div
-        className={`rounded-sm ${bgClass} ${className ?? ""}`}
-        style={style}
-      />
-    );
+// A ribbon: a sleek vertical-gradient barrier with the target shape punched
+// clean through it via an SVG mask. The cutout is genuinely transparent and the
+// avatar lives a layer below, so a matching, aligned avatar shows through the
+// hole — the "thread the needle" moment. Left/right slabs flank a square that
+// carries the cutout; all three share the same top-to-bottom gradient, so the
+// band reads as continuous no matter where the hole sits.
+function RibbonView({ id, shape, x }: { id: number; shape: ShapeName; x: number }) {
+  const maskId = `hole-${id}`;
+  const gradId = `ribbon-${id}`;
+  const slab = "absolute top-0 bottom-0 bg-gradient-to-b from-indigo-500 to-violet-700";
   return (
-    <svg
-      viewBox="0 0 10 10"
-      className={`${fillClass} ${className ?? ""}`}
-      style={style}
-      aria-hidden="true"
-    >
-      {/* Triangle fills the viewBox so it matches the visual weight of the
-          circle and square at the same container size. */}
-      <polygon points="5,0 10,10 0,10" />
-    </svg>
-  );
-}
-
-// A ribbon: two coloured slabs flanking a square central block that has the
-// target shape physically cut out via an SVG mask. The cutout is genuinely
-// transparent — combined with the avatar living at a lower z-index, that
-// gives the "passing through" illusion when a matching avatar lines up with
-// the hole. Using a mask instead of stacking a dark shape over a coloured
-// band also kills the sub-pixel seam that used to show at the bottom of
-// the shape.
-function RibbonView({
-  id,
-  shape,
-  color,
-  y,
-}: {
-  id: number;
-  shape: ShapeName;
-  color: Color;
-  y: number;
-}) {
-  const maskId = `ribbon-hole-${id}`;
-  return (
-    <div
-      className="absolute inset-x-0 z-20 flex"
-      style={{
-        top: `${y - RIBBON_HEIGHT / 2}%`,
-        height: `${RIBBON_HEIGHT}%`,
-      }}
-      aria-hidden="true"
-    >
-      {/* Left and right slabs share the colour; flex-1 makes them eat
-          whatever width is left after the central pixel-square block. */}
-      <div className={`flex-1 ${COLOR_BG[color]}`} />
-      <svg
-        className="h-full aspect-square"
-        viewBox="0 0 10 10"
-        preserveAspectRatio="xMidYMid meet"
+    <>
+      <div className={`${slab} left-0`} style={{ width: `${Math.max(0, x - HOLE_HALF_W)}%` }} />
+      <div className={`${slab} right-0`} style={{ left: `${x + HOLE_HALF_W}%` }} />
+      <div
+        className="absolute top-0 h-full aspect-square -translate-x-1/2"
+        style={{ left: `${x}%` }}
       >
-        <defs>
-          <mask id={maskId}>
-            {/* White = keep, black = cut out. The shape inside the block
-                becomes a real transparent hole. */}
-            <rect width="10" height="10" fill="white" />
-            {shape === "circle" && (
-              <circle cx="5" cy="5" r="4.2" fill="black" />
-            )}
-            {shape === "square" && (
-              <rect
-                x="0.8"
-                y="0.8"
-                width="8.4"
-                height="8.4"
-                rx="0.6"
-                fill="black"
-              />
-            )}
-            {shape === "triangle" && (
-              <polygon points="5,0.5 9.7,9.5 0.3,9.5" fill="black" />
-            )}
-          </mask>
-        </defs>
-        <rect
-          width="10"
-          height="10"
-          mask={`url(#${maskId})`}
-          className={COLOR_FILL[color]}
-        />
-      </svg>
-      <div className={`flex-1 ${COLOR_BG[color]}`} />
-    </div>
+        <svg
+          viewBox="0 0 10 10"
+          className="h-full w-full"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <defs>
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#6366f1" />
+              <stop offset="1" stopColor="#6d28d9" />
+            </linearGradient>
+            <mask id={maskId}>
+              {/* White keeps the ribbon, the black shape carves the hole. */}
+              <rect width="10" height="10" fill="white" />
+              <polygon points={SHAPE_POINTS[shape]} fill="black" />
+            </mask>
+          </defs>
+          <rect width="10" height="10" mask={`url(#${maskId})`} fill={`url(#${gradId})`} />
+        </svg>
+      </div>
+    </>
   );
 }
 
@@ -172,27 +120,30 @@ export function meta({}: Route.MetaArgs) {
     {
       name: "description",
       content:
-        "Cycle shape on the left, colour on the right — thread each ribbon's hole.",
+        "Thread the sliding gate: tap to switch shape, drag to line your shape up with the moving hole.",
     },
   ];
 }
 
 export default function ColorSwitch() {
   const [avatarShape, setAvatarShape] = useState<ShapeName>(SHAPES[0]);
-  const [avatarColor, setAvatarColor] = useState<Color>(COLORS[0]);
+  const [avatarX, setAvatarX] = useState(50);
   const [ribbons, setRibbons] = useState<Ribbon[]>([]);
   const [score, setScore] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [{ best }, setStored] = useStoredGame("colorswitch", { best: 0 });
 
-  // Difficulty: live, since ramps mutate them. Stored in refs too so the
+  // Difficulty: live, since ramps mutate them. Mirrored into refs so the
   // animation loop reads the latest without re-creating itself.
   const [speed, setSpeed] = useState(SPEED_START);
   const [spacing, setSpacing] = useState(SPACING_START);
+  const [hspeed, setHspeed] = useState(HSPEED_START);
   const speedRef = useRef(speed);
   const spacingRef = useRef(spacing);
+  const hspeedRef = useRef(hspeed);
   speedRef.current = speed;
   spacingRef.current = spacing;
+  hspeedRef.current = hspeed;
 
   // Brief visual flash on the score whenever a ramp fires.
   const [lastRamp, setLastRamp] = useState<{ type: RampType; key: number } | null>(
@@ -207,66 +158,82 @@ export default function ColorSwitch() {
   const handledRef = useRef<Set<number>>(new Set());
   const phaseRef = useRef<Phase>(phase);
   phaseRef.current = phase;
+  // Active pointer drag (vs. a tap), tracked imperatively to avoid re-renders.
+  const dragRef = useRef<{
+    startX: number;
+    lastX: number;
+    moved: boolean;
+    id: number;
+  } | null>(null);
 
-  function makeRibbon(y: number, prev: Ribbon | null): Ribbon {
-    let shape: ShapeName;
-    let color: Color;
-    // Always differ from the previous ribbon on at least one axis so the
-    // player must input something between any two ribbons.
-    do {
-      shape = randomFrom(SHAPES);
-      color = randomFrom(COLORS);
-    } while (prev && shape === prev.shape && color === prev.color);
-    return { id: idRef.current++, shape, color, y };
+  function makeRibbon(y: number): Ribbon {
+    return {
+      id: idRef.current++,
+      shape: randomFrom(SHAPES),
+      x: X_MIN + Math.random() * (X_MAX - X_MIN),
+      dir: Math.random() < 0.5 ? -1 : 1,
+      y,
+    };
   }
 
   function seedRibbons(): Ribbon[] {
     idRef.current = 0;
     handledRef.current = new Set();
-    const seeded: Ribbon[] = [];
-    let prev: Ribbon | null = null;
-    for (let i = 0; i < 5; i++) {
-      const y = -SPACING_START * (i + 1);
-      const r = makeRibbon(y, prev);
-      seeded.push(r);
-      prev = r;
-    }
-    return seeded;
+    return Array.from({ length: 5 }, (_, i) => makeRibbon(-SPACING_START * (i + 1)));
   }
 
   const cycleShape = () =>
     setAvatarShape((s) => SHAPES[(SHAPES.indexOf(s) + 1) % SHAPES.length]);
-  const cycleColor = () =>
-    setAvatarColor((c) => COLORS[(COLORS.indexOf(c) + 1) % COLORS.length]);
+  const moveAvatar = (dx: number) =>
+    setAvatarX((x) => clamp(x + dx, AVATAR_X_MIN, AVATAR_X_MAX));
 
-  // Left half cycles shape, right half cycles colour. The very first input
-  // also starts the round (and re-seeds the ribbons).
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (phaseRef.current === "gameover") return;
-    e.preventDefault();
-    if (phaseRef.current === "idle") {
-      setPhase("playing");
-      setRibbons(seedRibbons());
-    }
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (e.clientX - rect.left < rect.width / 2) cycleShape();
-    else cycleColor();
+  const startGame = () => {
+    setPhase("playing");
+    setRibbons(seedRibbons());
   };
 
   const reset = () => {
     setAvatarShape(SHAPES[0]);
-    setAvatarColor(COLORS[0]);
+    setAvatarX(50);
     setScore(0);
     setSpeed(SPEED_START);
     setSpacing(SPACING_START);
+    setHspeed(HSPEED_START);
     prevTierRef.current = 0;
     lastTimeRef.current = null;
     setRibbons(seedRibbons());
     setPhase("playing");
   };
 
-  // Keyboard: ArrowLeft cycles shape, ArrowRight cycles colour. Restart on
-  // game-over with any key.
+  // Tap (a press that doesn't travel) switches shape; press-and-drag slides the
+  // avatar. The first input also starts the round.
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (phaseRef.current === "gameover") return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (phaseRef.current === "idle") startGame();
+    dragRef.current = { startX: e.clientX, lastX: e.clientX, moved: false, id: e.pointerId };
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d || d.id !== e.pointerId) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (Math.abs(e.clientX - d.startX) > TAP_SLOP) d.moved = true;
+    const dxPct = ((e.clientX - d.lastX) / rect.width) * 100;
+    d.lastX = e.clientX;
+    if (d.moved && dxPct !== 0) moveAvatar(dxPct);
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (!d || d.id !== e.pointerId) return;
+    if (!d.moved) cycleShape(); // a clean tap → switch shape
+  };
+
+  // Keyboard: arrows slide the avatar, space/up switches shape, both start the
+  // round; on game-over, space/enter restarts.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (phaseRef.current === "gameover") {
@@ -276,42 +243,59 @@ export default function ColorSwitch() {
         }
         return;
       }
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        if (phaseRef.current === "idle") {
-          setPhase("playing");
-          setRibbons(seedRibbons());
-        }
-        cycleShape();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        if (phaseRef.current === "idle") {
-          setPhase("playing");
-          setRibbons(seedRibbons());
-        }
-        cycleColor();
+      const start = () => phaseRef.current === "idle" && startGame();
+      switch (e.key) {
+        case "ArrowLeft":
+          start();
+          moveAvatar(-KEY_STEP);
+          break;
+        case "ArrowRight":
+          start();
+          moveAvatar(KEY_STEP);
+          break;
+        case " ":
+        case "ArrowUp":
+        case "Enter":
+          start();
+          cycleShape();
+          break;
+        default:
+          return;
       }
+      e.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Movement loop: scroll ribbons down at the current speed, spawn fresh
-  // ones to keep the chain evenly paced.
+  // Movement loop: scroll ribbons down and drift their holes sideways (bouncing
+  // off the walls), spawning fresh ones to keep the chain evenly paced.
   useEffect(() => {
     const step = (t: number) => {
       if (lastTimeRef.current !== null && phaseRef.current === "playing") {
         const dt = Math.min((t - lastTimeRef.current) / 1000, MAX_DT);
         const v = speedRef.current;
         const gap = spacingRef.current;
+        const hv = hspeedRef.current;
         setRibbons((prev) => {
           const moved = prev
-            .map((r) => ({ ...r, y: r.y + v * dt }))
-            .filter((r) => r.y < 110);
+            .map((r) => {
+              let x = r.x + r.dir * hv * dt;
+              let dir = r.dir;
+              if (x < X_MIN) {
+                x = X_MIN;
+                dir = 1;
+              } else if (x > X_MAX) {
+                x = X_MAX;
+                dir = -1;
+              }
+              return { ...r, y: r.y + v * dt, x, dir };
+            })
+            .filter((r) => r.y < 115);
           const top = moved[moved.length - 1];
           if (!top || top.y > -gap) {
-            const spawnY = top ? top.y - gap : -gap;
-            moved.push(makeRibbon(spawnY, top ?? null));
+            moved.push(makeRibbon(top ? top.y - gap : -gap));
           }
           return moved;
         });
@@ -326,39 +310,41 @@ export default function ColorSwitch() {
     };
   }, []);
 
-  // Collision + scoring. handledRef makes this idempotent across re-renders.
+  // Collision + scoring, resolved once per ribbon as it crosses the aim line:
+  // a pass needs the matching shape AND the avatar centred within the hole.
   useEffect(() => {
     if (phase !== "playing") return;
     let died = false;
     let gained = 0;
     for (const r of ribbons) {
       if (handledRef.current.has(r.id)) continue;
-      if (Math.abs(r.y - AVATAR_Y) < COLLISION_HALF) {
+      if (r.y >= COLLISION_Y) {
         handledRef.current.add(r.id);
-        if (r.shape === avatarShape && r.color === avatarColor) gained++;
+        const aligned = Math.abs(avatarX - r.x) <= PASS_TOLERANCE;
+        if (r.shape === avatarShape && aligned) gained++;
         else died = true;
       }
     }
     if (died) setPhase("gameover");
     if (gained) setScore((s) => s + gained);
-  }, [ribbons, avatarShape, avatarColor, phase]);
+  }, [ribbons, avatarShape, avatarX, phase]);
 
-  // Every RAMP_EVERY points, randomly bump speed or shrink spacing.
+  // Every RAMP_EVERY points, bump a random un-maxed lever.
   useEffect(() => {
     if (phase !== "playing") return;
     const tier = Math.floor(score / RAMP_EVERY);
     if (tier <= prevTierRef.current) return;
     prevTierRef.current = tier;
-    const speedCapped = speedRef.current >= SPEED_MAX;
-    const spacingCapped = spacingRef.current <= SPACING_MIN;
-    if (speedCapped && spacingCapped) return; // both maxed, nothing left
-    let type: RampType;
-    if (speedCapped) type = "spacing";
-    else if (spacingCapped) type = "speed";
-    else type = Math.random() < 0.5 ? "speed" : "spacing";
-    if (type === "speed")
-      setSpeed((s) => Math.min(s + SPEED_STEP, SPEED_MAX));
-    else setSpacing((s) => Math.max(s - SPACING_STEP, SPACING_MIN));
+    const options: RampType[] = [];
+    if (speedRef.current < SPEED_MAX) options.push("speed");
+    if (spacingRef.current > SPACING_MIN) options.push("spacing");
+    if (hspeedRef.current < HSPEED_MAX) options.push("hspeed");
+    if (options.length === 0) return; // everything maxed
+    const type = randomFrom(options);
+    if (type === "speed") setSpeed((s) => Math.min(s + SPEED_STEP, SPEED_MAX));
+    else if (type === "spacing")
+      setSpacing((s) => Math.max(s - SPACING_STEP, SPACING_MIN));
+    else setHspeed((s) => Math.min(s + HSPEED_STEP, HSPEED_MAX));
     setLastRamp({ type, key: Date.now() });
   }, [score, phase]);
 
@@ -375,12 +361,19 @@ export default function ColorSwitch() {
       setStored((s) => ({ best: Math.max(s.best, score) }));
   }, [phase, score, setStored]);
 
+  const avatarStyle: CSSProperties = {
+    left: `${avatarX}%`,
+    top: `${AVATAR_Y}%`,
+    height: `${AVATAR_SIZE}%`,
+    filter: "drop-shadow(0 0 6px rgba(251, 191, 36, 0.55))",
+  };
+
   return (
     <>
       <BackButton />
       <GameLayout>
         <header className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="bg-gradient-to-r from-amber-300 to-rose-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
             <Trans id="colorswitch.title" message="Threader 🪡" />
           </h1>
         </header>
@@ -389,74 +382,56 @@ export default function ColorSwitch() {
             leftover height lands at the bottom. */}
         <div className="flex min-h-0 flex-1 items-start justify-center">
           <div
-            onPointerDown={phase === "gameover" ? undefined : handlePointerDown}
-            className={`relative aspect-[3/4] h-full max-h-full w-auto max-w-full overflow-hidden rounded-2xl bg-neutral-900 select-none touch-none ${
+            onPointerDown={phase === "gameover" ? undefined : onPointerDown}
+            onPointerMove={phase === "gameover" ? undefined : onPointerMove}
+            onPointerUp={phase === "gameover" ? undefined : onPointerUp}
+            className={`relative aspect-[3/4] h-full max-h-full w-auto max-w-full overflow-hidden rounded-2xl bg-gradient-to-b from-slate-950 to-neutral-950 ring-1 ring-white/5 select-none touch-none ${
               phase === "gameover" ? "" : "cursor-pointer"
             }`}
           >
-            {/* Halves: left = shape, right = colour. Faint dividers so the
-                player can see the tap zones. */}
-            <div
-              className="pointer-events-none absolute top-0 bottom-0 left-1/2 w-px bg-white/5"
-              aria-hidden="true"
-            />
-
             {ribbons.map((r) => (
-              <RibbonView
+              <div
                 key={r.id}
-                id={r.id}
-                shape={r.shape}
-                color={r.color}
-                y={r.y}
-              />
+                className="absolute inset-x-0 z-20"
+                style={{
+                  top: `${r.y - RIBBON_HEIGHT / 2}%`,
+                  height: `${RIBBON_HEIGHT}%`,
+                }}
+                aria-hidden="true"
+              >
+                <RibbonView id={r.id} shape={r.shape} x={r.x} />
+              </div>
             ))}
 
             {/* Aim line — z-30 to ride above the ribbons so the player can
-                always see the collision line, even when one is crossing it. */}
+                always see the collision line. */}
             <div
               className="absolute inset-x-0 z-30 border-t border-dashed border-white/15"
               style={{ top: `${AVATAR_Y}%` }}
               aria-hidden="true"
             />
 
-            {/* Avatar — sized by playfield height so its pixel dimensions
-                match the ribbon's hole (both AVATAR_SIZE % of height with
-                aspect-square forcing a true pixel-square). Sits at z-10,
-                below the ribbons' z-20, so a matching avatar shows through
-                the cutout for a "thread the needle" effect. */}
+            {/* Avatar — z-10, below the ribbons' z-20, so a matching, aligned
+                avatar shows through the cutout for the thread-the-needle look.
+                Slightly smaller than the hole, giving the pass some leeway. */}
             <div
               className="absolute z-10 aspect-square -translate-x-1/2 -translate-y-1/2"
-              style={{
-                left: `${AVATAR_X}%`,
-                top: `${AVATAR_Y}%`,
-                height: `${AVATAR_SIZE}%`,
-              }}
+              style={avatarStyle}
             >
-              <ShapeView
-                shape={avatarShape}
-                bgClass={COLOR_BG[avatarColor]}
-                fillClass={COLOR_FILL[avatarColor]}
-                className="h-full w-full"
-              />
+              <svg
+                viewBox="0 0 10 10"
+                className="h-full w-full overflow-visible"
+                aria-hidden="true"
+              >
+                <defs>
+                  <linearGradient id="avatar-grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fde047" />
+                    <stop offset="1" stopColor="#fb7185" />
+                  </linearGradient>
+                </defs>
+                <polygon points={SHAPE_POINTS[avatarShape]} fill="url(#avatar-grad)" />
+              </svg>
             </div>
-
-            {/* Tap-zone hints — only while waiting to start. */}
-            {phase === "idle" && (
-              <>
-                <div
-                  className="pointer-events-none absolute top-1/4 left-2 text-xs uppercase tracking-wider text-white/40"
-                  aria-hidden="true"
-                >
-                  ◧ shape
-                </div>
-                <div
-                  className="pointer-events-none absolute top-1/4 right-2 text-xs uppercase tracking-wider text-white/40"
-                  aria-hidden="true"
-                >
-                  color ◨
-                </div>
-              </>
-            )}
 
             {/* Score + ramp flash */}
             <div className="absolute top-3 inset-x-0 z-30 flex items-center justify-center gap-2 text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
@@ -471,14 +446,10 @@ export default function ColorSwitch() {
               {lastRamp && (
                 <span
                   key={`badge-${lastRamp.key}`}
-                  className={`text-2xl motion-safe:animate-rps-tick ${
-                    lastRamp.type === "speed"
-                      ? "text-amber-300"
-                      : "text-sky-300"
-                  }`}
+                  className={`text-2xl motion-safe:animate-rps-tick ${RAMP_BADGE[lastRamp.type].color}`}
                   aria-hidden="true"
                 >
-                  {lastRamp.type === "speed" ? "⚡" : "⇲"}
+                  {RAMP_BADGE[lastRamp.type].glyph}
                 </span>
               )}
             </div>
@@ -495,7 +466,7 @@ export default function ColorSwitch() {
                     <p className="text-lg font-medium text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
                       <Trans
                         id="colorswitch.start"
-                        message="Left tap = shape · right tap = color"
+                        message="Tap to switch shape · drag to line it up"
                       />
                     </p>
                   ) : (
@@ -509,7 +480,7 @@ export default function ColorSwitch() {
                       </p>
                       <button
                         onClick={reset}
-                        className={`rounded-full px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95 ${COLOR_BG[avatarColor]}`}
+                        className="rounded-full bg-gradient-to-r from-amber-300 to-rose-400 px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95"
                       >
                         <Trans id="common.play_again" message="Play again" />
                       </button>
