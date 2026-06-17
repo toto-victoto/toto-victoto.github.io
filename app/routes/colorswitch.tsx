@@ -27,6 +27,14 @@ const AVATAR_X_MAX = 100 - AVATAR_HALF_W;
 const PASS_TOLERANCE = HOLE_HALF_W - AVATAR_HALF_W;
 const COLLISION_Y = AVATAR_Y; // resolve a ribbon as it crosses the aim line
 
+// The ribbon is drawn as one full-width SVG (no slab seams). Choosing the
+// viewBox so its aspect matches the band's rendered aspect (width:band-height =
+// 100·ASPECT : RIBBON_HEIGHT) makes the SVG units square under
+// preserveAspectRatio="none", so the cut-out shape isn't distorted.
+const VB_W = 100 * ASPECT; // viewBox width in square units
+const VB_H = RIBBON_HEIGHT; // viewBox height; also the hole's side
+const HOLE_SCALE = VB_H / 10; // shapes are authored in a 0..10 box
+
 // Difficulty ramps with score along three independent levers, one bumped at
 // random per step: ribbons fall faster, pack closer, or slide sideways faster.
 const SPEED_START = 16; // vertical %/s
@@ -59,12 +67,15 @@ const SHAPE_POINTS: Record<ShapeName, string> = {
 type Ribbon = { id: number; shape: ShapeName; x: number; dir: 1 | -1; y: number };
 type Phase = "idle" | "playing" | "gameover";
 type RampType = "speed" | "spacing" | "hspeed";
+type Spark = { id: number; dx: number; dy: number; color: string };
 
 const RAMP_BADGE: Record<RampType, { glyph: string; color: string }> = {
   speed: { glyph: "⚡", color: "text-amber-300" },
   spacing: { glyph: "⇲", color: "text-sky-300" },
   hspeed: { glyph: "↔", color: "text-fuchsia-300" },
 };
+
+const SPARK_COLORS = ["#fde047", "#fb7185", "#ffffff"];
 
 const clamp = (v: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, v));
@@ -73,44 +84,63 @@ function randomFrom<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// A ribbon: a sleek vertical-gradient barrier with the target shape punched
-// clean through it via an SVG mask. The cutout is genuinely transparent and the
-// avatar lives a layer below, so a matching, aligned avatar shows through the
-// hole — the "thread the needle" moment. Left/right slabs flank a square that
-// carries the cutout; all three share the same top-to-bottom gradient, so the
-// band reads as continuous no matter where the hole sits.
-function RibbonView({ id, shape, x }: { id: number; shape: ShapeName; x: number }) {
-  const maskId = `hole-${id}`;
-  const gradId = `ribbon-${id}`;
-  const slab = "absolute top-0 bottom-0 bg-gradient-to-b from-indigo-500 to-violet-700";
+// One horizontal half of a ribbon, drawn as a single full-width SVG with the
+// target shape punched clean through it via a mask. The two halves of a ribbon
+// render in different z-layers (top behind the avatar, bottom in front), so a
+// threading shape weaves through the band — over the top, under the bottom —
+// for a real sense of passing *through* it. Each half clips a full-band SVG, so
+// the gradient stays seamless across the cut and across x.
+function RibbonHalf({
+  id,
+  shape,
+  x,
+  y,
+  half,
+}: {
+  id: number;
+  shape: ShapeName;
+  x: number;
+  y: number;
+  half: "top" | "bottom";
+}) {
+  const cx = x * ASPECT; // hole centre in viewBox units
+  const maskId = `hole-${half}-${id}`;
+  const gradId = `rib-${half}-${id}`;
+  const bandTop = y - RIBBON_HEIGHT / 2;
+  const top = half === "top" ? bandTop : bandTop + RIBBON_HEIGHT / 2;
   return (
-    <>
-      <div className={`${slab} left-0`} style={{ width: `${Math.max(0, x - HOLE_HALF_W)}%` }} />
-      <div className={`${slab} right-0`} style={{ left: `${x + HOLE_HALF_W}%` }} />
-      <div
-        className="absolute top-0 h-full aspect-square -translate-x-1/2"
-        style={{ left: `${x}%` }}
+    <div
+      className="absolute inset-x-0 overflow-hidden"
+      style={{ top: `${top}%`, height: `${RIBBON_HEIGHT / 2}%` }}
+      aria-hidden="true"
+    >
+      <svg
+        viewBox={`0 0 ${VB_W} ${VB_H}`}
+        preserveAspectRatio="none"
+        className="absolute inset-x-0 w-full"
+        style={{ top: half === "top" ? "0" : "-100%", height: "200%" }}
       >
-        <svg
-          viewBox="0 0 10 10"
-          className="h-full w-full"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <defs>
-            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#6366f1" />
-              <stop offset="1" stopColor="#6d28d9" />
-            </linearGradient>
-            <mask id={maskId}>
-              {/* White keeps the ribbon, the black shape carves the hole. */}
-              <rect width="10" height="10" fill="white" />
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#6366f1" />
+            <stop offset="1" stopColor="#6d28d9" />
+          </linearGradient>
+          <mask id={maskId}>
+            {/* White keeps the ribbon; the black shape carves the hole. */}
+            <rect width={VB_W} height={VB_H} fill="white" />
+            <g transform={`translate(${cx - VB_H / 2} 0) scale(${HOLE_SCALE})`}>
               <polygon points={SHAPE_POINTS[shape]} fill="black" />
-            </mask>
-          </defs>
-          <rect width="10" height="10" mask={`url(#${maskId})`} fill={`url(#${gradId})`} />
-        </svg>
-      </div>
-    </>
+            </g>
+          </mask>
+        </defs>
+        <rect
+          width={VB_W}
+          height={VB_H}
+          fill={`url(#${gradId})`}
+          mask={`url(#${maskId})`}
+        />
+      </svg>
+    </div>
   );
 }
 
@@ -150,6 +180,11 @@ export default function ColorSwitch() {
     null,
   );
   const prevTierRef = useRef(0);
+
+  // Validation burst when a shape threads its hole: a ring + radial sparks at
+  // the pass point.
+  const [pass, setPass] = useState<{ key: number; x: number } | null>(null);
+  const [sparks, setSparks] = useState<Spark[]>([]);
 
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -201,6 +236,8 @@ export default function ColorSwitch() {
     setHspeed(HSPEED_START);
     prevTierRef.current = 0;
     lastTimeRef.current = null;
+    setPass(null);
+    setSparks([]);
     setRibbons(seedRibbons());
     setPhase("playing");
   };
@@ -310,6 +347,22 @@ export default function ColorSwitch() {
     };
   }, []);
 
+  // Fling a small radial spark burst from the pass point.
+  const burstSparks = () => {
+    setSparks(
+      Array.from({ length: 9 }, (_, i) => {
+        const a = (i / 9) * Math.PI * 2;
+        const d = 38 + Math.random() * 26;
+        return {
+          id: idRef.current * 100 + i, // unlikely to collide within a burst
+          dx: Math.cos(a) * d,
+          dy: Math.sin(a) * d,
+          color: SPARK_COLORS[i % SPARK_COLORS.length],
+        };
+      }),
+    );
+  };
+
   // Collision + scoring, resolved once per ribbon as it crosses the aim line:
   // a pass needs the matching shape AND the avatar centred within the hole.
   useEffect(() => {
@@ -325,8 +378,13 @@ export default function ColorSwitch() {
         else died = true;
       }
     }
+    if (gained) {
+      setScore((s) => s + gained);
+      setPass({ key: Date.now(), x: avatarX });
+      burstSparks();
+    }
     if (died) setPhase("gameover");
-    if (gained) setScore((s) => s + gained);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ribbons, avatarShape, avatarX, phase]);
 
   // Every RAMP_EVERY points, bump a random un-maxed lever.
@@ -348,12 +406,22 @@ export default function ColorSwitch() {
     setLastRamp({ type, key: Date.now() });
   }, [score, phase]);
 
-  // Clear the ramp flash after a moment so the icon doesn't linger.
+  // Clear the transient flashes after their animations finish.
   useEffect(() => {
     if (!lastRamp) return;
     const t = setTimeout(() => setLastRamp(null), 1200);
     return () => clearTimeout(t);
   }, [lastRamp]);
+  useEffect(() => {
+    if (!pass) return;
+    const t = setTimeout(() => setPass(null), 520);
+    return () => clearTimeout(t);
+  }, [pass]);
+  useEffect(() => {
+    if (sparks.length === 0) return;
+    const t = setTimeout(() => setSparks([]), 600);
+    return () => clearTimeout(t);
+  }, [sparks]);
 
   // Track the best score of the session.
   useEffect(() => {
@@ -389,33 +457,17 @@ export default function ColorSwitch() {
               phase === "gameover" ? "" : "cursor-pointer"
             }`}
           >
-            {ribbons.map((r) => (
-              <div
-                key={r.id}
-                className="absolute inset-x-0 z-20"
-                style={{
-                  top: `${r.y - RIBBON_HEIGHT / 2}%`,
-                  height: `${RIBBON_HEIGHT}%`,
-                }}
-                aria-hidden="true"
-              >
-                <RibbonView id={r.id} shape={r.shape} x={r.x} />
-              </div>
-            ))}
+            {/* Top halves — z-10, behind the avatar (the shape passes over). */}
+            <div className="absolute inset-0 z-10" aria-hidden="true">
+              {ribbons.map((r) => (
+                <RibbonHalf key={r.id} id={r.id} shape={r.shape} x={r.x} y={r.y} half="top" />
+              ))}
+            </div>
 
-            {/* Aim line — z-30 to ride above the ribbons so the player can
-                always see the collision line. */}
+            {/* Avatar — z-20, woven between the ribbon halves. Slightly smaller
+                than the hole, giving the pass some leeway. */}
             <div
-              className="absolute inset-x-0 z-30 border-t border-dashed border-white/15"
-              style={{ top: `${AVATAR_Y}%` }}
-              aria-hidden="true"
-            />
-
-            {/* Avatar — z-10, below the ribbons' z-20, so a matching, aligned
-                avatar shows through the cutout for the thread-the-needle look.
-                Slightly smaller than the hole, giving the pass some leeway. */}
-            <div
-              className="absolute z-10 aspect-square -translate-x-1/2 -translate-y-1/2"
+              className="absolute z-20 aspect-square -translate-x-1/2 -translate-y-1/2"
               style={avatarStyle}
             >
               <svg
@@ -433,8 +485,47 @@ export default function ColorSwitch() {
               </svg>
             </div>
 
+            {/* Bottom halves — z-30, in front of the avatar (it tucks under). */}
+            <div className="absolute inset-0 z-30" aria-hidden="true">
+              {ribbons.map((r) => (
+                <RibbonHalf key={r.id} id={r.id} shape={r.shape} x={r.x} y={r.y} half="bottom" />
+              ))}
+            </div>
+
+            {/* Validation burst — ring + sparks at the threaded point. */}
+            {pass && (
+              <div
+                key={pass.key}
+                className="pointer-events-none absolute z-40 aspect-square -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${pass.x}%`, top: `${AVATAR_Y}%`, height: `${RIBBON_HEIGHT}%` }}
+                aria-hidden="true"
+              >
+                <div className="h-full w-full animate-thread-ring rounded-full border-2 border-amber-300 [box-shadow:0_0_12px_rgba(251,191,36,0.7)]" />
+                {sparks.map((s) => (
+                  <span
+                    key={s.id}
+                    className="absolute top-1/2 left-1/2 -ml-[2px] -mt-[2px] h-1 w-1 animate-thread-spark rounded-full"
+                    style={
+                      {
+                        backgroundColor: s.color,
+                        "--dx": `${s.dx}px`,
+                        "--dy": `${s.dy}px`,
+                      } as CSSProperties
+                    }
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Aim line — z-40 so the player can always see the thread line. */}
+            <div
+              className="absolute inset-x-0 z-40 border-t border-dashed border-white/15"
+              style={{ top: `${AVATAR_Y}%` }}
+              aria-hidden="true"
+            />
+
             {/* Score + ramp flash */}
-            <div className="absolute top-3 inset-x-0 z-30 flex items-center justify-center gap-2 text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
+            <div className="absolute top-3 inset-x-0 z-50 flex items-center justify-center gap-2 text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
               <span
                 key={lastRamp?.key ?? "stable"}
                 className={`inline-block text-4xl font-bold tabular-nums ${
@@ -457,7 +548,7 @@ export default function ColorSwitch() {
             {phase !== "playing" && (
               <div
                 onPointerDown={(e) => e.stopPropagation()}
-                className={`absolute inset-0 z-40 flex items-center justify-center bg-neutral-950/55 backdrop-blur-[1px] ${
+                className={`absolute inset-0 z-[60] flex items-center justify-center bg-neutral-950/55 backdrop-blur-[1px] ${
                   phase === "idle" ? "pointer-events-none" : ""
                 }`}
               >

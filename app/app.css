@@ -9,6 +9,8 @@
   --animate-fade-in: fade-in 500ms ease-out;
   --animate-trias-clear: trias-clear 320ms ease-out forwards;
   --animate-trias-confetti: trias-confetti 900ms ease-out forwards;
+  --animate-thread-ring: thread-ring 520ms ease-out forwards;
+  --animate-thread-spark: thread-spark 600ms ease-out forwards;
 
   @keyframes fade-in {
     from {
@@ -66,6 +68,30 @@
     }
     100% {
       transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+      opacity: 0;
+    }
+  }
+
+  /* Threader: a ring that pops outward when a shape clears its hole. */
+  @keyframes thread-ring {
+    0% {
+      transform: scale(0.3);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
+  /* Threader: a spark flung radially from a successful thread. */
+  @keyframes thread-spark {
+    0% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--dx), var(--dy));
       opacity: 0;
     }
   }
