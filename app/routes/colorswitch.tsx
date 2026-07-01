@@ -31,8 +31,8 @@ const HOLE_SCALE = RIBBON_HEIGHT / 10;
 
 // Difficulty ramps every RAMP_EVERY threads: faster fall, tighter spacing, or
 // quicker sideways drift, one at random per step.
-const SPEED_START = 16;
-const SPEED_MAX = 40;
+const SPEED_START = 32; // twice the old base — the field moves off the mark
+const SPEED_MAX = 56;
 const SPEED_STEP = 2.5;
 const SPACING_START = 58;
 const SPACING_MIN = 28;
@@ -631,15 +631,21 @@ export default function ColorSwitch() {
           </h1>
         </header>
 
-        <div className="flex min-h-0 flex-1 items-start justify-center">
+        {/* Handlers live on the FULL-HEIGHT container, not the 3:4 box, so the
+            empty space below the field is draggable too — you can steer from
+            the bottom of the screen. Drag is relative, and this container's
+            width equals the field's (w-full), so the scale is unchanged. */}
+        <div
+          onPointerDown={phase === "gameover" ? undefined : onPointerDown}
+          onPointerMove={phase === "gameover" ? undefined : onPointerMove}
+          onPointerUp={phase === "gameover" ? undefined : onPointerUp}
+          className={`flex min-h-0 flex-1 items-start justify-center touch-none select-none ${
+            phase === "gameover" ? "" : "cursor-pointer"
+          }`}
+        >
           {/* Sized by WIDTH (like Snake) so aspect-[3/4] holds in portrait. */}
           <div
-            onPointerDown={phase === "gameover" ? undefined : onPointerDown}
-            onPointerMove={phase === "gameover" ? undefined : onPointerMove}
-            onPointerUp={phase === "gameover" ? undefined : onPointerUp}
-            className={`relative aspect-[3/4] w-full max-h-full overflow-hidden rounded-2xl bg-gradient-to-b from-slate-950 to-neutral-950 ring-1 ring-white/5 select-none touch-none ${
-              phase === "gameover" ? "" : "cursor-pointer"
-            }`}
+            className="relative aspect-[3/4] w-full max-h-full overflow-hidden rounded-2xl bg-gradient-to-b from-slate-950 to-neutral-950 ring-1 ring-white/5"
           >
             {/* Combo glow rising from the aim line. */}
             <div
@@ -790,6 +796,7 @@ export default function ColorSwitch() {
             </div>
             <button
               type="button"
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={() => setMuted((m) => !m)}
               className="absolute top-3 right-3 z-50 text-xl opacity-70 transition hover:opacity-100"
               aria-label="Toggle sound"
