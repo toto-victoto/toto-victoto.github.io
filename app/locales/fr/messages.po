@@ -237,3 +237,6 @@ msgstr "Tape pour changer de forme · glisse pour l'aligner"
 
 msgid "colorswitch.gameover"
 msgstr "Perdu !"
+
+msgid "colorswitch.perfect"
+msgstr "Parfait"

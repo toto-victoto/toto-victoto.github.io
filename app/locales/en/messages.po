@@ -237,3 +237,6 @@ msgstr "Tap to switch shape · drag to line it up"
 
 msgid "colorswitch.gameover"
 msgstr "Game over"
+
+msgid "colorswitch.perfect"
+msgstr "Perfect"
