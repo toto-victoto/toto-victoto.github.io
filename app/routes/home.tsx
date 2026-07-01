@@ -74,7 +74,7 @@ export default function Home() {
           <AppIcon
             to="/colorswitch"
             label={<Trans id="colorswitch.title" message="Threader 🪡" />}
-            tone="bg-gradient-to-br from-amber-300 via-sky-400 to-fuchsia-500"
+            tone="bg-gradient-to-br from-amber-400 to-sky-500"
           >
             <span aria-hidden="true">🪡</span>
           </AppIcon>

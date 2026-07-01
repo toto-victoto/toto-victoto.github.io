@@ -51,23 +51,24 @@ const SHIELD_MAX = 2;
 const BEAD_BONUS = 8; // extra points for threading a bead
 const BEAD_CHANCE = 0.16; // per single hole
 
-// Five-point star, rhombus, hexagon — authored in a 0..10 box, reused for the
-// avatar and the ribbon cutouts.
-const SHAPES = ["star", "diamond", "hexagon"] as const;
+// Two shapes only — plenty of read-time isn't there now the field moves fast.
+// A diamond (the stitch / needle-eye) and a star, the pair that best evokes
+// sewing, in complementary colours (warm orange vs cool blue) so they're
+// unmistakable at a glance. Authored in a 0..10 box, reused for the avatar and
+// the ribbon cutouts.
+const SHAPES = ["star", "diamond"] as const;
 type ShapeName = (typeof SHAPES)[number];
 
 const SHAPE_POINTS: Record<ShapeName, string> = {
   star: "5,0.2 6.18,3.38 9.56,3.52 6.9,5.62 7.82,8.88 5,7 2.18,8.88 3.1,5.62 0.44,3.52 3.82,3.38",
   diamond: "5,0.3 9.7,5 5,9.7 0.3,5",
-  hexagon: "5,0.2 9.16,2.6 9.16,7.4 5,9.8 0.84,7.4 0.84,2.6",
 };
 
 // Each shape wears its own sleek gradient (+ glow rgb), so colour reinforces
 // shape: the avatar shows its current shape's, a ribbon shows its hole's.
 const SHAPE_STYLE: Record<ShapeName, { from: string; to: string; glow: string }> = {
-  star: { from: "#fcd34d", to: "#f97316", glow: "251,191,36" },
-  diamond: { from: "#38bdf8", to: "#4f46e5", glow: "56,189,248" },
-  hexagon: { from: "#f0abfc", to: "#c026d3", glow: "217,70,239" },
+  star: { from: "#fbbf24", to: "#f97316", glow: "251,146,60" }, // warm orange
+  diamond: { from: "#38bdf8", to: "#2563eb", glow: "56,189,248" }, // cool blue
 };
 
 // The combo tier tints the sewn thread and the field glow so escalation reads.
@@ -639,7 +640,7 @@ export default function ColorSwitch() {
       <BackButton />
       <GameLayout>
         <header className="text-center">
-          <h1 className="bg-gradient-to-r from-amber-300 via-sky-400 to-fuchsia-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
+          <h1 className="bg-gradient-to-r from-amber-400 to-sky-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
             <Trans id="colorswitch.title" message="Threader 🪡" />
           </h1>
         </header>
@@ -685,6 +686,19 @@ export default function ColorSwitch() {
                   className="absolute inset-0 z-[5] h-full w-full"
                   aria-hidden="true"
                 >
+                  {/* Two plain strokes fake the glow — a wide translucent one
+                      under a thin bright one. No SVG filter: the thread redraws
+                      every frame, and a per-frame drop-shadow tanks the fps. */}
+                  <polyline
+                    points={threadPoints}
+                    fill="none"
+                    stroke={threadColor}
+                    strokeOpacity={0.25}
+                    strokeWidth={7}
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                  />
                   <polyline
                     points={threadPoints}
                     fill="none"
@@ -693,7 +707,6 @@ export default function ColorSwitch() {
                     strokeLinejoin="round"
                     strokeLinecap="round"
                     vectorEffect="non-scaling-stroke"
-                    style={{ filter: `drop-shadow(0 0 3px ${threadColor})` }}
                   />
                 </svg>
               )}
@@ -874,7 +887,7 @@ export default function ColorSwitch() {
                       </p>
                       <button
                         onClick={reset}
-                        className="rounded-full bg-gradient-to-r from-amber-300 via-sky-400 to-fuchsia-500 px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95"
+                        className="rounded-full bg-gradient-to-r from-amber-400 to-sky-500 px-8 py-3 text-lg font-semibold text-neutral-950 transition hover:opacity-90 active:scale-95"
                       >
                         <Trans id="common.play_again" message="Play again" />
                       </button>
