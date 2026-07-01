@@ -457,8 +457,11 @@ export default function ColorSwitch() {
           if (!top || top.y > -gap) moved.push(nextRibbon(top ? top.y - gap : -gap));
           return moved;
         });
+        // Keep stitches well past the bottom edge so the thread stays anchored
+        // off-frame — it keeps flowing until the next hole is sewn, instead of
+        // vanishing the instant a passed ribbon leaves the screen.
         setStitches((prev) =>
-          prev.map((s) => ({ ...s, y: s.y + v * dt })).filter((s) => s.y < 122),
+          prev.map((s) => ({ ...s, y: s.y + v * dt })).filter((s) => s.y < 145),
         );
       }
       lastTimeRef.current = t;
@@ -612,13 +615,23 @@ export default function ColorSwitch() {
     filter: `drop-shadow(0 0 6px rgba(${st.glow}, 0.6))`,
   };
   const threadColor = comboColor(combo);
-  // Thread polyline: from the needle down through every stitched hole.
-  const threadPoints = [
-    `${avatarX},${AVATAR_Y}`,
-    ...[...stitches]
-      .sort((a, b) => a.y - b.y)
-      .map((s) => `${s.x},${s.y}`),
-  ].join(" ");
+  // Thread polyline: from the needle down through every stitched hole, then
+  // extended past the bottom edge along its last heading so the tail always
+  // trails off-frame instead of ending at the last passed hole.
+  const threadPts = [
+    { x: avatarX, y: AVATAR_Y },
+    ...[...stitches].sort((a, b) => a.y - b.y),
+  ];
+  if (threadPts.length >= 2) {
+    const a = threadPts[threadPts.length - 2];
+    const b = threadPts[threadPts.length - 1];
+    const endY = 150;
+    if (b.y < endY) {
+      const k = b.y - a.y > 0.001 ? (endY - b.y) / (b.y - a.y) : 0;
+      threadPts.push({ x: clamp(b.x + (b.x - a.x) * k, 0, 100), y: endY });
+    }
+  }
+  const threadPoints = threadPts.map((p) => `${p.x},${p.y}`).join(" ");
   const glowAlpha = Math.min(0.42, combo * 0.03);
 
   return (
