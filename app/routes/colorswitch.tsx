@@ -43,6 +43,11 @@ const HSPEED_STEP = 4;
 const RAMP_EVERY = 6; // threads per difficulty step
 const MAX_DT = 0.05;
 
+// Hit-stop: freeze the world scroll for a beat on a thread (a touch longer on a
+// Perfect) for a punchy "snap". Input stays live — only the descent pauses.
+const FREEZE_MS = 70;
+const FREEZE_PERFECT_MS = 130;
+
 const KEY_STEP = 5;
 const TAP_SLOP = 6;
 
@@ -218,6 +223,7 @@ export default function ColorSwitch() {
   const dragRef = useRef<{ startX: number; lastX: number; moved: boolean; id: number } | null>(null);
   const shakeElRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<AudioContext | null>(null);
+  const freezeUntilRef = useRef(0); // rAF timestamp until which the world is frozen
 
   // ---- Audio: a lazy WebAudio context + tiny synthesised blips ----
   const ensureAudio = () => {
@@ -338,6 +344,7 @@ export default function ColorSwitch() {
     shieldsRef.current = 0;
     threadsRef.current = 0;
     tierRef.current = 0;
+    freezeUntilRef.current = 0;
     setCombo(0);
     setShields(0);
     setStitches([]);
@@ -429,7 +436,13 @@ export default function ColorSwitch() {
   // Movement loop: scroll ribbons + stitches down, drift holes, spawn ribbons.
   useEffect(() => {
     const step = (t: number) => {
-      if (lastTimeRef.current !== null && phaseRef.current === "playing") {
+      // During the hit-stop window we skip the advance (but keep the clock
+      // ticking, so there's no catch-up jump when it resumes).
+      if (
+        lastTimeRef.current !== null &&
+        phaseRef.current === "playing" &&
+        t >= freezeUntilRef.current
+      ) {
         const dt = Math.min((t - lastTimeRef.current) / 1000, MAX_DT);
         const v = speedRef.current;
         const gap = spacingRef.current;
@@ -545,6 +558,9 @@ export default function ColorSwitch() {
       if (anyPerfect) soundPerfect(comboNow);
       else soundPass(comboNow);
       vibrate(anyPerfect ? 18 : 8);
+      // Hit-stop: freeze the descent for a beat to punch the moment.
+      const now = typeof performance !== "undefined" ? performance.now() : 0;
+      freezeUntilRef.current = now + (anyPerfect ? FREEZE_PERFECT_MS : FREEZE_MS);
     }
 
     if (missed) {
