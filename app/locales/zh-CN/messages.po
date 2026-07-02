@@ -229,20 +229,20 @@ msgstr "三行"
 msgid "trias.clear.perfect"
 msgstr "完美清屏！"
 
-msgid "colorswitch.title"
+msgid "threader.title"
 msgstr "Threader 🪡"
 
-msgid "colorswitch.start"
+msgid "threader.start"
 msgstr "点击切换形状 · 拖动对准缺口"
 
-msgid "colorswitch.gameover"
+msgid "threader.gameover"
 msgstr "游戏结束"
 
-msgid "colorswitch.perfect"
+msgid "threader.perfect"
 msgstr "完美"
 
-msgid "colorswitch.legend.bead"
+msgid "threader.legend.bead"
 msgstr "穿过圆珠可得额外分数"
 
-msgid "colorswitch.legend.shield"
+msgid "threader.legend.shield"
 msgstr "连击可获得护盾 — 每个替你挡下一次失误"

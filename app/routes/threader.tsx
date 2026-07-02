@@ -657,7 +657,7 @@ export default function Threader() {
       <GameLayout>
         <header className="text-center">
           <h1 className="bg-gradient-to-r from-amber-400 to-sky-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
-            <Trans id="colorswitch.title" message="Threader 🪡" />
+            <Trans id="threader.title" message="Threader 🪡" />
           </h1>
         </header>
 
@@ -798,7 +798,7 @@ export default function Threader() {
                       className="animate-fade-in absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-black uppercase tracking-wider [text-shadow:_0_1px_3px_rgb(0_0_0_/_70%)]"
                       style={{ color: pass.color }}
                     >
-                      <Trans id="colorswitch.perfect" message="Perfect" />
+                      <Trans id="threader.perfect" message="Perfect" />
                     </span>
                   )}
                   {sparks.map((s) => (
@@ -889,7 +889,7 @@ export default function Threader() {
                     <>
                       <p className="text-lg font-medium text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
                         <Trans
-                          id="colorswitch.start"
+                          id="threader.start"
                           message="Tap to switch shape · drag to line it up"
                         />
                       </p>
@@ -903,7 +903,7 @@ export default function Threader() {
                           />
                           <span>
                             <Trans
-                              id="colorswitch.legend.bead"
+                              id="threader.legend.bead"
                               message="Thread a bead for bonus points"
                             />
                           </span>
@@ -914,7 +914,7 @@ export default function Threader() {
                           </span>
                           <span>
                             <Trans
-                              id="colorswitch.legend.shield"
+                              id="threader.legend.shield"
                               message="Combos earn shields — each takes one hit for you"
                             />
                           </span>
@@ -924,7 +924,7 @@ export default function Threader() {
                   ) : (
                     <>
                       <p className="text-3xl font-bold text-white">
-                        <Trans id="colorswitch.gameover" message="Game over" />
+                        <Trans id="threader.gameover" message="Game over" />
                       </p>
                       <p className="text-sm text-white/90">
                         <Trans id="common.best" message="Best" />{" "}

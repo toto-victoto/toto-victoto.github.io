@@ -229,20 +229,20 @@ msgstr "Triplé"
 msgid "trias.clear.perfect"
 msgstr "Grille vidée !"
 
-msgid "colorswitch.title"
+msgid "threader.title"
 msgstr "Threader 🪡"
 
-msgid "colorswitch.start"
+msgid "threader.start"
 msgstr "Tape pour changer de forme · glisse pour l'aligner"
 
-msgid "colorswitch.gameover"
+msgid "threader.gameover"
 msgstr "Perdu !"
 
-msgid "colorswitch.perfect"
+msgid "threader.perfect"
 msgstr "Parfait"
 
-msgid "colorswitch.legend.bead"
+msgid "threader.legend.bead"
 msgstr "Enfile une boule pour des points bonus"
 
-msgid "colorswitch.legend.shield"
+msgid "threader.legend.shield"
 msgstr "Les combos donnent des boucliers — chacun encaisse une faute"
