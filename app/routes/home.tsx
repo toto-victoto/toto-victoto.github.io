@@ -72,7 +72,7 @@ export default function Home() {
           </AppIcon>
 
           <AppIcon
-            to="/colorswitch"
+            to="/threader"
             label={<Trans id="colorswitch.title" message="Threader 🪡" />}
             tone="bg-gradient-to-br from-amber-400 to-sky-500"
           >

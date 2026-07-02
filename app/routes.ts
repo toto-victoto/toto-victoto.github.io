@@ -9,5 +9,5 @@ export default [
   route("roulette", "routes/roulette.tsx"),
   route("ultimate", "routes/ultimate.tsx"),
   route("trias", "routes/trias.tsx"),
-  route("colorswitch", "routes/colorswitch.tsx"),
+  route("threader", "routes/threader.tsx"),
 ] satisfies RouteConfig;

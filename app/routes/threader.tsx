@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Trans } from "@lingui/react";
-import type { Route } from "./+types/colorswitch";
+import type { Route } from "./+types/threader";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
@@ -171,7 +171,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function ColorSwitch() {
+export default function Threader() {
   const [avatarShape, setAvatarShape] = useState<ShapeName>(SHAPES[0]);
   const [avatarX, setAvatarX] = useState(50);
   const [ribbons, setRibbons] = useState<Ribbon[]>([]);
@@ -181,6 +181,8 @@ export default function ColorSwitch() {
   const [shields, setShields] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [muted, setMuted] = useState(false);
+  // Storage key stays "colorswitch" (the old route name) so existing saved best
+  // scores survive the rename to Threader; it's an internal key, never shown.
   const [{ best }, setStored] = useStoredGame("colorswitch", { best: 0 });
 
   // Difficulty: live, mirrored to refs for the animation loop.
