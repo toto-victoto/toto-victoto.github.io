@@ -181,9 +181,7 @@ export default function Threader() {
   const [shields, setShields] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [muted, setMuted] = useState(false);
-  // Storage key stays "colorswitch" (the old route name) so existing saved best
-  // scores survive the rename to Threader; it's an internal key, never shown.
-  const [{ best }, setStored] = useStoredGame("colorswitch", { best: 0 });
+  const [{ best }, setStored] = useStoredGame("threader", { best: 0 });
 
   // Difficulty: live, mirrored to refs for the animation loop.
   const [speed, setSpeed] = useState(SPEED_START);

@@ -16,7 +16,7 @@ type Player = "X" | "O";
 export type Persisted = {
   snake: { best: number };
   flappy: { best: number };
-  colorswitch: { best: number };
+  threader: { best: number };
   rps: { player: number; cpu: number };
   roulette: { best: number; balance: number; history: number[] };
   ultimate: {
@@ -35,6 +35,18 @@ export type Persisted = {
 
 type Stored = Partial<Persisted> & { schema?: number };
 type GameKey = keyof Persisted;
+
+// Runtime list of the games that still exist. Keep in sync with Persisted; any
+// stored key not in here is dead data (a removed/renamed game) and gets pruned.
+const GAME_KEYS = [
+  "snake",
+  "flappy",
+  "threader",
+  "rps",
+  "roulette",
+  "ultimate",
+  "trias",
+] as const satisfies readonly GameKey[];
 
 function readAll(): Stored {
   if (typeof window === "undefined") return {};
@@ -59,6 +71,22 @@ function writeAll(state: Stored): void {
   } catch {
     // Storage full or disabled (Safari private mode) — silently skip.
   }
+}
+
+// Drop saved data for games that no longer exist (removed or renamed). Called
+// on home load so stale keys — e.g. an old game's slot or a pre-rename name —
+// don't linger forever. No-op when there's nothing to clean.
+export function pruneStorage(): void {
+  if (typeof window === "undefined") return;
+  const all = readAll();
+  const known = new Set<string>(GAME_KEYS);
+  let changed = false;
+  for (const key of Object.keys(all)) {
+    if (key === "schema" || known.has(key)) continue;
+    delete (all as Record<string, unknown>)[key];
+    changed = true;
+  }
+  if (changed) writeAll(all);
 }
 
 export function loadGame<K extends GameKey>(

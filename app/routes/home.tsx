@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/home";
 import { AppIcon } from "../components/AppIcon";
+import { pruneStorage } from "../storage";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -10,6 +12,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  // Sweep away saved data for games that no longer exist (removed or renamed).
+  useEffect(() => {
+    pruneStorage();
+  }, []);
+
   return (
     <main className="min-h-dvh bg-neutral-950 text-neutral-100 p-6 pt-24 pb-12">
       <div className="max-w-2xl mx-auto">
