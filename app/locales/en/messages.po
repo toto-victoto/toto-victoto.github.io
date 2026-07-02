@@ -240,3 +240,9 @@ msgstr "Game over"
 
 msgid "colorswitch.perfect"
 msgstr "Perfect"
+
+msgid "colorswitch.legend.bead"
+msgstr "Thread a bead for bonus points"
+
+msgid "colorswitch.legend.shield"
+msgstr "Combos earn shields — each takes one hit for you"

@@ -868,14 +868,43 @@ export default function ColorSwitch() {
                   phase === "idle" ? "pointer-events-none" : ""
                 }`}
               >
-                <div className="space-y-3 px-6 text-center">
+                <div className="space-y-4 px-6 text-center">
                   {phase === "idle" ? (
-                    <p className="text-lg font-medium text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
-                      <Trans
-                        id="colorswitch.start"
-                        message="Tap to switch shape · drag to line it up"
-                      />
-                    </p>
+                    <>
+                      <p className="text-lg font-medium text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">
+                        <Trans
+                          id="colorswitch.start"
+                          message="Tap to switch shape · drag to line it up"
+                        />
+                      </p>
+                      {/* Legend: what the collectibles do. */}
+                      <div className="mx-auto flex max-w-[16rem] flex-col gap-2 text-left text-sm text-white/85 [text-shadow:_0_1px_3px_rgb(0_0_0_/_70%)]">
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className="inline-block h-3 w-3 shrink-0 rounded-full bg-white"
+                            style={{ boxShadow: "0 0 8px 2px rgba(253,224,71,0.9)" }}
+                            aria-hidden="true"
+                          />
+                          <span>
+                            <Trans
+                              id="colorswitch.legend.bead"
+                              message="Thread a bead for bonus points"
+                            />
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <span className="shrink-0 text-base leading-none" aria-hidden="true">
+                            🛡️
+                          </span>
+                          <span>
+                            <Trans
+                              id="colorswitch.legend.shield"
+                              message="Combos earn shields — each takes one hit for you"
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <>
                       <p className="text-3xl font-bold text-white">

@@ -240,3 +240,9 @@ msgstr "Perdu !"
 
 msgid "colorswitch.perfect"
 msgstr "Parfait"
+
+msgid "colorswitch.legend.bead"
+msgstr "Enfile une boule pour des points bonus"
+
+msgid "colorswitch.legend.shield"
+msgstr "Les combos donnent des boucliers — chacun encaisse une faute"

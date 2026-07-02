@@ -240,3 +240,9 @@ msgstr "游戏结束"
 
 msgid "colorswitch.perfect"
 msgstr "完美"
+
+msgid "colorswitch.legend.bead"
+msgstr "穿过圆珠可得额外分数"
+
+msgid "colorswitch.legend.shield"
+msgstr "连击可获得护盾 — 每个替你挡下一次失误"
