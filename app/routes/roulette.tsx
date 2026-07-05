@@ -7,7 +7,9 @@ import { loadGame, saveGame } from "../storage";
 import { sfx } from "../sound";
 
 const START_BALANCE = 100;
-const STAKES = [1, 5, 10, 25];
+const STAKES = [1, 5, 10, 25, 100];
+// The chip selection: a fixed denomination, or "allin" (stake the whole pocket).
+type Stake = number | "allin";
 
 // European single-zero wheel. Reds don't follow a formula, so they're the one
 // thing we keep as a lookup; color/parity/range of any number derive from it.
@@ -129,7 +131,7 @@ export default function Roulette() {
   const [displayBalance, setDisplayBalance] = useState(START_BALANCE);
   const [best, setBest] = useState(START_BALANCE);
   const [bets, setBets] = useState<Record<string, number>>({});
-  const [stake, setStake] = useState(STAKES[1]);
+  const [stake, setStake] = useState<Stake>(STAKES[1]);
   const [result, setResult] = useState<number | null>(null);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -321,9 +323,11 @@ export default function Roulette() {
 
   const placeBet = (key: string) => {
     if (spinning) return;
-    if (stake > balance) return;
-    setBalance((b) => b - stake);
-    setBets((prev) => ({ ...prev, [key]: (prev[key] ?? 0) + stake }));
+    // "all-in" stakes the whole remaining pocket on this spot.
+    const amount = stake === "allin" ? balance : stake;
+    if (amount <= 0 || amount > balance) return;
+    setBalance((b) => b - amount);
+    setBets((prev) => ({ ...prev, [key]: (prev[key] ?? 0) + amount }));
     sfx.place();
   };
 
@@ -628,6 +632,17 @@ export default function Roulette() {
                         {s}
                       </button>
                     ))}
+                    <button
+                      onClick={() => setStake("allin")}
+                      disabled={spinning}
+                      className={`h-8 rounded-full px-2.5 text-xs font-bold uppercase tracking-wide ring-2 transition disabled:opacity-50 ${
+                        stake === "allin"
+                          ? "bg-rose-500 text-neutral-950 ring-rose-300"
+                          : "bg-neutral-800 text-rose-300 ring-transparent hover:bg-neutral-700"
+                      }`}
+                    >
+                      <Trans id="roulette.allin" message="All-in" />
+                    </button>
                   </div>
                   <button
                     onClick={clearBets}

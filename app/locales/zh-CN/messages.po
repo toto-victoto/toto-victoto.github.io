@@ -94,6 +94,9 @@ msgstr "下注中"
 msgid "roulette.chip"
 msgstr "筹码"
 
+msgid "roulette.allin"
+msgstr "全押"
+
 msgid "roulette.clear"
 msgstr "清除"
 

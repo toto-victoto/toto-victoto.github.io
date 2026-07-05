@@ -94,6 +94,9 @@ msgstr "In play"
 msgid "roulette.chip"
 msgstr "Chip"
 
+msgid "roulette.allin"
+msgstr "All-in"
+
 msgid "roulette.clear"
 msgstr "Clear bets"
 

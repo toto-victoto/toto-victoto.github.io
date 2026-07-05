@@ -94,6 +94,9 @@ msgstr "En jeu"
 msgid "roulette.chip"
 msgstr "Jeton"
 
+msgid "roulette.allin"
+msgstr "Tapis"
+
 msgid "roulette.clear"
 msgstr "Annuler les mises"
 
