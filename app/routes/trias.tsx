@@ -4,6 +4,7 @@ import type { Route } from "./+types/trias";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { loadGame, saveGame } from "../storage";
+import { sfx } from "../sound";
 
 // Tetris-standard playfield. Cells are nullable Tailwind background classes
 // so a non-null entry already encodes the colour of the locked piece.
@@ -474,6 +475,7 @@ export default function Trias() {
     if (mode === "marathon" && level >= MARATHON_MAX_LEVEL) {
       setElapsed(Date.now() - startRef.current);
       setPhase("won");
+      sfx.win();
     } else if (mode === "timeattack" && score >= TIME_ATTACK_TARGET) {
       const finalMs = Date.now() - startRef.current;
       setElapsed(finalMs);
@@ -483,6 +485,7 @@ export default function Trias() {
           : b,
       );
       setPhase("won");
+      sfx.win();
     }
   }, [phase, mode, level, score]);
 
@@ -573,7 +576,10 @@ export default function Trias() {
     patch: Partial<Game>,
   ): Game => {
     const over = collides(g.grid, PIECES[next.key].shape, next.x, next.y);
-    if (over) setPhase("gameover");
+    if (over) {
+      setPhase("gameover");
+      sfx.lose();
+    }
     return {
       ...g,
       ...patch,
@@ -618,7 +624,12 @@ export default function Trias() {
       // Nothing cleared: the combo chain breaks and the next piece comes now.
       const { active: nextA, queue, bag } = dealNext(g.queue, g.bag);
       const over = collides(grid, PIECES[nextA.key].shape, nextA.x, nextA.y);
-      if (over) setPhase("gameover");
+      if (over) {
+        setPhase("gameover");
+        sfx.lose();
+      } else {
+        sfx.ui(); // soft lock tick
+      }
       return {
         ...g,
         grid,
@@ -639,6 +650,7 @@ export default function Trias() {
     setLines((n) => n + rows.length);
     setClearingRows(rows);
     setFlash({ lines: rows.length, combo, perfect: false });
+    sfx.rise(Math.max(0, combo)); // pitch rises with the combo
     if (rows.length >= 2 || combo >= 1) {
       burstConfetti(rows, 18 + rows.length * 10 + Math.max(0, combo) * 8);
     }
@@ -692,6 +704,7 @@ export default function Trias() {
               : { lines: clearingRows.length, combo: g.combo, perfect: true },
           );
           burstConfetti([Math.floor(ROWS / 2)], 110); // jackpot shower
+          sfx.win();
         }
         const { active: nextA, queue, bag } = dealNext(g.queue, g.bag);
         const over = collides(grid, PIECES[nextA.key].shape, nextA.x, nextA.y);

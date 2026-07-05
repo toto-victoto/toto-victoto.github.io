@@ -55,7 +55,7 @@ export function LanguageSelector() {
   return (
     <nav
       aria-label="Language"
-      className="fixed top-4 right-4 z-50 flex items-center gap-2 text-sm text-neutral-400"
+      className="flex items-center gap-2 text-sm text-neutral-400"
     >
       {SUPPORTED.map((loc, i) => {
         const active = i18n.locale === loc;

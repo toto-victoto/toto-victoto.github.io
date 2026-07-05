@@ -4,6 +4,7 @@ import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
+import { sfx } from "../sound";
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
@@ -66,6 +67,7 @@ export default function RPS() {
     const t = setTimeout(() => {
       if (phase.count > 1) {
         setPhase({ ...phase, count: phase.count - 1 });
+        sfx.ui(); // rock… paper… scissors…
       } else {
         setPhase({
           type: "revealed",
@@ -77,6 +79,9 @@ export default function RPS() {
           player: s.player + (phase.outcome === "win" ? 1 : 0),
           cpu: s.cpu + (phase.outcome === "lose" ? 1 : 0),
         }));
+        if (phase.outcome === "win") sfx.win();
+        else if (phase.outcome === "lose") sfx.lose();
+        else sfx.score();
       }
     }, COUNT_TICK_MS);
     return () => clearTimeout(t);

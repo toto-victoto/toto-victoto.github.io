@@ -11,6 +11,7 @@ import { I18nProvider } from "@lingui/react";
 import type { Route } from "./+types/root";
 import { i18n } from "./i18n";
 import { LanguageSelector } from "./components/LanguageSelector";
+import { SoundToggle } from "./components/SoundToggle";
 import { HomeButton } from "./components/HomeButton";
 import "./app.css";
 
@@ -38,7 +39,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <I18nProvider i18n={i18n}>
-          <LanguageSelector />
+          {/* Shared top-right controls on every page: sound + language. */}
+          <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+            <SoundToggle />
+            <LanguageSelector />
+          </div>
           {children}
         </I18nProvider>
         <ScrollRestoration />

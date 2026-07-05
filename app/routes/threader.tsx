@@ -4,6 +4,7 @@ import type { Route } from "./+types/threader";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
+import { tone } from "../sound";
 
 // All positions are % of the playfield: X is % of width, Y is % of height.
 // The playfield is sized by WIDTH (aspect-[3/4] w-full max-h-full), the same
@@ -180,7 +181,6 @@ export default function Threader() {
   const [combo, setCombo] = useState(0);
   const [shields, setShields] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [muted, setMuted] = useState(false);
   const [{ best }, setStored] = useStoredGame("threader", { best: 0 });
 
   // Difficulty: live, mirrored to refs for the animation loop.
@@ -208,8 +208,6 @@ export default function Threader() {
   const handledRef = useRef<Set<number>>(new Set());
   const phaseRef = useRef<Phase>(phase);
   phaseRef.current = phase;
-  const mutedRef = useRef(muted);
-  mutedRef.current = muted;
   // Combo, shields, threads-cleared, and difficulty tier live in refs as the
   // authority (the collision effect mutates them synchronously); state mirrors
   // them for display.
@@ -222,46 +220,17 @@ export default function Threader() {
   );
   const dragRef = useRef<{ startX: number; lastX: number; moved: boolean; id: number } | null>(null);
   const shakeElRef = useRef<HTMLDivElement | null>(null);
-  const audioRef = useRef<AudioContext | null>(null);
   const freezeUntilRef = useRef(0); // rAF timestamp until which the world is frozen
 
-  // ---- Audio: a lazy WebAudio context + tiny synthesised blips ----
-  const ensureAudio = () => {
-    if (typeof window === "undefined") return null;
-    if (!audioRef.current) {
-      const Ctx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext?: typeof AudioContext })
-          .webkitAudioContext;
-      if (Ctx) audioRef.current = new Ctx();
-    }
-    if (audioRef.current?.state === "suspended") void audioRef.current.resume();
-    return audioRef.current;
-  };
-  const blip = (freq: number, dur: number, type: OscillatorType, gain = 0.14) => {
-    if (mutedRef.current) return;
-    const ctx = audioRef.current;
-    if (!ctx) return;
-    const t = ctx.currentTime;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = type;
-    o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(gain, t);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.start(t);
-    o.stop(t + dur);
-  };
+  // ---- Audio: Threader's pitched cues, on the shared sound engine ----
   const soundPass = (c: number) =>
-    blip(294 * Math.pow(2, Math.min(c - 1, 14) / 12), 0.16, "triangle");
+    tone(294 * 2 ** (Math.min(c - 1, 14) / 12), 0.16, { type: "triangle" });
   const soundPerfect = (c: number) => {
-    blip(392 * Math.pow(2, Math.min(c - 1, 14) / 12), 0.14, "triangle", 0.13);
-    blip(587 * Math.pow(2, Math.min(c - 1, 14) / 12), 0.2, "sine", 0.1);
+    tone(392 * 2 ** (Math.min(c - 1, 14) / 12), 0.14, { type: "triangle", gain: 0.13 });
+    tone(587 * 2 ** (Math.min(c - 1, 14) / 12), 0.2, { type: "sine", gain: 0.1 });
   };
-  const soundMiss = () => blip(140, 0.32, "sawtooth", 0.16);
-  const soundShield = () => blip(220, 0.18, "square", 0.12);
+  const soundMiss = () => tone(140, 0.32, { type: "sawtooth", gain: 0.16 });
+  const soundShield = () => tone(220, 0.18, { type: "square", gain: 0.12 });
 
   const vibrate = (ms: number | number[]) => {
     if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(ms);
@@ -369,7 +338,6 @@ export default function Threader() {
     if (phaseRef.current === "gameover") return;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
-    ensureAudio();
     if (phaseRef.current === "idle") {
       setScore(0);
       startGame();
@@ -402,7 +370,6 @@ export default function Threader() {
         return;
       }
       const start = () => {
-        ensureAudio();
         if (phaseRef.current === "idle") {
           setScore(0);
           startGame();
@@ -836,15 +803,6 @@ export default function Threader() {
                 </span>
               ))}
             </div>
-            <button
-              type="button"
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => setMuted((m) => !m)}
-              className="absolute top-3 right-3 z-50 text-xl opacity-70 transition hover:opacity-100"
-              aria-label="Toggle sound"
-            >
-              {muted ? "🔇" : "🔊"}
-            </button>
 
             {/* Score + combo + ramp flash. */}
             <div className="pointer-events-none absolute inset-x-0 top-3 z-50 flex flex-col items-center text-white [text-shadow:_0_2px_4px_rgb(0_0_0_/_60%)]">

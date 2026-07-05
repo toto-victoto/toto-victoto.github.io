@@ -4,6 +4,7 @@ import type { Route } from "./+types/ultimate";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { loadGame, saveGame } from "../storage";
+import { sfx } from "../sound";
 
 type Player = "X" | "O";
 type Cell = Player | null;
@@ -333,10 +334,14 @@ export default function Ultimate() {
       setWinner(metaWin.winner);
       setWinLine(metaWin.line);
       setScores((s) => ({ ...s, [metaWin.winner]: s[metaWin.winner] + 1 }));
+      sfx.win();
     } else if (metaDrawNow) {
       setScores((s) => ({ ...s, draws: s.draws + 1 }));
+      sfx.ui();
     } else {
       setTurn(other(turn));
+      if (localWin) sfx.score(); // captured a sub-board
+      else sfx.place();
     }
   };
 

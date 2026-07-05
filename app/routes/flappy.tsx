@@ -4,6 +4,7 @@ import type { Route } from "./+types/flappy";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
+import { sfx } from "../sound";
 
 // All positions are expressed in % of the playfield, so the game is
 // resolution-independent and scales with the responsive container.
@@ -73,6 +74,7 @@ export default function Flappy() {
     velocityRef.current = FLAP_VELOCITY;
     rotationRef.current = FLAP_ROTATION;
     setRotation(FLAP_ROTATION);
+    sfx.flap();
   };
 
   const reset = () => {
@@ -143,7 +145,10 @@ export default function Flappy() {
         gained += 1;
       }
     }
-    if (gained) setScore((s) => s + gained);
+    if (gained) {
+      setScore((s) => s + gained);
+      sfx.score();
+    }
   }, [pipes, phase]);
 
   // Collision: end the game when the bird hits the ground or a pipe.
@@ -158,7 +163,10 @@ export default function Flappy() {
       const gapBottom = p.gapY + p.gap / 2;
       return birdY - BIRD_HALF < gapTop || birdY + BIRD_HALF > gapBottom;
     });
-    if (hitGround || hitPipe) setPhase("gameover");
+    if (hitGround || hitPipe) {
+      setPhase("gameover");
+      sfx.lose();
+    }
   }, [birdY, pipes, phase]);
 
   // Track the best score of the session.

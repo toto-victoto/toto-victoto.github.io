@@ -4,6 +4,7 @@ import type { Route } from "./+types/roulette";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { loadGame, saveGame } from "../storage";
+import { sfx } from "../sound";
 
 const START_BALANCE = 100;
 const STAKES = [1, 5, 10, 25];
@@ -195,6 +196,7 @@ export default function Roulette() {
     if (spinning) return;
     const el = wheelRef.current;
     if (!el) return;
+    sfx.spin();
     const r = Math.floor(Math.random() * 37);
     const idx = WHEEL_ORDER.indexOf(r);
     // Rotate so pocket idx (at idx*STEP from the top) ends up under the pointer.
@@ -305,10 +307,12 @@ export default function Roulette() {
     if (returned > 0) {
       setBalance((b) => b + returned); // count-up + best are handled by effects
       flyCoins();
+      sfx.win();
     }
     const lostStake = wagered - wonStake;
     if (lostStake > 0) {
       loseCoins(Math.min(12, Math.max(5, Math.round(lostStake / 5))));
+      if (returned === 0) sfx.lose(); // pure loss
     }
     setHistory((h) => [r, ...h]);
     setBets({});
@@ -320,6 +324,7 @@ export default function Roulette() {
     if (stake > balance) return;
     setBalance((b) => b - stake);
     setBets((prev) => ({ ...prev, [key]: (prev[key] ?? 0) + stake }));
+    sfx.place();
   };
 
   const clearBets = () => {

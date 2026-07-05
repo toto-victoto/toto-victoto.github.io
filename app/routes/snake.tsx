@@ -4,6 +4,7 @@ import type { Route } from "./+types/snake";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
+import { sfx } from "../sound";
 
 const COLS = 15;
 const ROWS = 15;
@@ -137,6 +138,7 @@ export default function Snake() {
         const next: Cell = { x: head.x + dx, y: head.y + dy };
         if (next.x < 0 || next.x >= COLS || next.y < 0 || next.y >= ROWS) {
           setPhase("gameover");
+          sfx.lose();
           return current;
         }
         const eats =
@@ -144,12 +146,14 @@ export default function Snake() {
         const body = eats ? current : current.slice(0, -1);
         if (body.some((c) => c.x === next.x && c.y === next.y)) {
           setPhase("gameover");
+          sfx.lose();
           return current;
         }
         const nextSnake = [next, ...body];
         if (eats) {
           setScore((s) => s + 1);
           setFood(randomFood(nextSnake));
+          sfx.eat();
         }
         return nextSnake;
       });
