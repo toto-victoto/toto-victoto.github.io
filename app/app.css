@@ -101,6 +101,14 @@ html,
 body {
   @apply bg-white dark:bg-gray-950;
 
+  /* This is a touch games app with no selectable content — kill the iOS
+     Safari long-press behaviours that fire during play: text selection, the
+     callout/magnifier ("Copy / Look Up"), and the grey tap flash. */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
