@@ -34,10 +34,9 @@ const LOCK_DELAY_MS = 1000;
 const LOCK_TICK_MS = 50;
 const LOCK_MOVE_PENALTY = 150;
 
-// Win targets for the timed/goal modes, sized for ~5-minute matches under the
-// speed ramp above.
-const MARATHON_MAX_LEVEL = 13;
-const TIME_ATTACK_TARGET = 8000;
+// Win targets for the timed/goal modes — shorter matches.
+const MARATHON_MAX_LEVEL = 5;
+const TIME_ATTACK_TARGET = 3000;
 
 // Line-clear feedback: how long the cleared rows flash + fade before the stack
 // collapses, the per-step bonus for chaining clears across consecutive locks (a
