@@ -15,12 +15,11 @@ const SWIPE = 24; // px before a touch drag counts as a swipe
 
 // Gravity speeds up geometrically: every level multiplies the *drop speed* by
 // SPEEDUP_FACTOR, i.e. divides the tick by it, down to a MIN_TICK_MS floor. A
-// multiplicative ramp bites far harder at high levels than a flat subtraction
-// would — see the speed table in the commit notes. Tuned (with LINES_PER_LEVEL
-// and MARATHON_MAX_LEVEL) so a competent run to the top level lasts ~5 minutes.
-const BASE_TICK_MS = 800; // gravity period at level 1
-const SPEEDUP_FACTOR = 1.25; // drop speed ×1.25 each level (tick ÷1.25)
-const MIN_TICK_MS = 60; // fastest gravity — the floor
+// steep factor makes the ramp brutal fast — by the short Marathon goal (L5)
+// gravity is already savage. Ticks per level: 700, 438, 273, 171, 107, 67, 50…
+const BASE_TICK_MS = 700; // gravity period at level 1
+const SPEEDUP_FACTOR = 1.6; // drop speed ×1.6 each level (tick ÷1.6)
+const MIN_TICK_MS = 50; // fastest gravity — the floor
 const LINES_PER_LEVEL = 4;
 const SOFT_DROP_MS = 45; // gravity period while a downward swipe is held
 const LONG_PRESS_MS = 350; // hold this long without swiping to stash a piece

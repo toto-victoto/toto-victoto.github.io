@@ -97,11 +97,13 @@ export default function Snake() {
 
   const queueDir = (d: Dir) => {
     if (phaseRef.current === "gameover") return;
+    // Any swipe kicks off an idle game — even one in the direction the snake
+    // already faces (so a swipe-right start works from the default heading).
+    if (phaseRef.current === "idle") setPhase("playing");
     const queue = dirQueueRef.current;
     const last = queue.length ? queue[queue.length - 1] : dirRef.current;
     if (d === last || OPPOSITE[d] === last) return;
     if (queue.length < 4) queue.push(d);
-    if (phaseRef.current === "idle") setPhase("playing");
   };
 
   const reset = () => {
