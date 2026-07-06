@@ -545,12 +545,6 @@ export default function RPS() {
           <StatLine stats={player} highlight />
         </section>
 
-        {drawMult > 1 && (
-          <p className="text-center text-xs font-bold text-amber-300">
-            ⚡ Tension ×{drawMult.toFixed(2)} — cashed in on the next hit
-          </p>
-        )}
-
         <section
           key={youHit ? `moves-${hit.key}` : "moves"}
           className="grid grid-cols-3 gap-4"
