@@ -26,10 +26,10 @@ const BEATS: Record<Move, Move> = { rock: "scissors", paper: "rock", scissors: "
 // escalate, play the move it beats to soften, play the third to hold.
 const roleOf = (m: Move, last: Move | null): "up" | "down" | "flat" =>
   last === null ? "flat" : m === last ? "up" : m === BEATS[last] ? "down" : "flat";
-const ROLE_TAG: Record<"up" | "down" | "flat", { label: string; cls: string }> = {
-  up: { label: "escalate", cls: "text-amber-300" },
-  down: { label: "soften", cls: "text-sky-300" },
-  flat: { label: "hold", cls: "text-neutral-500" },
+const ROLE_COLOR: Record<"up" | "down" | "flat", string> = {
+  up: "text-amber-300",
+  down: "text-sky-300",
+  flat: "text-neutral-500",
 };
 const judge = (p: Move, c: Move): Outcome =>
   p === c ? "draw" : BEATS[p] === c ? "win" : "lose";
@@ -356,7 +356,14 @@ export default function RPS() {
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
-  const showStance = phase === "choose" && Math.round(stakes * 10) !== 10;
+  // What the stakes multiplier would become if you played each move now.
+  const growth = growthRate(player.dex);
+  const projectStakes = (m: Move): number => {
+    if (lastMove === null) return stakes;
+    if (m === lastMove) return clampStake(stakes * (1 + growth));
+    if (m === BEATS[lastMove]) return clampStake(stakes * (1 - growth * 0.55));
+    return stakes;
+  };
 
   return (
     <>
@@ -547,15 +554,6 @@ export default function RPS() {
           <StatLine stats={player} highlight />
         </section>
 
-        {/* Current stakes — scales both damage dealt and taken */}
-        <p className="h-4 text-center text-xs font-bold">
-          {showStance && (
-            <span className={stakes > 1 ? "text-amber-300" : "text-sky-300"}>
-              Stakes ×{stakes.toFixed(1)} — deal &amp; take
-            </span>
-          )}
-        </p>
-
         <section
           key={youHit ? `moves-${hit.key}` : "moves"}
           className="grid grid-cols-3 gap-4"
@@ -563,6 +561,7 @@ export default function RPS() {
         >
           {MOVES.map((m) => {
             const role = roleOf(m.id, lastMove);
+            const proj = projectStakes(m.id);
             return (
               <button
                 key={m.id}
@@ -578,10 +577,8 @@ export default function RPS() {
                 }`}
               >
                 <span aria-hidden="true">{m.emoji}</span>
-                <span
-                  className={`text-[10px] font-medium uppercase tracking-wide ${ROLE_TAG[role].cls}`}
-                >
-                  {ROLE_TAG[role].label}
+                <span className={`text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
+                  ×{proj.toFixed(1)}
                 </span>
               </button>
             );
