@@ -368,7 +368,7 @@ export default function RPS() {
         {/* Foe */}
         <section className="relative space-y-1 text-center">
           <div
-            key={foeHitting ? hit.key : "foe-static"}
+            key={foeHitting ? `foe-${hit.key}` : "foe-static"}
             className="inline-block text-7xl leading-none will-change-transform"
             style={foeAnim ? { animation: foeAnim } : undefined}
             aria-hidden="true"
@@ -377,7 +377,7 @@ export default function RPS() {
           </div>
           {foeHitting && (
             <div
-              key={hit.key}
+              key={`mark-${hit.key}`}
               className="pointer-events-none absolute inset-x-0 top-0 text-center text-3xl font-black"
               style={{ animation: "rps-float 900ms ease-out forwards" }}
               aria-hidden="true"
