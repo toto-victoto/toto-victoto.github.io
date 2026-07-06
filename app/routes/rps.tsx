@@ -53,12 +53,15 @@ const STAT_GAIN: Record<StatKey, number> = { hp: 8, str: 1, def: 1, agi: 1, dex:
 
 const START: Stats = { maxHp: 45, str: 6, def: 3, agi: 3, dex: 2 };
 
-// Stakes tuning: per-repeat growth (DEX quickens it) and bounds. One "stakes"
-// multiplier scales BOTH damage dealt and damage taken.
-const growthRate = (dex: number) => 0.5 + dex * 0.13;
-const STAKE_MIN = 0.25;
+// Stakes tuning. One "stakes" multiplier scales BOTH damage dealt and taken.
+// Escalating MULTIPLIES (almost exponential up); softening SUBTRACTS a flat
+// step (a steady 0.9, 0.8, 0.7…) down to a defensive cap. DEX quickens both.
 const STAKE_MAX = 64;
-const clampStake = (v: number) => Math.max(STAKE_MIN, Math.min(STAKE_MAX, v));
+const DEF_CAP = 0.5; // softening can't take stakes below this — the defensive cap
+const escalateStakes = (s: number, dex: number) =>
+  Math.min(STAKE_MAX, s * (1.5 + dex * 0.13));
+const softenStakes = (s: number, dex: number) =>
+  Math.max(DEF_CAP, s - (0.1 + dex * 0.04));
 
 const ROSTER: Foe[] = [
   { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 8, str: 2, def: 0, agi: 1, dex: 0 },
@@ -268,9 +271,8 @@ export default function RPS() {
     // Move the stakes based on this throw's relation to the last move.
     let stk = stakes;
     if (lastMove !== null) {
-      const r = growthRate(player.dex);
-      if (move === lastMove) stk = clampStake(stk * (1 + r)); // repeat → escalate
-      else if (move === BEATS[lastMove]) stk = clampStake(stk * (1 - r * 0.55)); // soften
+      if (move === lastMove) stk = escalateStakes(stk, player.dex); // repeat → escalate
+      else if (move === BEATS[lastMove]) stk = softenStakes(stk, player.dex); // soften
       // the third move: unchanged (hold)
     }
 
@@ -298,7 +300,7 @@ export default function RPS() {
       resultHp = Math.max(0, hp - dmg);
     } else {
       // draw — double the stakes for what comes next
-      stk = clampStake(stk * 2);
+      stk = Math.min(STAKE_MAX, stk * 2);
       mult = stk;
       doubled = true;
     }
@@ -360,11 +362,10 @@ export default function RPS() {
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
   // What the stakes multiplier would become if you played each move now.
-  const growth = growthRate(player.dex);
   const projectStakes = (m: Move): number => {
     if (lastMove === null) return stakes;
-    if (m === lastMove) return clampStake(stakes * (1 + growth));
-    if (m === BEATS[lastMove]) return clampStake(stakes * (1 - growth * 0.55));
+    if (m === lastMove) return escalateStakes(stakes, player.dex);
+    if (m === BEATS[lastMove]) return softenStakes(stakes, player.dex);
     return stakes;
   };
 
