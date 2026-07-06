@@ -3,6 +3,7 @@ import { Trans } from "@lingui/react";
 import type { Route } from "./+types/home";
 import { AppIcon } from "../components/AppIcon";
 import { pruneStorage } from "../storage";
+import { GAMES } from "../games";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -30,61 +31,16 @@ export default function Home() {
         </header>
 
         <div className="grid grid-cols-4 gap-x-4 gap-y-6">
-          <AppIcon
-            to="/rps"
-            label={<Trans id="rps.title" message="RPS Saga" />}
-            tone="bg-gradient-to-br from-amber-400 to-orange-600"
-          >
-            <span aria-hidden="true">✊</span>
-          </AppIcon>
-
-          <AppIcon
-            to="/snake"
-            label={<Trans id="snake.title" message="Snake" />}
-            tone="bg-gradient-to-br from-emerald-400 to-green-700"
-          >
-            <span aria-hidden="true">🐍</span>
-          </AppIcon>
-
-          <AppIcon
-            to="/flappy"
-            label={<Trans id="flappy.title" message="Flappy" />}
-            tone="bg-gradient-to-br from-sky-400 to-blue-600"
-          >
-            <span aria-hidden="true">🐤</span>
-          </AppIcon>
-
-          <AppIcon
-            to="/roulette"
-            label={<Trans id="roulette.title" message="Roulette" />}
-            tone="bg-gradient-to-br from-rose-500 to-red-700"
-          >
-            <span aria-hidden="true">🎰</span>
-          </AppIcon>
-
-          <AppIcon
-            to="/ultimate"
-            label={<Trans id="ultimate.title" message="Ultimate Tic-Tac-Toe" />}
-            tone="bg-gradient-to-br from-violet-500 to-purple-700"
-          >
-            <span aria-hidden="true">🎯</span>
-          </AppIcon>
-
-          <AppIcon
-            to="/trias"
-            label={<Trans id="trias.title" message="Trias" />}
-            tone="bg-gradient-to-br from-fuchsia-500 to-pink-600"
-          >
-            <span aria-hidden="true">🔻</span>
-          </AppIcon>
-
-          <AppIcon
-            to="/threader"
-            label={<Trans id="threader.title" message="Threader" />}
-            tone="bg-gradient-to-br from-amber-400 to-sky-500"
-          >
-            <span aria-hidden="true">🪡</span>
-          </AppIcon>
+          {GAMES.map((g) => (
+            <AppIcon
+              key={g.slug}
+              to={`/${g.slug}`}
+              label={<Trans id={g.titleId} message={g.title} />}
+              tone={g.tone}
+            >
+              <span aria-hidden="true">{g.icon}</span>
+            </AppIcon>
+          ))}
 
           <AppIcon
             to="/about"

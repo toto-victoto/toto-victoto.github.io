@@ -3,6 +3,7 @@ import { Trans } from "@lingui/react";
 import type { Route } from "./+types/about";
 import { BackButton } from "../components/BackButton";
 import { clearGame, peekGame } from "../storage";
+import { GAMES } from "../games";
 
 const REPO_URL = "https://github.com/toto-victoto/toto-victoto.github.io";
 
@@ -54,18 +55,11 @@ export default function About() {
     setConfirmKey(null);
   };
 
-  const games: { key: string; label: React.ReactNode }[] = [
-    { key: "snake", label: <Trans id="snake.title" message="Snake" /> },
-    { key: "flappy", label: <Trans id="flappy.title" message="Flappy" /> },
-    { key: "threader", label: <Trans id="threader.title" message="Threader" /> },
-    { key: "trias", label: <Trans id="trias.title" message="Trias" /> },
-    { key: "roulette", label: <Trans id="roulette.title" message="Roulette" /> },
-    { key: "rps", label: <Trans id="rps.title" message="RPS Saga" /> },
-    {
-      key: "ultimate",
-      label: <Trans id="ultimate.title" message="Ultimate Tic-Tac-Toe" />,
-    },
-  ];
+  // Same order as the home grid — both come from GAMES.
+  const games = GAMES.map((g) => ({
+    key: g.slug,
+    label: <Trans id={g.titleId} message={g.title} />,
+  }));
 
   return (
     <>
