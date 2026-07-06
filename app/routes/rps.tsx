@@ -352,7 +352,9 @@ export default function RPS() {
     : foeHitting
       ? `rps-hit-${hit.move} 480ms ease-out`
       : undefined;
-  const foeEmoji = phase === "death" ? "🪦" : foe.emoji;
+  // The foe stays a tombstone through the death beat AND the level-up screen —
+  // it's only replaced when the next foe steps in (intro).
+  const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
 
   return (
     <>
