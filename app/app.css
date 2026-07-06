@@ -113,3 +113,93 @@ body {
     color-scheme: dark;
   }
 }
+
+/* RPS RPG — hit reactions on the foe emoji, one per winning move; a dodge
+   sidestep; a screen-shake for taking a blow; and a floating hit marker.
+   Top-level (not @theme) so they're always emitted for inline `animation`. */
+@keyframes rps-hit-rock {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  20% {
+    transform: translate(-9px, 2px) rotate(-4deg);
+  }
+  45% {
+    transform: translate(7px, -1px) rotate(3deg);
+  }
+  70% {
+    transform: translate(-4px, 1px) rotate(-1deg);
+  }
+}
+@keyframes rps-hit-scissors {
+  0%,
+  100% {
+    transform: skewX(0) translateX(0);
+  }
+  25% {
+    transform: skewX(-18deg) translateX(-5px);
+  }
+  55% {
+    transform: skewX(11deg) translateX(4px);
+  }
+  80% {
+    transform: skewX(-4deg);
+  }
+}
+@keyframes rps-hit-paper {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  22% {
+    transform: rotate(17deg);
+  }
+  52% {
+    transform: rotate(-13deg);
+  }
+  78% {
+    transform: rotate(6deg);
+  }
+}
+@keyframes rps-dodge {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  35%,
+  65% {
+    transform: translateX(-24px) scale(0.94);
+  }
+}
+@keyframes rps-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+@keyframes rps-float {
+  0% {
+    transform: translateY(6px) scale(0.7);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-42px) scale(1.15);
+    opacity: 0;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
@@ -7,8 +7,8 @@ import { useStoredGame } from "../storage";
 import { sfx } from "../sound";
 
 // A gimmicky RPG on top of rock-paper-scissors: each RPS round is one exchange.
-// Win the RPS and you strike; lose it and the foe strikes. This is a first POC —
-// numbers are meant to be tuned.
+// Win the RPS and you strike; lose it and the foe strikes. First POC — numbers
+// are meant to be tuned.
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
@@ -23,6 +23,8 @@ const judge = (p: Move, c: Move): Outcome =>
   p === c ? "draw" : BEATS[p] === c ? "win" : "lose";
 const randomMove = (): Move => MOVES[Math.floor(Math.random() * MOVES.length)].id;
 const emojiOf = (m: Move) => MOVES.find((x) => x.id === m)!.emoji;
+// The hit marker that flies off the foe, keyed to the winning move.
+const MARKER: Record<Move, string> = { rock: "💥", paper: "👋", scissors: "✂️" };
 
 type Stats = { maxHp: number; str: number; def: number; agi: number; luk: number };
 type Foe = Stats & { emoji: string; name: string; cry: string };
@@ -36,13 +38,10 @@ const STAT_LABEL: Record<StatKey, string> = {
   agi: "AGI",
   luk: "LUK",
 };
-// Points bought per stat: HP is worth more per point than the flat stats.
 const STAT_GAIN: Record<StatKey, number> = { hp: 4, str: 1, def: 1, agi: 1, luk: 1 };
 
 const START: Stats = { maxHp: 20, str: 5, def: 2, agi: 3, luk: 1 };
 
-// The early foes are one-shot kills for us and barely scratch back; it ramps
-// from there — around Insp. Mora, AGI and DEF start to matter.
 const ROSTER: Foe[] = [
   { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", maxHp: 3, str: 1, def: 0, agi: 1, luk: 0 },
   { emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", maxHp: 6, str: 2, def: 1, agi: 2, luk: 1 },
@@ -67,8 +66,6 @@ const EXTRA_CRY = [
   "Beyond your reach.",
 ];
 
-// Foes past the roster are procedurally scaled by index (deterministic, so no
-// hydration surprises), keeping the run endless.
 function makeFoe(index: number): Foe {
   if (index < ROSTER.length) return ROSTER[index];
   const t = index - ROSTER.length;
@@ -85,12 +82,10 @@ function makeFoe(index: number): Foe {
   };
 }
 
-const luckPct = (luk: number) => Math.min(10, Math.max(0, luk)); // dodge/crit %, capped 10
+const luckPct = (luk: number) => Math.min(10, Math.max(0, luk));
 const pointsForLevel = (level: number) => 2 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
 
-// One attack: the defender may dodge (their LUK), else the attacker may crit
-// (their LUK, ignoring DEF); AGI advantage doubles the blow.
 function strike(att: Stats, def: Stats): { dmg: number; crit: boolean; dodged: boolean } {
   if (Math.random() * 100 < luckPct(def.luk)) return { dmg: 0, crit: false, dodged: true };
   const crit = Math.random() * 100 < luckPct(att.luk);
@@ -110,7 +105,19 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-type Phase = "intro" | "choose" | "reveal" | "levelup" | "gameover";
+type Phase = "intro" | "choose" | "count" | "clash" | "strike" | "levelup" | "gameover";
+type Round = {
+  player: Move;
+  foe: Move;
+  outcome: Outcome;
+  attacker: "you" | "foe" | null;
+  dmg: number;
+  crit: boolean;
+  dodged: boolean;
+  faster: boolean;
+  resultFoeHp: number;
+  resultHp: number;
+};
 
 export default function RPS() {
   const [player, setPlayer] = useState<Stats>(START);
@@ -120,12 +127,8 @@ export default function RPS() {
   const [foe, setFoe] = useState<Foe>(() => makeFoe(0));
   const [foeHp, setFoeHp] = useState(() => makeFoe(0).maxHp);
   const [phase, setPhase] = useState<Phase>("intro");
-  const [round, setRound] = useState<{
-    player: Move;
-    foe: Move;
-    outcome: Outcome;
-    log: string[];
-  } | null>(null);
+  const [count, setCount] = useState(0);
+  const [round, setRound] = useState<Round | null>(null);
   const [points, setPoints] = useState(0);
   const [alloc, setAlloc] = useState<Record<StatKey, number>>({
     hp: 0,
@@ -135,70 +138,103 @@ export default function RPS() {
     luk: 0,
   });
   const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(
-    () => () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    },
-    [],
-  );
+  // The battle cry shows itself, then hands over to the choice.
+  useEffect(() => {
+    if (phase !== "intro") return;
+    sfx.ui();
+    const t = setTimeout(() => setPhase("choose"), 1600);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  // Rock… paper… scissors… — the 3-2-1 that adds the tension.
+  useEffect(() => {
+    if (phase !== "count") return;
+    if (count <= 0) {
+      setPhase("clash");
+      return;
+    }
+    const t = setTimeout(() => {
+      sfx.ui();
+      setCount((c) => c - 1);
+    }, 260);
+    return () => clearTimeout(t);
+  }, [phase, count]);
+
+  // Show who won the toss for a beat before the blow lands.
+  useEffect(() => {
+    if (phase !== "clash") return;
+    const t = setTimeout(() => setPhase("strike"), 500);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  // The blow: apply HP (bars animate), then resolve KO / level-up / next.
+  useEffect(() => {
+    if (phase !== "strike" || !round) return;
+    const r = round;
+    setFoeHp(r.resultFoeHp);
+    setHp(r.resultHp);
+    if (r.outcome !== "draw" && !r.dodged && r.crit) sfx.win();
+    else if (r.outcome === "win" && !r.dodged) sfx.score();
+    else sfx.ui();
+    const t = setTimeout(
+      () => {
+        if (r.resultFoeHp <= 0) {
+          const nl = level + 1;
+          setLevel(nl);
+          setPoints(pointsForLevel(nl));
+          setAlloc({ hp: 0, str: 0, def: 0, agi: 0, luk: 0 });
+          setStored((s) => ({ bestLevel: Math.max(s.bestLevel, nl) }));
+          setPhase("levelup");
+          sfx.win();
+        } else if (r.resultHp <= 0) {
+          setPhase("gameover");
+          sfx.lose();
+        } else {
+          setPhase("choose");
+        }
+      },
+      r.outcome === "draw" ? 650 : 1150,
+    );
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   const pick = (move: Move) => {
     if (phase !== "choose") return;
     const foeMove = randomMove();
     const outcome = judge(move, foeMove);
-    const log: string[] = [];
-    let nextFoeHp = foeHp;
-    let nextHp = hp;
-
+    let attacker: "you" | "foe" | null = null;
+    let dmg = 0;
+    let crit = false;
+    let dodged = false;
+    let faster = false;
+    let resultFoeHp = foeHp;
+    let resultHp = hp;
     if (outcome === "win") {
-      const r = strike(player, foe);
-      if (r.dodged) log.push(`${foe.name} slips the blow!`);
-      else {
-        nextFoeHp = Math.max(0, foeHp - r.dmg);
-        log.push(`You strike for ${r.dmg}${r.crit ? " — critical!" : ""}`);
-      }
-      sfx.score();
+      attacker = "you";
+      const s = strike(player, foe);
+      crit = s.crit;
+      dodged = s.dodged;
+      dmg = s.dmg;
+      faster = player.agi > foe.agi;
+      if (!dodged) resultFoeHp = Math.max(0, foeHp - dmg);
     } else if (outcome === "lose") {
-      const r = strike(foe, player);
-      if (r.dodged) log.push(`You dodge ${foe.name}'s attack!`);
-      else {
-        nextHp = Math.max(0, hp - r.dmg);
-        log.push(`${foe.name} hits you for ${r.dmg}${r.crit ? " — critical!" : ""}`);
-      }
-      sfx.ui();
-    } else {
-      log.push("A stand-off — no one lands a hit.");
-      sfx.ui();
+      attacker = "foe";
+      const s = strike(foe, player);
+      crit = s.crit;
+      dodged = s.dodged;
+      dmg = s.dmg;
+      faster = foe.agi > player.agi;
+      if (!dodged) resultHp = Math.max(0, hp - dmg);
     }
-
-    setFoeHp(nextFoeHp);
-    setHp(nextHp);
-    setRound({ player: move, foe: foeMove, outcome, log });
-    setPhase("reveal");
-
-    timerRef.current = setTimeout(() => {
-      if (nextFoeHp <= 0) {
-        const newLevel = level + 1;
-        setLevel(newLevel);
-        setPoints(pointsForLevel(newLevel));
-        setAlloc({ hp: 0, str: 0, def: 0, agi: 0, luk: 0 });
-        setStored((s) => ({ bestLevel: Math.max(s.bestLevel, newLevel) }));
-        setPhase("levelup");
-        sfx.win();
-      } else if (nextHp <= 0) {
-        setPhase("gameover");
-        sfx.lose();
-      } else {
-        setPhase("choose");
-      }
-    }, 1250);
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, crit, dodged, faster, resultFoeHp, resultHp });
+    setCount(3);
+    setPhase("count");
   };
 
   const spent = STAT_KEYS.reduce((n, k) => n + alloc[k], 0);
   const remaining = points - spent;
-
   const addPoint = (k: StatKey) => {
     if (remaining <= 0) return;
     setAlloc((a) => ({ ...a, [k]: a[k] + 1 }));
@@ -213,7 +249,7 @@ export default function RPS() {
       luk: player.luk + alloc.luk,
     };
     setPlayer(np);
-    setHp(np.maxHp); // heal up between foes
+    setHp(np.maxHp);
     const next = foeIndex + 1;
     setFoeIndex(next);
     const nf = makeFoe(next);
@@ -234,6 +270,18 @@ export default function RPS() {
     setPhase("intro");
   };
 
+  const striking = phase === "strike" && round;
+  const foeAnim =
+    striking && round.outcome === "win"
+      ? round.dodged
+        ? "rps-dodge 440ms ease-out"
+        : `rps-hit-${round.player} ${round.faster ? "340ms ease-out 2" : "440ms ease-out"}`
+      : undefined;
+  const playerAnim =
+    striking && round.outcome === "lose" && !round.dodged
+      ? "rps-shake 440ms ease-out"
+      : undefined;
+
   return (
     <>
       <BackButton />
@@ -242,16 +290,28 @@ export default function RPS() {
           <h1 className="text-2xl font-semibold tracking-tight">
             <Trans id="rps.title" message="Rock Paper Scissors" />
           </h1>
-          <span className="text-sm font-bold tabular-nums text-amber-300">
-            Lv {level}
-          </span>
+          <span className="text-sm font-bold tabular-nums text-amber-300">Lv {level}</span>
         </header>
 
         {/* Foe */}
-        <section className="space-y-1 text-center">
-          <div className="text-6xl leading-none" aria-hidden="true">
+        <section className="relative space-y-1 text-center">
+          <div
+            className="text-6xl leading-none"
+            style={foeAnim ? { animation: foeAnim } : undefined}
+            aria-hidden="true"
+          >
             {foe.emoji}
           </div>
+          {striking && round.outcome === "win" && !round.dodged && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-1 text-center text-2xl font-black"
+              style={{ animation: "rps-float 900ms ease-out forwards" }}
+              aria-hidden="true"
+            >
+              {MARKER[round.player]}
+              <span className="ml-1 text-rose-300">-{round.dmg}</span>
+            </div>
+          )}
           <div className="font-semibold text-neutral-200">{foe.name}</div>
           <HpBar hp={foeHp} max={foe.maxHp} className="bg-rose-500" />
           <StatLine stats={foe} />
@@ -260,17 +320,9 @@ export default function RPS() {
         {/* Middle — phase content */}
         <section className="flex min-h-0 flex-1 items-center justify-center">
           {phase === "intro" && (
-            <div className="space-y-4 text-center">
-              <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300">
-                “{foe.cry}”
-              </p>
-              <button
-                onClick={() => setPhase("choose")}
-                className="rounded-full bg-emerald-500 px-8 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
-              >
-                <Trans id="rps.rpg.fight" message="Fight!" />
-              </button>
-            </div>
+            <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300 motion-safe:animate-rps-tick">
+              “{foe.cry}”
+            </p>
           )}
 
           {phase === "choose" && (
@@ -279,26 +331,45 @@ export default function RPS() {
             </p>
           )}
 
-          {phase === "reveal" && round && (
+          {phase === "count" && round && (
+            <div className="space-y-2 text-center">
+              <div className="text-5xl" aria-hidden="true">
+                {emojiOf(round.player)}
+              </div>
+              <div
+                key={count}
+                className="text-3xl font-bold tabular-nums text-neutral-400 motion-safe:animate-rps-tick"
+                aria-live="polite"
+              >
+                {count}
+              </div>
+            </div>
+          )}
+
+          {(phase === "clash" || phase === "strike") && round && (
             <div className="space-y-3 text-center">
               <div className="flex items-center justify-center gap-6 text-5xl">
                 <span aria-hidden="true">{emojiOf(round.player)}</span>
                 <span className="text-2xl text-neutral-600">vs</span>
                 <span aria-hidden="true">{emojiOf(round.foe)}</span>
               </div>
-              <div
-                className={`text-sm font-medium ${
-                  round.outcome === "win"
-                    ? "text-emerald-400"
-                    : round.outcome === "lose"
-                      ? "text-rose-400"
-                      : "text-neutral-400"
-                }`}
-              >
-                {round.log.map((l, i) => (
-                  <p key={i}>{l}</p>
-                ))}
-              </div>
+              {phase === "clash" ? (
+                <p
+                  className={`text-lg font-medium ${
+                    round.outcome === "win"
+                      ? "text-emerald-400"
+                      : round.outcome === "lose"
+                        ? "text-rose-400"
+                        : "text-neutral-400"
+                  }`}
+                >
+                  {round.outcome === "win" && "You win the round!"}
+                  {round.outcome === "lose" && `${foe.name} wins the round`}
+                  {round.outcome === "draw" && "Draw"}
+                </p>
+              ) : (
+                <StrikeBanner round={round} foe={foe} />
+              )}
             </div>
           )}
 
@@ -310,9 +381,7 @@ export default function RPS() {
                 </p>
                 <p className="text-sm text-neutral-400">
                   <Trans id="rps.rpg.spend" message="Spend your points" /> ·{" "}
-                  <span className="font-bold tabular-nums text-neutral-100">
-                    {remaining}
-                  </span>
+                  <span className="font-bold tabular-nums text-neutral-100">{remaining}</span>
                 </p>
               </div>
               <div className="space-y-1.5">
@@ -322,10 +391,7 @@ export default function RPS() {
                     <span className="flex-1 tabular-nums text-neutral-200">
                       {statValue(player, k)}
                       {alloc[k] > 0 && (
-                        <span className="text-emerald-400">
-                          {" "}
-                          +{alloc[k] * STAT_GAIN[k]}
-                        </span>
+                        <span className="text-emerald-400"> +{alloc[k] * STAT_GAIN[k]}</span>
                       )}
                     </span>
                     <button
@@ -371,7 +437,19 @@ export default function RPS() {
         </section>
 
         {/* Player */}
-        <section className="space-y-1">
+        <section
+          className="relative space-y-1"
+          style={playerAnim ? { animation: playerAnim } : undefined}
+        >
+          {striking && round.outcome === "lose" && !round.dodged && (
+            <div
+              className="pointer-events-none absolute inset-x-0 -top-6 text-center text-lg font-black text-rose-300"
+              style={{ animation: "rps-float 900ms ease-out forwards" }}
+              aria-hidden="true"
+            >
+              -{round.dmg}
+            </div>
+          )}
           <HpBar hp={hp} max={player.maxHp} className="bg-emerald-500" />
           <StatLine stats={player} highlight />
         </section>
@@ -391,6 +469,49 @@ export default function RPS() {
         </section>
       </GameLayout>
     </>
+  );
+}
+
+// The combat call-outs — AGI advantage, crit, and dodge all get a pop.
+function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
+  if (round.outcome === "draw") {
+    return <p className="text-lg font-medium text-neutral-400">Stand-off</p>;
+  }
+  if (round.dodged) {
+    const you = round.attacker === "foe"; // foe attacked, you dodged
+    return (
+      <p
+        className={`text-lg font-bold motion-safe:animate-rps-tick ${
+          you ? "text-sky-300" : "text-neutral-400"
+        }`}
+      >
+        {you ? "You dodge!" : `${foe.name} dodges!`}
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-1">
+      {round.faster && (
+        <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
+          {round.attacker === "you" ? "You're faster!" : `${foe.name} is faster!`}{" "}
+          <span className="text-amber-200">×2</span>
+        </p>
+      )}
+      {round.crit && (
+        <p className="text-lg font-bold text-fuchsia-300 motion-safe:animate-rps-tick">
+          Critical!
+        </p>
+      )}
+      {!round.faster && !round.crit && (
+        <p
+          className={`text-lg font-medium ${
+            round.attacker === "you" ? "text-emerald-400" : "text-rose-400"
+          }`}
+        >
+          {round.attacker === "you" ? "Hit!" : "You're hit!"}
+        </p>
+      )}
+    </div>
   );
 }
 
