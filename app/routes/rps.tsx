@@ -115,6 +115,7 @@ type Round = {
   crit: boolean;
   dodged: boolean;
   faster: boolean;
+  mult: number; // tension multiplier applied to this hit, or the new stack on a draw
   resultFoeHp: number;
   resultHp: number;
 };
@@ -137,6 +138,9 @@ export default function RPS() {
     agi: 0,
     luk: 0,
   });
+  // Each draw builds tension (×1.2, stacking); the next blow that lands cashes
+  // it in, then it resets.
+  const [drawMult, setDrawMult] = useState(1);
   const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
 
   // The battle cry shows itself, then hands over to the choice.
@@ -209,6 +213,7 @@ export default function RPS() {
     let crit = false;
     let dodged = false;
     let faster = false;
+    let mult = 1;
     let resultFoeHp = foeHp;
     let resultHp = hp;
     if (outcome === "win") {
@@ -216,19 +221,33 @@ export default function RPS() {
       const s = strike(player, foe);
       crit = s.crit;
       dodged = s.dodged;
-      dmg = s.dmg;
       faster = player.agi > foe.agi;
-      if (!dodged) resultFoeHp = Math.max(0, foeHp - dmg);
+      dmg = s.dmg;
+      if (!dodged) {
+        mult = drawMult;
+        dmg = Math.round(dmg * mult);
+        resultFoeHp = Math.max(0, foeHp - dmg);
+        setDrawMult(1); // tension released
+      }
     } else if (outcome === "lose") {
       attacker = "foe";
       const s = strike(foe, player);
       crit = s.crit;
       dodged = s.dodged;
-      dmg = s.dmg;
       faster = foe.agi > player.agi;
-      if (!dodged) resultHp = Math.max(0, hp - dmg);
+      dmg = s.dmg;
+      if (!dodged) {
+        mult = drawMult;
+        dmg = Math.round(dmg * mult);
+        resultHp = Math.max(0, hp - dmg);
+        setDrawMult(1);
+      }
+    } else {
+      // draw — no blow, tension stacks for the next hit
+      mult = Math.round(drawMult * 1.2 * 100) / 100;
+      setDrawMult(mult);
     }
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, crit, dodged, faster, resultFoeHp, resultHp });
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, crit, dodged, faster, mult, resultFoeHp, resultHp });
     setCount(3);
     setPhase("count");
   };
@@ -255,6 +274,7 @@ export default function RPS() {
     const nf = makeFoe(next);
     setFoe(nf);
     setFoeHp(nf.maxHp);
+    setDrawMult(1);
     setPhase("intro");
   };
 
@@ -267,6 +287,7 @@ export default function RPS() {
     setFoe(nf);
     setFoeHp(nf.maxHp);
     setRound(null);
+    setDrawMult(1);
     setPhase("intro");
   };
 
@@ -274,8 +295,8 @@ export default function RPS() {
   const foeAnim =
     striking && round.outcome === "win"
       ? round.dodged
-        ? "rps-dodge 440ms ease-out"
-        : `rps-hit-${round.player} ${round.faster ? "340ms ease-out 2" : "440ms ease-out"}`
+        ? "rps-dodge 500ms ease-out"
+        : `rps-hit-${round.player} ${round.faster ? "400ms ease-out 2" : "560ms ease-out"}`
       : undefined;
   const playerAnim =
     striking && round.outcome === "lose" && !round.dodged
@@ -296,7 +317,7 @@ export default function RPS() {
         {/* Foe */}
         <section className="relative space-y-1 text-center">
           <div
-            className="text-6xl leading-none"
+            className="inline-block text-7xl leading-none will-change-transform"
             style={foeAnim ? { animation: foeAnim } : undefined}
             aria-hidden="true"
           >
@@ -304,7 +325,7 @@ export default function RPS() {
           </div>
           {striking && round.outcome === "win" && !round.dodged && (
             <div
-              className="pointer-events-none absolute inset-x-0 top-1 text-center text-2xl font-black"
+              className="pointer-events-none absolute inset-x-0 top-0 text-center text-3xl font-black"
               style={{ animation: "rps-float 900ms ease-out forwards" }}
               aria-hidden="true"
             >
@@ -454,6 +475,12 @@ export default function RPS() {
           <StatLine stats={player} highlight />
         </section>
 
+        {drawMult > 1 && (
+          <p className="text-center text-xs font-bold text-amber-300">
+            ⚡ Tension ×{drawMult.toFixed(2)} — cashed in on the next hit
+          </p>
+        )}
+
         <section className="grid grid-cols-3 gap-4">
           {MOVES.map((m) => (
             <button
@@ -472,10 +499,14 @@ export default function RPS() {
   );
 }
 
-// The combat call-outs — AGI advantage, crit, and dodge all get a pop.
+// The combat call-outs — tension, AGI advantage, crit, and dodge all get a pop.
 function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
   if (round.outcome === "draw") {
-    return <p className="text-lg font-medium text-neutral-400">Stand-off</p>;
+    return (
+      <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
+        Tension ×{round.mult.toFixed(2)}!
+      </p>
+    );
   }
   if (round.dodged) {
     const you = round.attacker === "foe"; // foe attacked, you dodged
@@ -489,28 +520,32 @@ function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
       </p>
     );
   }
+  const lines: React.ReactNode[] = [];
+  if (round.mult > 1)
+    lines.push(
+      <span className="text-amber-300">⚡ Tension ×{round.mult.toFixed(2)}!</span>,
+    );
+  if (round.faster)
+    lines.push(
+      <span className="text-amber-300">
+        {round.attacker === "you" ? "You're faster!" : `${foe.name} is faster!`}{" "}
+        <span className="text-amber-200">×2</span>
+      </span>,
+    );
+  if (round.crit) lines.push(<span className="text-fuchsia-300">Critical!</span>);
+  if (lines.length === 0)
+    lines.push(
+      <span className={round.attacker === "you" ? "text-emerald-400" : "text-rose-400"}>
+        {round.attacker === "you" ? "Hit!" : "You're hit!"}
+      </span>,
+    );
   return (
-    <div className="space-y-1">
-      {round.faster && (
-        <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
-          {round.attacker === "you" ? "You're faster!" : `${foe.name} is faster!`}{" "}
-          <span className="text-amber-200">×2</span>
+    <div className="space-y-1 text-lg font-bold">
+      {lines.map((l, i) => (
+        <p key={i} className="motion-safe:animate-rps-tick">
+          {l}
         </p>
-      )}
-      {round.crit && (
-        <p className="text-lg font-bold text-fuchsia-300 motion-safe:animate-rps-tick">
-          Critical!
-        </p>
-      )}
-      {!round.faster && !round.crit && (
-        <p
-          className={`text-lg font-medium ${
-            round.attacker === "you" ? "text-emerald-400" : "text-rose-400"
-          }`}
-        >
-          {round.attacker === "you" ? "Hit!" : "You're hit!"}
-        </p>
-      )}
+      ))}
     </div>
   );
 }
