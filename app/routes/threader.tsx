@@ -624,7 +624,7 @@ export default function Threader() {
       <GameLayout>
         <header className="text-center">
           <h1 className="bg-gradient-to-r from-amber-400 to-sky-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
-            <Trans id="threader.title" message="Threader 🪡" />
+            <Trans id="threader.title" message="Threader" />
           </h1>
         </header>
 

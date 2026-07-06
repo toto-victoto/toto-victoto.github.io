@@ -95,10 +95,14 @@ export function peekGame<K extends GameKey>(game: K): Persisted[K] | undefined {
   return readAll()[game] as Persisted[K] | undefined;
 }
 
-// Wipe every saved game (scores, balances, in-progress state). Used by the
-// "reset records" control.
-export function clearStoredGames(): void {
-  writeAll({});
+// Wipe one game's saved slot (its scores, balance, in-progress state). Used by
+// the per-game "reset" controls.
+export function clearGame(game: string): void {
+  const all = readAll();
+  if (game in all) {
+    delete (all as Record<string, unknown>)[game];
+    writeAll(all);
+  }
 }
 
 export function loadGame<K extends GameKey>(

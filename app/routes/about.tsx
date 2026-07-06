@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
 import type { Route } from "./+types/about";
 import { BackButton } from "../components/BackButton";
-import { clearStoredGames, peekGame } from "../storage";
+import { clearGame, peekGame } from "../storage";
 
 const REPO_URL = "https://github.com/toto-victoto/toto-victoto.github.io";
 
@@ -31,33 +31,34 @@ function readRecords(): Record<string, string> {
 export default function About() {
   // null until the client reads localStorage, so the prerendered HTML is stable.
   const [records, setRecords] = useState<Record<string, string> | null>(null);
-  const [confirming, setConfirming] = useState(false);
+  // Which game's reset is currently "armed" (waiting for a confirming 2nd tap).
+  const [confirmKey, setConfirmKey] = useState<string | null>(null);
 
   useEffect(() => {
     setRecords(readRecords());
   }, []);
 
-  // First tap arms the reset, second confirms; it disarms itself after a beat.
+  // A first tap arms a row's reset; it disarms itself after a beat.
   useEffect(() => {
-    if (!confirming) return;
-    const t = setTimeout(() => setConfirming(false), 3000);
+    if (!confirmKey) return;
+    const t = setTimeout(() => setConfirmKey(null), 3000);
     return () => clearTimeout(t);
-  }, [confirming]);
+  }, [confirmKey]);
 
-  const onReset = () => {
-    if (!confirming) {
-      setConfirming(true);
+  const onReset = (key: string) => {
+    if (confirmKey !== key) {
+      setConfirmKey(key);
       return;
     }
-    clearStoredGames();
+    clearGame(key);
     setRecords(readRecords());
-    setConfirming(false);
+    setConfirmKey(null);
   };
 
   const games: { key: string; label: React.ReactNode }[] = [
     { key: "snake", label: <Trans id="snake.title" message="Snake" /> },
     { key: "flappy", label: <Trans id="flappy.title" message="Flappy" /> },
-    { key: "threader", label: <Trans id="threader.title" message="Threader 🪡" /> },
+    { key: "threader", label: <Trans id="threader.title" message="Threader" /> },
     { key: "trias", label: <Trans id="trias.title" message="Trias" /> },
     { key: "roulette", label: <Trans id="roulette.title" message="Roulette" /> },
     { key: "rps", label: <Trans id="rps.title" message="Rock Paper Scissors" /> },
@@ -112,25 +113,27 @@ export default function About() {
                     <td className="py-2 text-right font-bold tabular-nums text-neutral-100">
                       {records ? records[g.key] : "—"}
                     </td>
+                    <td className="py-2 pl-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => onReset(g.key)}
+                        className={`rounded-full px-3 py-1 text-xs font-medium transition active:scale-95 ${
+                          confirmKey === g.key
+                            ? "bg-rose-500 text-neutral-950 hover:bg-rose-400"
+                            : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+                        }`}
+                      >
+                        {confirmKey === g.key ? (
+                          <Trans id="about.records.confirm" message="Confirm" />
+                        ) : (
+                          <Trans id="about.records.reset" message="Reset" />
+                        )}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <button
-              type="button"
-              onClick={onReset}
-              className={`mt-4 rounded-full px-4 py-2 text-sm font-medium transition active:scale-95 ${
-                confirming
-                  ? "bg-rose-500 text-neutral-950 hover:bg-rose-400"
-                  : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-              }`}
-            >
-              {confirming ? (
-                <Trans id="about.records.confirm" message="Confirm reset" />
-              ) : (
-                <Trans id="about.records.reset" message="Reset records" />
-              )}
-            </button>
           </section>
 
           <section>

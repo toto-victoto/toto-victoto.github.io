@@ -140,10 +140,10 @@ msgid "about.section.records"
 msgstr "Records"
 
 msgid "about.records.reset"
-msgstr "Reset records"
+msgstr "Reset"
 
 msgid "about.records.confirm"
-msgstr "Confirm reset"
+msgstr "Confirm"
 
 msgid "about.section.legal"
 msgstr "Legal"
@@ -245,7 +245,7 @@ msgid "trias.clear.perfect"
 msgstr "Perfect clear!"
 
 msgid "threader.title"
-msgstr "Threader 🪡"
+msgstr "Threader"
 
 msgid "threader.start"
 msgstr "Tap to switch shape · drag to line it up"

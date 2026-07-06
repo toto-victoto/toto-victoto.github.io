@@ -140,7 +140,7 @@ msgid "about.section.records"
 msgstr "Records"
 
 msgid "about.records.reset"
-msgstr "Réinitialiser"
+msgstr "Effacer"
 
 msgid "about.records.confirm"
 msgstr "Confirmer"
@@ -245,7 +245,7 @@ msgid "trias.clear.perfect"
 msgstr "Grille vidée !"
 
 msgid "threader.title"
-msgstr "Threader 🪡"
+msgstr "Threader"
 
 msgid "threader.start"
 msgstr "Tape pour changer de forme · glisse pour l'aligner"

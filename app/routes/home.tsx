@@ -80,7 +80,7 @@ export default function Home() {
 
           <AppIcon
             to="/threader"
-            label={<Trans id="threader.title" message="Threader 🪡" />}
+            label={<Trans id="threader.title" message="Threader" />}
             tone="bg-gradient-to-br from-amber-400 to-sky-500"
           >
             <span aria-hidden="true">🪡</span>

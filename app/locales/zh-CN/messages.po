@@ -140,10 +140,10 @@ msgid "about.section.records"
 msgstr "纪录"
 
 msgid "about.records.reset"
-msgstr "重置纪录"
+msgstr "重置"
 
 msgid "about.records.confirm"
-msgstr "确认重置"
+msgstr "确认"
 
 msgid "about.section.legal"
 msgstr "法律声明"
@@ -245,7 +245,7 @@ msgid "trias.clear.perfect"
 msgstr "完美清屏！"
 
 msgid "threader.title"
-msgstr "Threader 🪡"
+msgstr "Threader"
 
 msgid "threader.start"
 msgstr "点击切换形状 · 拖动对准缺口"
