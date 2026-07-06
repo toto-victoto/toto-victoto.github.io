@@ -6,51 +6,59 @@ import { GameLayout } from "../components/GameLayout";
 import { useStoredGame } from "../storage";
 import { sfx } from "../sound";
 
-// A gimmicky RPG on top of rock-paper-scissors: each RPS round is one exchange.
-// Win the RPS and you strike; lose it and the foe strikes. First POC — numbers
-// are meant to be tuned.
+// An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
+// strategy is a REPETITION multiplier: repeat a move and its multipliers climb
+// (almost exponentially), switch and they reset. ✊ escalates both attack and
+// damage-taken, ✌️ shrinks both (turtle), ✋ is neutral. A draw doubles them.
+// DEX governs how fast the multipliers move. First POC — numbers to tune.
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
 
-const MOVES: { id: Move; emoji: string }[] = [
-  { id: "rock", emoji: "✊" },
-  { id: "paper", emoji: "✋" },
-  { id: "scissors", emoji: "✌️" },
+const MOVES: { id: Move; emoji: string; tag: string }[] = [
+  { id: "rock", emoji: "✊", tag: "escalate" },
+  { id: "paper", emoji: "✋", tag: "steady" },
+  { id: "scissors", emoji: "✌️", tag: "defend" },
 ];
 const BEATS: Record<Move, Move> = { rock: "scissors", paper: "rock", scissors: "paper" };
 const judge = (p: Move, c: Move): Outcome =>
   p === c ? "draw" : BEATS[p] === c ? "win" : "lose";
 const randomMove = (): Move => MOVES[Math.floor(Math.random() * MOVES.length)].id;
 const emojiOf = (m: Move) => MOVES.find((x) => x.id === m)!.emoji;
-// The hit marker that flies off the foe, keyed to the winning move.
 const MARKER: Record<Move, string> = { rock: "💥", paper: "👋", scissors: "✂️" };
 
-type Stats = { maxHp: number; str: number; def: number; agi: number; luk: number };
+type Stats = { maxHp: number; str: number; def: number; agi: number; dex: number };
 type Foe = Stats & { emoji: string; name: string; cry: string; lastWords: string };
-type StatKey = "hp" | "str" | "def" | "agi" | "luk";
+type StatKey = "hp" | "str" | "def" | "agi" | "dex";
 
-const STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi", "luk"];
+const STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi", "dex"];
 const STAT_LABEL: Record<StatKey, string> = {
   hp: "HP",
   str: "STR",
   def: "DEF",
   agi: "AGI",
-  luk: "LUK",
+  dex: "DEX",
 };
-const STAT_GAIN: Record<StatKey, number> = { hp: 4, str: 1, def: 1, agi: 1, luk: 1 };
+const STAT_GAIN: Record<StatKey, number> = { hp: 8, str: 1, def: 1, agi: 1, dex: 1 };
 
-const START: Stats = { maxHp: 20, str: 5, def: 2, agi: 3, luk: 1 };
+const START: Stats = { maxHp: 45, str: 6, def: 3, agi: 3, dex: 2 };
+
+// Multiplier tuning: rock's per-repeat growth (DEX quickens it), and bounds.
+const growthRate = (dex: number) => 0.5 + dex * 0.13;
+const MULT_MAX = 64;
+const OFF_MIN = 0.3;
+const DEF_MIN = 0.25;
+const clampMult = (v: number, lo: number) => Math.max(lo, Math.min(MULT_MAX, v));
 
 const ROSTER: Foe[] = [
-  { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 3, str: 1, def: 0, agi: 1, luk: 0 },
-  { emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 6, str: 2, def: 1, agi: 2, luk: 1 },
-  { emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 11, str: 3, def: 2, agi: 2, luk: 1 },
-  { emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 15, str: 4, def: 3, agi: 4, luk: 2 },
-  { emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 19, str: 6, def: 3, agi: 7, luk: 4 },
-  { emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 26, str: 8, def: 5, agi: 5, luk: 5 },
-  { emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 34, str: 10, def: 7, agi: 6, luk: 4 },
-  { emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 48, str: 14, def: 9, agi: 9, luk: 8 },
+  { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 8, str: 2, def: 0, agi: 1, dex: 0 },
+  { emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 14, str: 3, def: 1, agi: 2, dex: 1 },
+  { emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 22, str: 4, def: 2, agi: 2, dex: 1 },
+  { emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 30, str: 5, def: 4, agi: 4, dex: 2 },
+  { emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 38, str: 7, def: 4, agi: 7, dex: 3 },
+  { emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 50, str: 9, def: 6, agi: 5, dex: 3 },
+  { emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 64, str: 12, def: 8, agi: 6, dex: 3 },
+  { emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 85, str: 16, def: 10, agi: 9, dex: 4 },
 ];
 
 const EXTRA_EMOJI = ["🧟", "👹", "🤺", "🧛", "🦸", "👺", "🧝", "🧌"];
@@ -85,25 +93,16 @@ function makeFoe(index: number): Foe {
     name: EXTRA_NAME[i],
     cry: EXTRA_CRY[i],
     lastWords: EXTRA_LASTWORDS[i],
-    maxHp: 52 + t * 9,
-    str: 15 + t * 2,
-    def: 9 + t,
-    agi: 9 + t,
-    luk: 6 + Math.floor(t / 2),
+    maxHp: 90 + t * 16,
+    str: 17 + t * 2,
+    def: 11 + t,
+    agi: 10 + t,
+    dex: 4 + Math.floor(t / 2),
   };
 }
 
-const luckPct = (luk: number) => Math.min(10, Math.max(0, luk));
 const pointsForLevel = (level: number) => 2 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
-
-function strike(att: Stats, def: Stats): { dmg: number; crit: boolean; dodged: boolean } {
-  if (Math.random() * 100 < luckPct(def.luk)) return { dmg: 0, crit: false, dodged: true };
-  const crit = Math.random() * 100 < luckPct(att.luk);
-  let dmg = crit ? att.str : Math.max(1, att.str - def.def);
-  if (att.agi > def.agi) dmg *= 2;
-  return { dmg, crit, dodged: false };
-}
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -131,15 +130,13 @@ type Round = {
   outcome: Outcome;
   attacker: "you" | "foe" | null;
   dmg: number;
-  hits: number[]; // damage split into visual blows (two on an AGI double)
-  crit: boolean;
-  dodged: boolean;
+  hits: number[]; // split into two on an AGI double
   faster: boolean;
-  mult: number;
+  mult: number; // multiplier applied to this exchange (off on win, def on loss)
+  doubled: boolean; // a draw doubled the stakes
   resultFoeHp: number;
   resultHp: number;
 };
-// The currently-landing blow, re-keyed so its animations replay per sub-hit.
 type Hit = { key: number; dmg: number; target: "foe" | "you"; move: Move };
 
 export default function RPS() {
@@ -159,14 +156,15 @@ export default function RPS() {
     str: 0,
     def: 0,
     agi: 0,
-    luk: 0,
+    dex: 0,
   });
-  // Each draw builds tension (×1.2, stacking); the next blow that lands cashes
-  // it in, then it resets.
-  const [drawMult, setDrawMult] = useState(1);
+  // Repetition multipliers: offMult scales damage dealt, defMult scales damage
+  // taken. They ride the current streak of `lastMove`.
+  const [offMult, setOffMult] = useState(1);
+  const [defMult, setDefMult] = useState(1);
+  const [lastMove, setLastMove] = useState<Move | null>(null);
   const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
 
-  // The battle cry shows itself, then hands over to the choice.
   useEffect(() => {
     if (phase !== "intro") return;
     sfx.ui();
@@ -174,7 +172,6 @@ export default function RPS() {
     return () => clearTimeout(t);
   }, [phase]);
 
-  // Rock… paper… scissors… — the 3-2-1 that adds the tension.
   useEffect(() => {
     if (phase !== "count") return;
     if (count <= 0) {
@@ -188,15 +185,12 @@ export default function RPS() {
     return () => clearTimeout(t);
   }, [phase, count]);
 
-  // Show who won the toss for a beat before the blow lands.
   useEffect(() => {
     if (phase !== "clash") return;
     const t = setTimeout(() => setPhase("strike"), 500);
     return () => clearTimeout(t);
   }, [phase]);
 
-  // The blow(s): apply HP in staggered chunks (so a double reads as two hits),
-  // then resolve KO / level-up / next.
   useEffect(() => {
     if (phase !== "strike" || !round) return;
     const r = round;
@@ -208,7 +202,7 @@ export default function RPS() {
         const nl = level + 1;
         setLevel(nl);
         setPoints(pointsForLevel(nl));
-        setAlloc({ hp: 0, str: 0, def: 0, agi: 0, luk: 0 });
+        setAlloc({ hp: 0, str: 0, def: 0, agi: 0, dex: 0 });
         setStored((s) => ({ bestLevel: Math.max(s.bestLevel, nl) }));
         setPhase("death");
         sfx.win();
@@ -220,11 +214,10 @@ export default function RPS() {
       }
     };
 
-    const landed = r.outcome !== "draw" && !r.dodged;
-    if (!landed) {
+    if (r.outcome === "draw") {
       setHit(null);
       sfx.ui();
-      timers.push(setTimeout(finish, r.outcome === "draw" ? 650 : 1000));
+      timers.push(setTimeout(finish, 700));
       return () => timers.forEach(clearTimeout);
     }
 
@@ -238,8 +231,7 @@ export default function RPS() {
           cum += c;
           apply(Math.max(0, base - cum));
           setHit({ key: Date.now() + i, dmg: c, target, move: r.player });
-          if (r.crit && i === 0) sfx.win();
-          else if (target === "foe") sfx.score();
+          if (target === "foe") sfx.score();
           else sfx.ui();
         }, i * 300),
       );
@@ -249,7 +241,6 @@ export default function RPS() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // Linger on the tombstone + last words before the level-up screen.
   useEffect(() => {
     if (phase !== "death") return;
     const t = setTimeout(() => setPhase("levelup"), 1700);
@@ -260,47 +251,64 @@ export default function RPS() {
     if (phase !== "choose") return;
     const foeMove = randomMove();
     const outcome = judge(move, foeMove);
+
+    // Update the repetition multipliers for this throw.
+    let off = offMult;
+    let def = defMult;
+    if (move !== lastMove) {
+      off = 1;
+      def = 1; // switching resets
+    } else {
+      const r = growthRate(player.dex);
+      if (move === "rock") {
+        off *= 1 + r;
+        def *= 1 + r; // hit harder, take harder
+      } else if (move === "scissors") {
+        off *= 1 - r * 0.55;
+        def *= 1 - r * 0.65; // softer, but safer
+      }
+      // paper: unchanged
+      off = clampMult(off, OFF_MIN);
+      def = clampMult(def, DEF_MIN);
+    }
+
     let attacker: "you" | "foe" | null = null;
     let dmg = 0;
-    let crit = false;
-    let dodged = false;
     let faster = false;
     let mult = 1;
+    let doubled = false;
     let resultFoeHp = foeHp;
     let resultHp = hp;
+
     if (outcome === "win") {
       attacker = "you";
-      const s = strike(player, foe);
-      crit = s.crit;
-      dodged = s.dodged;
       faster = player.agi > foe.agi;
-      dmg = s.dmg;
-      if (!dodged) {
-        mult = drawMult;
-        dmg = Math.round(dmg * mult);
-        resultFoeHp = Math.max(0, foeHp - dmg);
-        setDrawMult(1);
-      }
+      let b = Math.max(1, player.str - foe.def);
+      if (faster) b *= 2;
+      dmg = Math.max(1, Math.round(b * off));
+      mult = off;
+      resultFoeHp = Math.max(0, foeHp - dmg);
     } else if (outcome === "lose") {
       attacker = "foe";
-      const s = strike(foe, player);
-      crit = s.crit;
-      dodged = s.dodged;
       faster = foe.agi > player.agi;
-      dmg = s.dmg;
-      if (!dodged) {
-        mult = drawMult;
-        dmg = Math.round(dmg * mult);
-        resultHp = Math.max(0, hp - dmg);
-        setDrawMult(1);
-      }
+      let b = Math.max(1, foe.str - player.def);
+      if (faster) b *= 2;
+      dmg = Math.max(1, Math.round(b * def));
+      mult = def;
+      resultHp = Math.max(0, hp - dmg);
     } else {
-      mult = Math.round(drawMult * 1.2 * 100) / 100;
-      setDrawMult(mult);
+      // draw — double the stakes for what comes next
+      off = clampMult(off * 2, OFF_MIN);
+      def = clampMult(def * 2, DEF_MIN);
+      doubled = true;
     }
-    // An AGI double lands as two separate blows.
-    const hits = faster && !dodged && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, crit, dodged, faster, mult, resultFoeHp, resultHp });
+
+    setOffMult(off);
+    setDefMult(def);
+    setLastMove(move);
+
+    const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult, doubled, resultFoeHp, resultHp });
     setCount(3);
     setPhase("count");
   };
@@ -312,13 +320,19 @@ export default function RPS() {
     setAlloc((a) => ({ ...a, [k]: a[k] + 1 }));
   };
 
+  const nextFoe = () => {
+    setOffMult(1);
+    setDefMult(1);
+    setLastMove(null);
+  };
+
   const confirmLevelUp = () => {
     const np: Stats = {
       maxHp: player.maxHp + alloc.hp * STAT_GAIN.hp,
       str: player.str + alloc.str,
       def: player.def + alloc.def,
       agi: player.agi + alloc.agi,
-      luk: player.luk + alloc.luk,
+      dex: player.dex + alloc.dex,
     };
     setPlayer(np);
     setHp(np.maxHp);
@@ -327,7 +341,7 @@ export default function RPS() {
     const nf = makeFoe(next);
     setFoe(nf);
     setFoeHp(nf.maxHp);
-    setDrawMult(1);
+    nextFoe();
     setPhase("intro");
   };
 
@@ -340,21 +354,15 @@ export default function RPS() {
     setFoe(nf);
     setFoeHp(nf.maxHp);
     setRound(null);
-    setDrawMult(1);
+    nextFoe();
     setPhase("intro");
   };
 
   const foeHitting = hit?.target === "foe";
   const youHit = hit?.target === "you";
-  const foeDodging = phase === "strike" && round?.outcome === "win" && round.dodged;
-  const foeAnim = foeDodging
-    ? "rps-dodge 500ms ease-out"
-    : foeHitting
-      ? `rps-hit-${hit.move} 480ms ease-out`
-      : undefined;
-  // The foe stays a tombstone through the death beat AND the level-up screen —
-  // it's only replaced when the next foe steps in (intro).
+  const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
+  const showStance = phase === "choose" && lastMove && (offMult !== 1 || defMult !== 1);
 
   return (
     <>
@@ -545,6 +553,20 @@ export default function RPS() {
           <StatLine stats={player} highlight />
         </section>
 
+        {/* Current streak stakes */}
+        <p className="h-4 text-center text-xs font-bold">
+          {showStance && (
+            <>
+              <span className="text-neutral-400">{emojiOf(lastMove!)} streak</span>{" "}
+              <span className="text-amber-300">deal ×{offMult.toFixed(1)}</span>
+              {" · "}
+              <span className={defMult > 1 ? "text-rose-300" : "text-sky-300"}>
+                take ×{defMult.toFixed(1)}
+              </span>
+            </>
+          )}
+        </p>
+
         <section
           key={youHit ? `moves-${hit.key}` : "moves"}
           className="grid grid-cols-3 gap-4"
@@ -556,9 +578,16 @@ export default function RPS() {
               onClick={() => pick(m.id)}
               disabled={phase !== "choose"}
               aria-label={m.id}
-              className="flex aspect-square items-center justify-center rounded-2xl bg-neutral-800 text-5xl transition hover:bg-neutral-700 active:scale-95 disabled:opacity-40 disabled:hover:bg-neutral-800 disabled:active:scale-100"
+              className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-2xl text-5xl ring-2 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
+                lastMove === m.id
+                  ? "bg-neutral-700 ring-amber-400"
+                  : "bg-neutral-800 ring-transparent hover:bg-neutral-700"
+              }`}
             >
               <span aria-hidden="true">{m.emoji}</span>
+              <span className="text-[10px] font-medium uppercase tracking-wide text-neutral-400">
+                {m.tag}
+              </span>
             </button>
           ))}
         </section>
@@ -567,32 +596,21 @@ export default function RPS() {
   );
 }
 
-// The combat call-outs — tension, AGI advantage, crit, and dodge all get a pop.
+// The combat call-outs — the streak multiplier, the AGI double, or a draw's
+// doubled stakes all get a pop.
 function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
   if (round.outcome === "draw") {
     return (
       <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
-        Tension ×{round.mult.toFixed(2)}!
-      </p>
-    );
-  }
-  if (round.dodged) {
-    const you = round.attacker === "foe"; // foe attacked, you dodged
-    return (
-      <p
-        className={`text-lg font-bold motion-safe:animate-rps-tick ${
-          you ? "text-sky-300" : "text-neutral-400"
-        }`}
-      >
-        {you ? "You dodge!" : `${foe.name} dodges!`}
+        Stalemate — stakes doubled! ×2
       </p>
     );
   }
   const lines: React.ReactNode[] = [];
-  if (round.mult > 1)
-    lines.push(
-      <span className="text-amber-300">⚡ Tension ×{round.mult.toFixed(2)}!</span>,
-    );
+  if (round.mult >= 1.15)
+    lines.push(<span className="text-amber-300">⚔ Stakes ×{round.mult.toFixed(1)}!</span>);
+  else if (round.mult <= 0.85)
+    lines.push(<span className="text-sky-300">Softened ×{round.mult.toFixed(1)}</span>);
   if (round.faster)
     lines.push(
       <span className="text-amber-300">
@@ -600,7 +618,6 @@ function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
         <span className="text-amber-200">×2</span>
       </span>,
     );
-  if (round.crit) lines.push(<span className="text-fuchsia-300">Critical!</span>);
   if (lines.length === 0)
     lines.push(
       <span className={round.attacker === "you" ? "text-emerald-400" : "text-rose-400"}>
