@@ -142,8 +142,9 @@ type Round = {
   dmg: number;
   hits: number[]; // split into two on an AGI double
   faster: boolean;
-  mult: number; // multiplier applied to this exchange (off on win, def on loss)
+  mult: number; // stakes multiplier applied to this exchange
   doubled: boolean; // a draw doubled the stakes
+  newStakes: number; // stakes to commit once the round finishes (not before)
   resultFoeHp: number;
   resultHp: number;
 };
@@ -207,6 +208,9 @@ export default function RPS() {
 
     const finish = () => {
       setHit(null);
+      // Commit the new stakes now — after the exchange has resolved.
+      setStakes(r.newStakes);
+      setLastMove(r.player);
       if (r.resultFoeHp <= 0) {
         const nl = level + 1;
         setLevel(nl);
@@ -299,11 +303,10 @@ export default function RPS() {
       doubled = true;
     }
 
-    setStakes(stk);
-    setLastMove(move);
-
+    // NB: the stakes state is only committed once the round animation ends
+    // (in the strike effect), so the shown ×N matches what's resolving.
     const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult, doubled, resultFoeHp, resultHp });
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult, doubled, newStakes: stk, resultFoeHp, resultHp });
     setCount(3);
     setPhase("count");
   };
@@ -568,7 +571,7 @@ export default function RPS() {
                 onClick={() => pick(m.id)}
                 disabled={phase !== "choose"}
                 aria-label={m.id}
-                className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-2xl text-5xl ring-2 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
+                className={`flex aspect-square flex-col items-center justify-center gap-1.5 rounded-2xl text-5xl ring-2 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
                   role === "up"
                     ? "bg-neutral-700 ring-amber-400"
                     : role === "down"
@@ -577,7 +580,7 @@ export default function RPS() {
                 }`}
               >
                 <span aria-hidden="true">{m.emoji}</span>
-                <span className={`text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
+                <span className={`pt-1 text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
                   ×{proj.toFixed(1)}
                 </span>
               </button>
