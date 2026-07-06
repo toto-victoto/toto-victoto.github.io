@@ -133,6 +133,18 @@ msgstr "构建工具"
 msgid "about.section.source"
 msgstr "源代码"
 
+msgid "about.built.claude"
+msgstr "与 Claude（Anthropic）共同编写"
+
+msgid "about.section.records"
+msgstr "纪录"
+
+msgid "about.records.reset"
+msgstr "重置纪录"
+
+msgid "about.records.confirm"
+msgstr "确认重置"
+
 msgid "about.section.legal"
 msgstr "法律声明"
 

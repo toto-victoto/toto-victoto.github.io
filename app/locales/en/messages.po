@@ -133,6 +133,18 @@ msgstr "Built with"
 msgid "about.section.source"
 msgstr "Source code"
 
+msgid "about.built.claude"
+msgstr "Co-authored with Claude (Anthropic)"
+
+msgid "about.section.records"
+msgstr "Records"
+
+msgid "about.records.reset"
+msgstr "Reset records"
+
+msgid "about.records.confirm"
+msgstr "Confirm reset"
+
 msgid "about.section.legal"
 msgstr "Legal"
 
