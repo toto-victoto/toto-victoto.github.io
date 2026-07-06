@@ -46,6 +46,27 @@ msgstr "Toi"
 msgid "rps.score.cpu"
 msgstr "Ordi"
 
+msgid "rps.rpg.fight"
+msgstr "Combattre !"
+
+msgid "rps.rpg.continue"
+msgstr "Continuer"
+
+msgid "rps.rpg.tryagain"
+msgstr "Réessayer"
+
+msgid "rps.rpg.levelup"
+msgstr "Niveau supérieur !"
+
+msgid "rps.rpg.spend"
+msgstr "Répartis tes points"
+
+msgid "rps.rpg.defeated"
+msgstr "Tu as été vaincu"
+
+msgid "rps.rpg.reached"
+msgstr "Niveau {level} atteint"
+
 msgid "snake.title"
 msgstr "Serpent"
 

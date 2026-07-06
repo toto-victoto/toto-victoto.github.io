@@ -46,6 +46,27 @@ msgstr "You"
 msgid "rps.score.cpu"
 msgstr "CPU"
 
+msgid "rps.rpg.fight"
+msgstr "Fight!"
+
+msgid "rps.rpg.continue"
+msgstr "Continue"
+
+msgid "rps.rpg.tryagain"
+msgstr "Try again"
+
+msgid "rps.rpg.levelup"
+msgstr "Level up!"
+
+msgid "rps.rpg.spend"
+msgstr "Spend your points"
+
+msgid "rps.rpg.defeated"
+msgstr "You were defeated"
+
+msgid "rps.rpg.reached"
+msgstr "Reached level {level}"
+
 msgid "snake.title"
 msgstr "Snake"
 

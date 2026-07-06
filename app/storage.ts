@@ -17,7 +17,7 @@ export type Persisted = {
   snake: { best: number };
   flappy: { best: number };
   threader: { best: number };
-  rps: { player: number; cpu: number };
+  rps: { bestLevel: number };
   roulette: { best: number; balance: number; history: number[] };
   ultimate: {
     mode: "2p" | "ai";

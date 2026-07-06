@@ -46,6 +46,27 @@ msgstr "你"
 msgid "rps.score.cpu"
 msgstr "电脑"
 
+msgid "rps.rpg.fight"
+msgstr "战斗！"
+
+msgid "rps.rpg.continue"
+msgstr "继续"
+
+msgid "rps.rpg.tryagain"
+msgstr "再试一次"
+
+msgid "rps.rpg.levelup"
+msgstr "升级！"
+
+msgid "rps.rpg.spend"
+msgstr "分配点数"
+
+msgid "rps.rpg.defeated"
+msgstr "你被击败了"
+
+msgid "rps.rpg.reached"
+msgstr "达到第 {level} 级"
+
 msgid "snake.title"
 msgstr "贪吃蛇"
 
