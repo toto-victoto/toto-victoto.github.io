@@ -49,12 +49,12 @@ const ROSTER: Foe[] = [
   { emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 15, str: 4, def: 3, agi: 4, luk: 2 },
   { emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 19, str: 6, def: 3, agi: 7, luk: 4 },
   { emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 26, str: 8, def: 5, agi: 5, luk: 5 },
-  { emoji: "👑", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 34, str: 10, def: 7, agi: 6, luk: 4 },
+  { emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 34, str: 10, def: 7, agi: 6, luk: 4 },
   { emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 48, str: 14, def: 9, agi: 9, luk: 8 },
 ];
 
-const EXTRA_EMOJI = ["🧟", "👹", "🤺", "🧛", "🦸", "👺", "🧝", "🐉"];
-const EXTRA_NAME = ["Wanderer", "Brute", "Reaver", "Warden", "Fiend", "Marauder", "Specter", "Wyrm"];
+const EXTRA_EMOJI = ["🧟", "👹", "🤺", "🧛", "🦸", "👺", "🧝", "🧌"];
+const EXTRA_NAME = ["Wanderer", "Brute", "Reaver", "Warden", "Fiend", "Marauder", "Specter", "Troll"];
 const EXTRA_CRY = [
   "You're finished!",
   "Come closer.",
@@ -107,7 +107,7 @@ function strike(att: Stats, def: Stats): { dmg: number; crit: boolean; dodged: b
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Rock Paper Scissors — toto-victoto" },
+    { title: "RPS Saga — toto-victoto" },
     {
       name: "description",
       content:
@@ -362,7 +362,7 @@ export default function RPS() {
       <GameLayout>
         <header className="flex items-baseline justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">
-            <Trans id="rps.title" message="Rock Paper Scissors" />
+            <Trans id="rps.title" message="RPS Saga" />
           </h1>
           <span className="text-sm font-bold tabular-nums text-amber-300">Lv {level}</span>
         </header>

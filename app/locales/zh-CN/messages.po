@@ -26,7 +26,7 @@ msgid "home.app.about"
 msgstr "关于"
 
 msgid "rps.title"
-msgstr "石头剪刀布"
+msgstr "RPS Saga"
 
 msgid "rps.choose"
 msgstr "选择你的出招"

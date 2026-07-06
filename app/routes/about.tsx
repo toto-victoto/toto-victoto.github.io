@@ -60,7 +60,7 @@ export default function About() {
     { key: "threader", label: <Trans id="threader.title" message="Threader" /> },
     { key: "trias", label: <Trans id="trias.title" message="Trias" /> },
     { key: "roulette", label: <Trans id="roulette.title" message="Roulette" /> },
-    { key: "rps", label: <Trans id="rps.title" message="Rock Paper Scissors" /> },
+    { key: "rps", label: <Trans id="rps.title" message="RPS Saga" /> },
     {
       key: "ultimate",
       label: <Trans id="ultimate.title" message="Ultimate Tic-Tac-Toe" />,

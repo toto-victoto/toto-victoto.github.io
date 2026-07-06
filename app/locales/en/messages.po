@@ -26,7 +26,7 @@ msgid "home.app.about"
 msgstr "About"
 
 msgid "rps.title"
-msgstr "Rock Paper Scissors"
+msgstr "RPS Saga"
 
 msgid "rps.choose"
 msgstr "Choose your move"
