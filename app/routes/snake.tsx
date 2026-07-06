@@ -39,6 +39,10 @@ function makeInitialSnake(): Cell[] {
   ];
 }
 
+// Deterministic starting food so the prerendered HTML matches the first client
+// render (no hydration mismatch); it's re-randomised on mount.
+const INITIAL_FOOD: Cell = { x: Math.floor(COLS / 2), y: 3 };
+
 function randomFood(snake: Cell[]): Cell {
   const occupied = new Set(snake.map((c) => `${c.x},${c.y}`));
   const free: Cell[] = [];
@@ -82,7 +86,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Snake() {
   const [snake, setSnake] = useState<Cell[]>(makeInitialSnake);
-  const [food, setFood] = useState<Cell>(() => randomFood(makeInitialSnake()));
+  const [food, setFood] = useState<Cell>(INITIAL_FOOD);
   const [phase, setPhase] = useState<Phase>("idle");
   const [score, setScore] = useState(0);
   const [{ best }, setBestState] = useStoredGame("snake", { best: 0 });
@@ -91,8 +95,16 @@ export default function Snake() {
   const dirQueueRef = useRef<Dir[]>([]);
   const phaseRef = useRef<Phase>(phase);
   const foodRef = useRef<Cell>(food);
+  const snakeRef = useRef<Cell[]>(snake);
   phaseRef.current = phase;
   foodRef.current = food;
+  snakeRef.current = snake;
+
+  // Client-only: randomise the food once mounted, so the prerendered HTML stays
+  // deterministic and hydration matches.
+  useEffect(() => {
+    setFood(randomFood(snakeRef.current));
+  }, []);
   const touchAnchorRef = useRef<{ x: number; y: number } | null>(null);
 
   const queueDir = (d: Dir) => {
@@ -130,35 +142,38 @@ export default function Snake() {
   useEffect(() => {
     if (phase !== "playing") return;
     const id = setInterval(() => {
-      setSnake((current) => {
-        const nextDir = dirQueueRef.current.shift();
-        if (nextDir && OPPOSITE[nextDir] !== dirRef.current) {
-          dirRef.current = nextDir;
-        }
-        const [dx, dy] = DELTA[dirRef.current];
-        const head = current[0];
-        const next: Cell = { x: head.x + dx, y: head.y + dy };
-        if (next.x < 0 || next.x >= COLS || next.y < 0 || next.y >= ROWS) {
-          setPhase("gameover");
-          sfx.lose();
-          return current;
-        }
-        const eats =
-          next.x === foodRef.current.x && next.y === foodRef.current.y;
-        const body = eats ? current : current.slice(0, -1);
-        if (body.some((c) => c.x === next.x && c.y === next.y)) {
-          setPhase("gameover");
-          sfx.lose();
-          return current;
-        }
-        const nextSnake = [next, ...body];
-        if (eats) {
-          setScore((s) => s + 1);
-          setFood(randomFood(nextSnake));
-          sfx.eat();
-        }
-        return nextSnake;
-      });
+      // Read the live snake from a ref and apply every update at the top level.
+      // (Nesting setFood/setScore inside a setSnake updater is undefined
+      // behaviour in React 19 and was dropping the food respawn.)
+      const current = snakeRef.current;
+      const nextDir = dirQueueRef.current.shift();
+      if (nextDir && OPPOSITE[nextDir] !== dirRef.current) {
+        dirRef.current = nextDir;
+      }
+      const [dx, dy] = DELTA[dirRef.current];
+      const head = current[0];
+      const next: Cell = { x: head.x + dx, y: head.y + dy };
+      if (next.x < 0 || next.x >= COLS || next.y < 0 || next.y >= ROWS) {
+        setPhase("gameover");
+        sfx.lose();
+        return;
+      }
+      const eats =
+        next.x === foodRef.current.x && next.y === foodRef.current.y;
+      const body = eats ? current : current.slice(0, -1);
+      if (body.some((c) => c.x === next.x && c.y === next.y)) {
+        setPhase("gameover");
+        sfx.lose();
+        return;
+      }
+      const nextSnake = [next, ...body];
+      snakeRef.current = nextSnake; // keep the ref current for the next tick
+      setSnake(nextSnake);
+      if (eats) {
+        setScore((s) => s + 1);
+        setFood(randomFood(nextSnake));
+        sfx.eat();
+      }
     }, TICK_MS);
     return () => clearInterval(id);
   }, [phase]);
