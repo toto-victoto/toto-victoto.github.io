@@ -15,12 +15,22 @@ import { sfx } from "../sound";
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
 
-const MOVES: { id: Move; emoji: string; tag: string }[] = [
-  { id: "rock", emoji: "✊", tag: "escalate" },
-  { id: "paper", emoji: "✋", tag: "steady" },
-  { id: "scissors", emoji: "✌️", tag: "defend" },
+const MOVES: { id: Move; emoji: string }[] = [
+  { id: "rock", emoji: "✊" },
+  { id: "paper", emoji: "✋" },
+  { id: "scissors", emoji: "✌️" },
 ];
 const BEATS: Record<Move, Move> = { rock: "scissors", paper: "rock", scissors: "paper" };
+
+// Stakes change relative to your LAST move (not a fixed one): repeat it to
+// escalate, play the move it beats to soften, play the third to hold.
+const roleOf = (m: Move, last: Move | null): "up" | "down" | "flat" =>
+  last === null ? "flat" : m === last ? "up" : m === BEATS[last] ? "down" : "flat";
+const ROLE_TAG: Record<"up" | "down" | "flat", { label: string; cls: string }> = {
+  up: { label: "escalate", cls: "text-amber-300" },
+  down: { label: "soften", cls: "text-sky-300" },
+  flat: { label: "hold", cls: "text-neutral-500" },
+};
 const judge = (p: Move, c: Move): Outcome =>
   p === c ? "draw" : BEATS[p] === c ? "win" : "lose";
 const randomMove = (): Move => MOVES[Math.floor(Math.random() * MOVES.length)].id;
@@ -43,12 +53,12 @@ const STAT_GAIN: Record<StatKey, number> = { hp: 8, str: 1, def: 1, agi: 1, dex:
 
 const START: Stats = { maxHp: 45, str: 6, def: 3, agi: 3, dex: 2 };
 
-// Multiplier tuning: rock's per-repeat growth (DEX quickens it), and bounds.
+// Stakes tuning: per-repeat growth (DEX quickens it) and bounds. One "stakes"
+// multiplier scales BOTH damage dealt and damage taken.
 const growthRate = (dex: number) => 0.5 + dex * 0.13;
-const MULT_MAX = 64;
-const OFF_MIN = 0.3;
-const DEF_MIN = 0.25;
-const clampMult = (v: number, lo: number) => Math.max(lo, Math.min(MULT_MAX, v));
+const STAKE_MIN = 0.25;
+const STAKE_MAX = 64;
+const clampStake = (v: number) => Math.max(STAKE_MIN, Math.min(STAKE_MAX, v));
 
 const ROSTER: Foe[] = [
   { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 8, str: 2, def: 0, agi: 1, dex: 0 },
@@ -158,10 +168,9 @@ export default function RPS() {
     agi: 0,
     dex: 0,
   });
-  // Repetition multipliers: offMult scales damage dealt, defMult scales damage
-  // taken. They ride the current streak of `lastMove`.
-  const [offMult, setOffMult] = useState(1);
-  const [defMult, setDefMult] = useState(1);
+  // One "stakes" multiplier (scales damage dealt AND taken), driven by how each
+  // move relates to the last one played.
+  const [stakes, setStakes] = useState(1);
   const [lastMove, setLastMove] = useState<Move | null>(null);
   const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
 
@@ -252,30 +261,19 @@ export default function RPS() {
     const foeMove = randomMove();
     const outcome = judge(move, foeMove);
 
-    // Update the repetition multipliers for this throw.
-    let off = offMult;
-    let def = defMult;
-    if (move !== lastMove) {
-      off = 1;
-      def = 1; // switching resets
-    } else {
+    // Move the stakes based on this throw's relation to the last move.
+    let stk = stakes;
+    if (lastMove !== null) {
       const r = growthRate(player.dex);
-      if (move === "rock") {
-        off *= 1 + r;
-        def *= 1 + r; // hit harder, take harder
-      } else if (move === "scissors") {
-        off *= 1 - r * 0.55;
-        def *= 1 - r * 0.65; // softer, but safer
-      }
-      // paper: unchanged
-      off = clampMult(off, OFF_MIN);
-      def = clampMult(def, DEF_MIN);
+      if (move === lastMove) stk = clampStake(stk * (1 + r)); // repeat → escalate
+      else if (move === BEATS[lastMove]) stk = clampStake(stk * (1 - r * 0.55)); // soften
+      // the third move: unchanged (hold)
     }
 
     let attacker: "you" | "foe" | null = null;
     let dmg = 0;
     let faster = false;
-    let mult = 1;
+    let mult = stk;
     let doubled = false;
     let resultFoeHp = foeHp;
     let resultHp = hp;
@@ -285,26 +283,23 @@ export default function RPS() {
       faster = player.agi > foe.agi;
       let b = Math.max(1, player.str - foe.def);
       if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * off));
-      mult = off;
+      dmg = Math.max(1, Math.round(b * stk));
       resultFoeHp = Math.max(0, foeHp - dmg);
     } else if (outcome === "lose") {
       attacker = "foe";
       faster = foe.agi > player.agi;
       let b = Math.max(1, foe.str - player.def);
       if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * def));
-      mult = def;
+      dmg = Math.max(1, Math.round(b * stk));
       resultHp = Math.max(0, hp - dmg);
     } else {
       // draw — double the stakes for what comes next
-      off = clampMult(off * 2, OFF_MIN);
-      def = clampMult(def * 2, DEF_MIN);
+      stk = clampStake(stk * 2);
+      mult = stk;
       doubled = true;
     }
 
-    setOffMult(off);
-    setDefMult(def);
+    setStakes(stk);
     setLastMove(move);
 
     const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
@@ -321,8 +316,7 @@ export default function RPS() {
   };
 
   const nextFoe = () => {
-    setOffMult(1);
-    setDefMult(1);
+    setStakes(1);
     setLastMove(null);
   };
 
@@ -362,7 +356,7 @@ export default function RPS() {
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
-  const showStance = phase === "choose" && lastMove && (offMult !== 1 || defMult !== 1);
+  const showStance = phase === "choose" && Math.round(stakes * 10) !== 10;
 
   return (
     <>
@@ -553,17 +547,12 @@ export default function RPS() {
           <StatLine stats={player} highlight />
         </section>
 
-        {/* Current streak stakes */}
+        {/* Current stakes — scales both damage dealt and taken */}
         <p className="h-4 text-center text-xs font-bold">
           {showStance && (
-            <>
-              <span className="text-neutral-400">{emojiOf(lastMove!)} streak</span>{" "}
-              <span className="text-amber-300">deal ×{offMult.toFixed(1)}</span>
-              {" · "}
-              <span className={defMult > 1 ? "text-rose-300" : "text-sky-300"}>
-                take ×{defMult.toFixed(1)}
-              </span>
-            </>
+            <span className={stakes > 1 ? "text-amber-300" : "text-sky-300"}>
+              Stakes ×{stakes.toFixed(1)} — deal &amp; take
+            </span>
           )}
         </p>
 
@@ -572,24 +561,31 @@ export default function RPS() {
           className="grid grid-cols-3 gap-4"
           style={youHit ? { animation: "rps-shake 440ms ease-out" } : undefined}
         >
-          {MOVES.map((m) => (
-            <button
-              key={m.id}
-              onClick={() => pick(m.id)}
-              disabled={phase !== "choose"}
-              aria-label={m.id}
-              className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-2xl text-5xl ring-2 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
-                lastMove === m.id
-                  ? "bg-neutral-700 ring-amber-400"
-                  : "bg-neutral-800 ring-transparent hover:bg-neutral-700"
-              }`}
-            >
-              <span aria-hidden="true">{m.emoji}</span>
-              <span className="text-[10px] font-medium uppercase tracking-wide text-neutral-400">
-                {m.tag}
-              </span>
-            </button>
-          ))}
+          {MOVES.map((m) => {
+            const role = roleOf(m.id, lastMove);
+            return (
+              <button
+                key={m.id}
+                onClick={() => pick(m.id)}
+                disabled={phase !== "choose"}
+                aria-label={m.id}
+                className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-2xl text-5xl ring-2 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
+                  role === "up"
+                    ? "bg-neutral-700 ring-amber-400"
+                    : role === "down"
+                      ? "bg-neutral-800 ring-sky-500/40 hover:bg-neutral-700"
+                      : "bg-neutral-800 ring-transparent hover:bg-neutral-700"
+                }`}
+              >
+                <span aria-hidden="true">{m.emoji}</span>
+                <span
+                  className={`text-[10px] font-medium uppercase tracking-wide ${ROLE_TAG[role].cls}`}
+                >
+                  {ROLE_TAG[role].label}
+                </span>
+              </button>
+            );
+          })}
         </section>
       </GameLayout>
     </>
