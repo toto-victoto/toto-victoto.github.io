@@ -124,6 +124,150 @@ msgstr "Hit!"
 msgid "rps.banner.youhit"
 msgstr "You're hit!"
 
+msgid "rps.foe.farmhand.name"
+msgstr "Pip the Farmhand"
+
+msgid "rps.foe.farmhand.cry"
+msgstr "Get off my field!"
+
+msgid "rps.foe.farmhand.words"
+msgstr "Tell the cows… I tried."
+
+msgid "rps.foe.chef.name"
+msgstr "Chef Renard"
+
+msgid "rps.foe.chef.cry"
+msgstr "You'll be minced!"
+
+msgid "rps.foe.chef.words"
+msgstr "My soufflé… collapses…"
+
+msgid "rps.foe.sentry.name"
+msgstr "Sentry Cole"
+
+msgid "rps.foe.sentry.cry"
+msgstr "None shall pass!"
+
+msgid "rps.foe.sentry.words"
+msgstr "I had… one job…"
+
+msgid "rps.foe.inspector.name"
+msgstr "Insp. Mora"
+
+msgid "rps.foe.inspector.cry"
+msgstr "The trail ends here."
+
+msgid "rps.foe.inspector.words"
+msgstr "The butler… did it…"
+
+msgid "rps.foe.ninja.name"
+msgstr "Kaze"
+
+msgid "rps.foe.ninja.cry"
+msgstr "Blink and you're gone."
+
+msgid "rps.foe.ninja.words"
+msgstr "Didn't see… that one…"
+
+msgid "rps.foe.magus.name"
+msgstr "Magus Orin"
+
+msgid "rps.foe.magus.cry"
+msgstr "Feel the arcane!"
+
+msgid "rps.foe.magus.words"
+msgstr "My magic… was 60% vibes…"
+
+msgid "rps.foe.king.name"
+msgstr "King Aldwin"
+
+msgid "rps.foe.king.cry"
+msgstr "Kneel before me!"
+
+msgid "rps.foe.king.words"
+msgstr "Heavy is… the head…"
+
+msgid "rps.foe.villain.name"
+msgstr "Dread Volk"
+
+msgid "rps.foe.villain.cry"
+msgstr "Your story ends."
+
+msgid "rps.foe.villain.words"
+msgstr "But I had… a trilogy planned…"
+
+msgid "rps.foe.wanderer.name"
+msgstr "Wanderer"
+
+msgid "rps.foe.wanderer.cry"
+msgstr "You're finished!"
+
+msgid "rps.foe.wanderer.words"
+msgstr "Ow."
+
+msgid "rps.foe.brute.name"
+msgstr "Brute"
+
+msgid "rps.foe.brute.cry"
+msgstr "Come closer."
+
+msgid "rps.foe.brute.words"
+msgstr "That's it?"
+
+msgid "rps.foe.reaver.name"
+msgstr "Reaver"
+
+msgid "rps.foe.reaver.cry"
+msgstr "This ends now."
+
+msgid "rps.foe.reaver.words"
+msgstr "Worth it."
+
+msgid "rps.foe.warden.name"
+msgstr "Warden"
+
+msgid "rps.foe.warden.cry"
+msgstr "I've faced worse."
+
+msgid "rps.foe.warden.words"
+msgstr "Tell no one."
+
+msgid "rps.foe.fiend.name"
+msgstr "Fiend"
+
+msgid "rps.foe.fiend.cry"
+msgstr "No mercy."
+
+msgid "rps.foe.fiend.words"
+msgstr "Rats…"
+
+msgid "rps.foe.marauder.name"
+msgstr "Marauder"
+
+msgid "rps.foe.marauder.cry"
+msgstr "You dare?"
+
+msgid "rps.foe.marauder.words"
+msgstr "So it ends."
+
+msgid "rps.foe.specter.name"
+msgstr "Specter"
+
+msgid "rps.foe.specter.cry"
+msgstr "Breathe your last."
+
+msgid "rps.foe.specter.words"
+msgstr "I regret… nothing."
+
+msgid "rps.foe.troll.name"
+msgstr "Troll"
+
+msgid "rps.foe.troll.cry"
+msgstr "Beyond your reach."
+
+msgid "rps.foe.troll.words"
+msgstr "Glorious…"
+
 msgid "snake.title"
 msgstr "Snake"
 

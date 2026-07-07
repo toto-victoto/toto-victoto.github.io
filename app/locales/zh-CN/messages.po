@@ -124,6 +124,150 @@ msgstr "命中！"
 msgid "rps.banner.youhit"
 msgstr "你被击中！"
 
+msgid "rps.foe.farmhand.name"
+msgstr "农夫皮普"
+
+msgid "rps.foe.farmhand.cry"
+msgstr "滚出我的田地！"
+
+msgid "rps.foe.farmhand.words"
+msgstr "告诉奶牛们……我尽力了。"
+
+msgid "rps.foe.chef.name"
+msgstr "雷纳尔大厨"
+
+msgid "rps.foe.chef.cry"
+msgstr "把你剁成肉馅！"
+
+msgid "rps.foe.chef.words"
+msgstr "我的舒芙蕾……塌了……"
+
+msgid "rps.foe.sentry.name"
+msgstr "哨兵科尔"
+
+msgid "rps.foe.sentry.cry"
+msgstr "谁也别想过去！"
+
+msgid "rps.foe.sentry.words"
+msgstr "我就……一个任务……"
+
+msgid "rps.foe.inspector.name"
+msgstr "莫拉探长"
+
+msgid "rps.foe.inspector.cry"
+msgstr "线索到此为止。"
+
+msgid "rps.foe.inspector.words"
+msgstr "是管家……干的……"
+
+msgid "rps.foe.ninja.name"
+msgstr "疾风"
+
+msgid "rps.foe.ninja.cry"
+msgstr "一眨眼你就没了。"
+
+msgid "rps.foe.ninja.words"
+msgstr "没看清……那一招……"
+
+msgid "rps.foe.magus.name"
+msgstr "法师奥林"
+
+msgid "rps.foe.magus.cry"
+msgstr "感受奥术之力！"
+
+msgid "rps.foe.magus.words"
+msgstr "我的魔法……六成靠氛围……"
+
+msgid "rps.foe.king.name"
+msgstr "奥德温国王"
+
+msgid "rps.foe.king.cry"
+msgstr "向我下跪！"
+
+msgid "rps.foe.king.words"
+msgstr "欲戴王冠……必承其重……"
+
+msgid "rps.foe.villain.name"
+msgstr "恐惧沃尔克"
+
+msgid "rps.foe.villain.cry"
+msgstr "你的故事到此为止。"
+
+msgid "rps.foe.villain.words"
+msgstr "可我……还计划了三部曲……"
+
+msgid "rps.foe.wanderer.name"
+msgstr "流浪者"
+
+msgid "rps.foe.wanderer.cry"
+msgstr "你完蛋了！"
+
+msgid "rps.foe.wanderer.words"
+msgstr "哎哟。"
+
+msgid "rps.foe.brute.name"
+msgstr "蛮兵"
+
+msgid "rps.foe.brute.cry"
+msgstr "过来吧。"
+
+msgid "rps.foe.brute.words"
+msgstr "就这？"
+
+msgid "rps.foe.reaver.name"
+msgstr "劫掠者"
+
+msgid "rps.foe.reaver.cry"
+msgstr "现在就结束。"
+
+msgid "rps.foe.reaver.words"
+msgstr "值了。"
+
+msgid "rps.foe.warden.name"
+msgstr "守卫"
+
+msgid "rps.foe.warden.cry"
+msgstr "我见过更糟的。"
+
+msgid "rps.foe.warden.words"
+msgstr "别告诉任何人。"
+
+msgid "rps.foe.fiend.name"
+msgstr "恶魔"
+
+msgid "rps.foe.fiend.cry"
+msgstr "绝不留情。"
+
+msgid "rps.foe.fiend.words"
+msgstr "可恶……"
+
+msgid "rps.foe.marauder.name"
+msgstr "掠夺者"
+
+msgid "rps.foe.marauder.cry"
+msgstr "你敢？"
+
+msgid "rps.foe.marauder.words"
+msgstr "就这样结束了。"
+
+msgid "rps.foe.specter.name"
+msgstr "幽灵"
+
+msgid "rps.foe.specter.cry"
+msgstr "咽下最后一口气吧。"
+
+msgid "rps.foe.specter.words"
+msgstr "我……毫不后悔。"
+
+msgid "rps.foe.troll.name"
+msgstr "巨魔"
+
+msgid "rps.foe.troll.cry"
+msgstr "你够不着。"
+
+msgid "rps.foe.troll.words"
+msgstr "壮哉……"
+
 msgid "snake.title"
 msgstr "贪吃蛇"
 

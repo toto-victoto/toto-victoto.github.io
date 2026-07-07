@@ -17,7 +17,20 @@ export type Persisted = {
   snake: { best: number };
   flappy: { best: number };
   threader: { best: number };
-  rps: { bestLevel: number };
+  rps: {
+    bestLevel: number;
+    // In-progress run, snapshotted whenever the player is at the move-choice
+    // screen, so a refresh mid-fight resumes instead of restarting.
+    save?: {
+      player: { maxHp: number; str: number; def: number; agi: number; dex: number };
+      hp: number;
+      level: number;
+      foeIndex: number;
+      foeHp: number;
+      mults: { rock: number; paper: number; scissors: number };
+      anchor: "rock" | "paper" | "scissors" | null;
+    };
+  };
   roulette: { best: number; balance: number; history: number[] };
   ultimate: {
     mode: "2p" | "ai";

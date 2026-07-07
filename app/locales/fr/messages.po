@@ -124,6 +124,150 @@ msgstr "Touché !"
 msgid "rps.banner.youhit"
 msgstr "Tu es touché !"
 
+msgid "rps.foe.farmhand.name"
+msgstr "Pip le fermier"
+
+msgid "rps.foe.farmhand.cry"
+msgstr "Hors de mon champ !"
+
+msgid "rps.foe.farmhand.words"
+msgstr "Dites aux vaches… que j'ai essayé."
+
+msgid "rps.foe.chef.name"
+msgstr "Chef Renard"
+
+msgid "rps.foe.chef.cry"
+msgstr "Tu vas être haché !"
+
+msgid "rps.foe.chef.words"
+msgstr "Mon soufflé… retombe…"
+
+msgid "rps.foe.sentry.name"
+msgstr "Cole la sentinelle"
+
+msgid "rps.foe.sentry.cry"
+msgstr "Nul ne passera !"
+
+msgid "rps.foe.sentry.words"
+msgstr "J'avais… une seule mission…"
+
+msgid "rps.foe.inspector.name"
+msgstr "Insp. Mora"
+
+msgid "rps.foe.inspector.cry"
+msgstr "La piste s'arrête ici."
+
+msgid "rps.foe.inspector.words"
+msgstr "C'est le majordome… le coupable…"
+
+msgid "rps.foe.ninja.name"
+msgstr "Kaze"
+
+msgid "rps.foe.ninja.cry"
+msgstr "Un clignement et tu disparais."
+
+msgid "rps.foe.ninja.words"
+msgstr "Je ne l'ai pas… vu venir…"
+
+msgid "rps.foe.magus.name"
+msgstr "Mage Orin"
+
+msgid "rps.foe.magus.cry"
+msgstr "Goûte à l'arcane !"
+
+msgid "rps.foe.magus.words"
+msgstr "Ma magie… c'était 60% de vibes…"
+
+msgid "rps.foe.king.name"
+msgstr "Roi Aldwin"
+
+msgid "rps.foe.king.cry"
+msgstr "À genoux devant moi !"
+
+msgid "rps.foe.king.words"
+msgstr "Lourde est… la couronne…"
+
+msgid "rps.foe.villain.name"
+msgstr "Volk l'Effroi"
+
+msgid "rps.foe.villain.cry"
+msgstr "Ton histoire s'achève."
+
+msgid "rps.foe.villain.words"
+msgstr "J'avais… une trilogie de prévue…"
+
+msgid "rps.foe.wanderer.name"
+msgstr "Vagabond"
+
+msgid "rps.foe.wanderer.cry"
+msgstr "Tu es fini !"
+
+msgid "rps.foe.wanderer.words"
+msgstr "Aïe."
+
+msgid "rps.foe.brute.name"
+msgstr "Brute"
+
+msgid "rps.foe.brute.cry"
+msgstr "Approche."
+
+msgid "rps.foe.brute.words"
+msgstr "C'est tout ?"
+
+msgid "rps.foe.reaver.name"
+msgstr "Pillard"
+
+msgid "rps.foe.reaver.cry"
+msgstr "Ça se termine maintenant."
+
+msgid "rps.foe.reaver.words"
+msgstr "Ça valait le coup."
+
+msgid "rps.foe.warden.name"
+msgstr "Gardien"
+
+msgid "rps.foe.warden.cry"
+msgstr "J'ai connu pire."
+
+msgid "rps.foe.warden.words"
+msgstr "N'en parle à personne."
+
+msgid "rps.foe.fiend.name"
+msgstr "Démon"
+
+msgid "rps.foe.fiend.cry"
+msgstr "Aucune pitié."
+
+msgid "rps.foe.fiend.words"
+msgstr "Zut…"
+
+msgid "rps.foe.marauder.name"
+msgstr "Maraudeur"
+
+msgid "rps.foe.marauder.cry"
+msgstr "Tu oses ?"
+
+msgid "rps.foe.marauder.words"
+msgstr "Ainsi tout s'achève."
+
+msgid "rps.foe.specter.name"
+msgstr "Spectre"
+
+msgid "rps.foe.specter.cry"
+msgstr "Rends ton dernier souffle."
+
+msgid "rps.foe.specter.words"
+msgstr "Je ne regrette… rien."
+
+msgid "rps.foe.troll.name"
+msgstr "Troll"
+
+msgid "rps.foe.troll.cry"
+msgstr "Hors de ta portée."
+
+msgid "rps.foe.troll.words"
+msgstr "Glorieux…"
+
 msgid "snake.title"
 msgstr "Serpent"
 

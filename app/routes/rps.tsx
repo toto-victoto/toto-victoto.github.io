@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Trans } from "@lingui/react";
+import { Trans, useLingui } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
-import { useStoredGame } from "../storage";
+import { peekGame, useStoredGame } from "../storage";
 import { sfx } from "../sound";
 
 // An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
@@ -41,7 +41,9 @@ const emojiOf = (m: Move) => MOVES.find((x) => x.id === m)!.emoji;
 const MARKER: Record<Move, string> = { rock: "💥", paper: "👋", scissors: "✂️" };
 
 type Stats = { maxHp: number; str: number; def: number; agi: number; dex: number };
-type Foe = Stats & { emoji: string; name: string; cry: string; lastWords: string };
+// `key` slugs the foe for its i18n ids (rps.foe.<key>.name/.cry/.words); the
+// name/cry/lastWords literals are the English fallbacks.
+type Foe = Stats & { key: string; emoji: string; name: string; cry: string; lastWords: string };
 type StatKey = "hp" | "str" | "def" | "agi" | "dex";
 
 const STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi", "dex"];
@@ -97,17 +99,18 @@ const applyFactors = (m: Mults, anchor: Move, dex: number): Mults => {
 };
 
 const ROSTER: Foe[] = [
-  { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
-  { emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 31, str: 5, def: 2, agi: 2, dex: 1 },
-  { emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 49, str: 7, def: 3, agi: 2, dex: 1 },
-  { emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 67, str: 8, def: 7, agi: 4, dex: 2 },
-  { emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 84, str: 12, def: 7, agi: 7, dex: 3 },
-  { emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 111, str: 15, def: 10, agi: 5, dex: 3 },
-  { emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 142, str: 20, def: 13, agi: 6, dex: 3 },
-  { emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 189, str: 27, def: 17, agi: 9, dex: 4 },
+  { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
+  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 31, str: 5, def: 2, agi: 2, dex: 1 },
+  { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 49, str: 7, def: 3, agi: 2, dex: 1 },
+  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 67, str: 8, def: 7, agi: 4, dex: 2 },
+  { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 84, str: 12, def: 7, agi: 7, dex: 3 },
+  { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 111, str: 15, def: 10, agi: 5, dex: 3 },
+  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 142, str: 20, def: 13, agi: 6, dex: 3 },
+  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 189, str: 27, def: 17, agi: 9, dex: 4 },
 ];
 
 const EXTRA_EMOJI = ["🧟", "👹", "🤺", "🧛", "🦸", "👺", "🧝", "🧌"];
+const EXTRA_KEY = ["wanderer", "brute", "reaver", "warden", "fiend", "marauder", "specter", "troll"];
 const EXTRA_NAME = ["Wanderer", "Brute", "Reaver", "Warden", "Fiend", "Marauder", "Specter", "Troll"];
 const EXTRA_CRY = [
   "You're finished!",
@@ -135,6 +138,7 @@ function makeFoe(index: number): Foe {
   const t = index - ROSTER.length;
   const i = t % EXTRA_EMOJI.length;
   return {
+    key: EXTRA_KEY[i],
     emoji: EXTRA_EMOJI[i],
     name: EXTRA_NAME[i],
     cry: EXTRA_CRY[i],
@@ -213,6 +217,39 @@ export default function RPS() {
   const [anchor, setAnchor] = useState<Move | null>(null);
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
+  const { i18n } = useLingui();
+  // Guards the save-snapshot effect until we've had a chance to restore any
+  // in-progress run, so we never overwrite a save before reading it.
+  const [resumed, setResumed] = useState(false);
+
+  // On mount, restore an interrupted run (snapshotted at the move-choice
+  // screen) so a page refresh mid-fight continues instead of starting over.
+  useEffect(() => {
+    const sv = peekGame("rps")?.save;
+    if (sv) {
+      setPlayer(sv.player);
+      setHp(sv.hp);
+      setLevel(sv.level);
+      setFoeIndex(sv.foeIndex);
+      setFoe(makeFoe(sv.foeIndex));
+      setFoeHp(sv.foeHp);
+      setMults(sv.mults);
+      setAnchor(sv.anchor);
+      setPhase("choose");
+    }
+    setResumed(true);
+  }, []);
+
+  // Snapshot the run every time we land on the move-choice screen — the one
+  // stable, resumable moment (never mid-animation).
+  useEffect(() => {
+    if (!resumed || phase !== "choose") return;
+    setStored((s) => ({
+      ...s,
+      save: { player, hp, level, foeIndex, foeHp, mults, anchor },
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumed, phase]);
 
   useEffect(() => {
     if (phase !== "intro") return;
@@ -257,10 +294,12 @@ export default function RPS() {
         setLevel(nl);
         setPoints(pointsForLevel(nl));
         setAlloc({ hp: 0, str: 0, def: 0, agi: 0, dex: 0 });
-        setStored((s) => ({ bestLevel: Math.max(s.bestLevel, nl) }));
+        setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, nl) }));
         setPhase("death");
         sfx.win();
       } else if (r.resultHp <= 0) {
+        // Run's over — keep the best-level record, drop the resume snapshot.
+        setStored((s) => ({ bestLevel: s.bestLevel }));
         setPhase("gameover");
         sfx.lose();
       } else {
@@ -413,6 +452,7 @@ export default function RPS() {
     setFoeHp(nf.maxHp);
     setRound(null);
     nextFoe();
+    setStored((s) => ({ bestLevel: s.bestLevel }));
     setPhase("intro");
   };
 
@@ -420,6 +460,10 @@ export default function RPS() {
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
+  // Localized foe flavor — the stored English literals are the fallbacks.
+  const foeName = i18n._(`rps.foe.${foe.key}.name`, undefined, { message: foe.name });
+  const foeCry = i18n._(`rps.foe.${foe.key}.cry`, undefined, { message: foe.cry });
+  const foeWords = i18n._(`rps.foe.${foe.key}.words`, undefined, { message: foe.lastWords });
 
   return (
     <>
@@ -453,7 +497,7 @@ export default function RPS() {
               <span className="ml-1 text-rose-300">-{hit.dmg}</span>
             </div>
           )}
-          <div className="font-semibold text-neutral-200">{foe.name}</div>
+          <div className="font-semibold text-neutral-200">{foeName}</div>
           <div
             key={foeHitting ? `bar-${hit.key}` : "bar"}
             style={foeHitting ? { animation: "rps-shake 380ms ease-out" } : undefined}
@@ -467,17 +511,17 @@ export default function RPS() {
         <section className="flex min-h-0 flex-1 items-center justify-center">
           {phase === "intro" && (
             <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300 motion-safe:animate-rps-tick">
-              “{foe.cry}”
+              “{foeCry}”
             </p>
           )}
 
           {phase === "death" && (
             <div className="space-y-2 text-center">
               <p className="text-sm text-neutral-500">
-                <Trans id="rps.rip" message="R.I.P. {name}" values={{ name: foe.name }} />
+                <Trans id="rps.rip" message="R.I.P. {name}" values={{ name: foeName }} />
               </p>
               <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300 motion-safe:animate-rps-tick">
-                “{foe.lastWords}”
+                “{foeWords}”
               </p>
             </div>
           )}
@@ -527,13 +571,13 @@ export default function RPS() {
                     <Trans
                       id="rps.round.lose"
                       message="{name} wins the round"
-                      values={{ name: foe.name }}
+                      values={{ name: foeName }}
                     />
                   )}
                   {round.outcome === "draw" && <Trans id="rps.draw" message="Draw" />}
                 </p>
               ) : (
-                <StrikeBanner round={round} foe={foe} />
+                <StrikeBanner round={round} foeName={foeName} />
               )}
             </div>
           )}
@@ -727,7 +771,7 @@ export default function RPS() {
 
 // The combat call-outs — the move's multiplier, the AGI double, or a draw's
 // deepened stance all get a pop.
-function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
+function StrikeBanner({ round, foeName }: { round: Round; foeName: string }) {
   const lines: React.ReactNode[] = [];
   if (round.heal > 0)
     lines.push(
@@ -784,7 +828,7 @@ function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
         {round.attacker === "you" ? (
           <Trans id="rps.banner.faster_you" message="You're faster!" />
         ) : (
-          <Trans id="rps.banner.faster_foe" message="{name} is faster!" values={{ name: foe.name }} />
+          <Trans id="rps.banner.faster_foe" message="{name} is faster!" values={{ name: foeName }} />
         )}{" "}
         <span className="text-amber-200">×2</span>
       </span>,
