@@ -52,15 +52,17 @@ const STAT_LABEL: Record<StatKey, string> = {
   agi: "AGI",
   dex: "DEX",
 };
-const STAT_GAIN: Record<StatKey, number> = { hp: 8, str: 1, def: 1, agi: 1, dex: 1 };
+const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 2, def: 2, agi: 1, dex: 1 };
 
-const START: Stats = { maxHp: 45, str: 6, def: 3, agi: 3, dex: 2 };
+// Numbers run on a ~10× scale: a level-1 hero has 100 HP and lands ~10 base
+// damage, so a turtled ×0.1 hit chips 1 and an escalated one bites deep.
+const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 2 };
 
 // Stakes tuning. Escalating MULTIPLIES (almost exponential up); softening
 // SUBTRACTS a flat step (a steady 0.9, 0.8, 0.7…) down to a defensive cap.
 // DEX quickens both.
 const STAKE_MAX = 64;
-const DEF_CAP = 0.5; // softening can't take stakes below this — the defensive cap
+const DEF_CAP = 0.1; // softening can't take stakes below this — the defensive cap
 const escalateStakes = (s: number, dex: number) =>
   Math.min(STAKE_MAX, s * (1.5 + dex * 0.13));
 const softenStakes = (s: number, dex: number) =>
@@ -70,14 +72,14 @@ const applyShift = (s: number, shift: "up" | "down" | "flat", dex: number) =>
   shift === "up" ? escalateStakes(s, dex) : shift === "down" ? softenStakes(s, dex) : s;
 
 const ROSTER: Foe[] = [
-  { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 8, str: 2, def: 0, agi: 1, dex: 0 },
-  { emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 14, str: 3, def: 1, agi: 2, dex: 1 },
-  { emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 22, str: 4, def: 2, agi: 2, dex: 1 },
-  { emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 30, str: 5, def: 4, agi: 4, dex: 2 },
-  { emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 38, str: 7, def: 4, agi: 7, dex: 3 },
-  { emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 50, str: 9, def: 6, agi: 5, dex: 3 },
-  { emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 64, str: 12, def: 8, agi: 6, dex: 3 },
-  { emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 85, str: 16, def: 10, agi: 9, dex: 4 },
+  { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
+  { emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 31, str: 5, def: 2, agi: 2, dex: 1 },
+  { emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 49, str: 7, def: 3, agi: 2, dex: 1 },
+  { emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 67, str: 8, def: 7, agi: 4, dex: 2 },
+  { emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 84, str: 12, def: 7, agi: 7, dex: 3 },
+  { emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 111, str: 15, def: 10, agi: 5, dex: 3 },
+  { emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 142, str: 20, def: 13, agi: 6, dex: 3 },
+  { emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 189, str: 27, def: 17, agi: 9, dex: 4 },
 ];
 
 const EXTRA_EMOJI = ["🧟", "👹", "🤺", "🧛", "🦸", "👺", "🧝", "🧌"];
@@ -112,9 +114,9 @@ function makeFoe(index: number): Foe {
     name: EXTRA_NAME[i],
     cry: EXTRA_CRY[i],
     lastWords: EXTRA_LASTWORDS[i],
-    maxHp: 90 + t * 16,
-    str: 17 + t * 2,
-    def: 11 + t,
+    maxHp: 200 + t * 36,
+    str: 28 + t * 3,
+    def: 18 + t * 2,
     agi: 10 + t,
     dex: 4 + Math.floor(t / 2),
   };
