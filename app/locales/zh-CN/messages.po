@@ -67,6 +67,63 @@ msgstr "你被击败了"
 msgid "rps.rpg.reached"
 msgstr "达到第 {level} 级"
 
+msgid "rps.round.win"
+msgstr "你赢下这一回合！"
+
+msgid "rps.round.lose"
+msgstr "{name} 赢下这一回合"
+
+msgid "rps.rip"
+msgstr "安息 {name}"
+
+msgid "rps.stats.title"
+msgstr "属性"
+
+msgid "rps.stats.gotit"
+msgstr "知道了"
+
+msgid "rps.stat.hp"
+msgstr "生命值。归零即被击败。"
+
+msgid "rps.stat.str"
+msgstr "攻击力 —— 你的基础伤害。"
+
+msgid "rps.stat.def"
+msgstr "减少你受到的伤害。"
+
+msgid "rps.stat.agi"
+msgstr "速度压制对手，攻击两次。"
+
+msgid "rps.stat.dex"
+msgstr "你的出招倍率上升和下降的速度。"
+
+msgid "rps.banner.healed"
+msgstr "回复 {amount}"
+
+msgid "rps.banner.stalemate_deep"
+msgstr "僵持 —— 蓄势更深！"
+
+msgid "rps.banner.stalemate"
+msgstr "僵持！"
+
+msgid "rps.banner.stakes"
+msgstr "赌注 ×{mult}！"
+
+msgid "rps.banner.softened"
+msgstr "减弱 ×{mult}"
+
+msgid "rps.banner.faster_you"
+msgstr "你更快！"
+
+msgid "rps.banner.faster_foe"
+msgstr "{name} 更快！"
+
+msgid "rps.banner.hit"
+msgstr "命中！"
+
+msgid "rps.banner.youhit"
+msgstr "你被击中！"
+
 msgid "snake.title"
 msgstr "贪吃蛇"
 

@@ -67,6 +67,63 @@ msgstr "Tu as été vaincu"
 msgid "rps.rpg.reached"
 msgstr "Niveau {level} atteint"
 
+msgid "rps.round.win"
+msgstr "Tu gagnes la manche !"
+
+msgid "rps.round.lose"
+msgstr "{name} gagne la manche"
+
+msgid "rps.rip"
+msgstr "R.I.P. {name}"
+
+msgid "rps.stats.title"
+msgstr "Stats"
+
+msgid "rps.stats.gotit"
+msgstr "Compris"
+
+msgid "rps.stat.hp"
+msgstr "Points de vie. À 0, tu es vaincu."
+
+msgid "rps.stat.str"
+msgstr "Puissance d'attaque — tes dégâts de base."
+
+msgid "rps.stat.def"
+msgstr "Réduit les dégâts que tu subis."
+
+msgid "rps.stat.agi"
+msgstr "Prends l'adversaire de vitesse pour frapper deux fois."
+
+msgid "rps.stat.dex"
+msgstr "La vitesse à laquelle tes multiplicateurs montent et descendent."
+
+msgid "rps.banner.healed"
+msgstr "Soin +{amount}"
+
+msgid "rps.banner.stalemate_deep"
+msgstr "Impasse — la posture se creuse !"
+
+msgid "rps.banner.stalemate"
+msgstr "Impasse !"
+
+msgid "rps.banner.stakes"
+msgstr "Enjeu ×{mult} !"
+
+msgid "rps.banner.softened"
+msgstr "Amorti ×{mult}"
+
+msgid "rps.banner.faster_you"
+msgstr "Tu es plus rapide !"
+
+msgid "rps.banner.faster_foe"
+msgstr "{name} est plus rapide !"
+
+msgid "rps.banner.hit"
+msgstr "Touché !"
+
+msgid "rps.banner.youhit"
+msgstr "Tu es touché !"
+
 msgid "snake.title"
 msgstr "Serpent"
 

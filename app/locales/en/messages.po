@@ -67,6 +67,63 @@ msgstr "You were defeated"
 msgid "rps.rpg.reached"
 msgstr "Reached level {level}"
 
+msgid "rps.round.win"
+msgstr "You win the round!"
+
+msgid "rps.round.lose"
+msgstr "{name} wins the round"
+
+msgid "rps.rip"
+msgstr "R.I.P. {name}"
+
+msgid "rps.stats.title"
+msgstr "Stats"
+
+msgid "rps.stats.gotit"
+msgstr "Got it"
+
+msgid "rps.stat.hp"
+msgstr "Health. Hit 0 and you're defeated."
+
+msgid "rps.stat.str"
+msgstr "Attack power — your base damage."
+
+msgid "rps.stat.def"
+msgstr "Cuts the damage you take."
+
+msgid "rps.stat.agi"
+msgstr "Outspeed your foe to strike twice."
+
+msgid "rps.stat.dex"
+msgstr "How fast your move multipliers climb and fall."
+
+msgid "rps.banner.healed"
+msgstr "Healed {amount}"
+
+msgid "rps.banner.stalemate_deep"
+msgstr "Stalemate — stance deepens!"
+
+msgid "rps.banner.stalemate"
+msgstr "Stalemate!"
+
+msgid "rps.banner.stakes"
+msgstr "Stakes ×{mult}!"
+
+msgid "rps.banner.softened"
+msgstr "Softened ×{mult}"
+
+msgid "rps.banner.faster_you"
+msgstr "You're faster!"
+
+msgid "rps.banner.faster_foe"
+msgstr "{name} is faster!"
+
+msgid "rps.banner.hit"
+msgstr "Hit!"
+
+msgid "rps.banner.youhit"
+msgstr "You're hit!"
+
 msgid "snake.title"
 msgstr "Snake"
 

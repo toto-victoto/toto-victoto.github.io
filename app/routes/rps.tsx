@@ -52,12 +52,20 @@ const STAT_LABEL: Record<StatKey, string> = {
   agi: "AGI",
   dex: "DEX",
 };
+// English fallbacks + their catalog ids — rendered via <Trans> in the modal.
 const STAT_HELP: Record<StatKey, string> = {
   hp: "Health. Hit 0 and you're defeated.",
   str: "Attack power — your base damage.",
   def: "Cuts the damage you take.",
   agi: "Outspeed your foe to strike twice.",
   dex: "How fast your move multipliers climb and fall.",
+};
+const STAT_HELP_ID: Record<StatKey, string> = {
+  hp: "rps.stat.hp",
+  str: "rps.stat.str",
+  def: "rps.stat.def",
+  agi: "rps.stat.agi",
+  dex: "rps.stat.dex",
 };
 const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 2, def: 2, agi: 1, dex: 1 };
 
@@ -465,7 +473,9 @@ export default function RPS() {
 
           {phase === "death" && (
             <div className="space-y-2 text-center">
-              <p className="text-sm text-neutral-500">R.I.P. {foe.name}</p>
+              <p className="text-sm text-neutral-500">
+                <Trans id="rps.rip" message="R.I.P. {name}" values={{ name: foe.name }} />
+              </p>
               <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300 motion-safe:animate-rps-tick">
                 “{foe.lastWords}”
               </p>
@@ -510,9 +520,17 @@ export default function RPS() {
                         : "text-neutral-400"
                   }`}
                 >
-                  {round.outcome === "win" && "You win the round!"}
-                  {round.outcome === "lose" && `${foe.name} wins the round`}
-                  {round.outcome === "draw" && "Draw"}
+                  {round.outcome === "win" && (
+                    <Trans id="rps.round.win" message="You win the round!" />
+                  )}
+                  {round.outcome === "lose" && (
+                    <Trans
+                      id="rps.round.lose"
+                      message="{name} wins the round"
+                      values={{ name: foe.name }}
+                    />
+                  )}
+                  {round.outcome === "draw" && <Trans id="rps.draw" message="Draw" />}
                 </p>
               ) : (
                 <StrikeBanner round={round} foe={foe} />
@@ -679,12 +697,16 @@ export default function RPS() {
               className="w-full max-w-xs space-y-3 rounded-2xl bg-neutral-900 p-5 ring-1 ring-neutral-700"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-lg font-semibold text-neutral-100">Stats</h2>
+              <h2 className="text-lg font-semibold text-neutral-100">
+                <Trans id="rps.stats.title" message="Stats" />
+              </h2>
               <dl className="space-y-2 text-sm">
                 {STAT_KEYS.map((k) => (
                   <div key={k} className="flex gap-3">
                     <dt className="w-9 shrink-0 font-bold text-neutral-300">{STAT_LABEL[k]}</dt>
-                    <dd className="text-neutral-400">{STAT_HELP[k]}</dd>
+                    <dd className="text-neutral-400">
+                      <Trans id={STAT_HELP_ID[k]} message={STAT_HELP[k]} />
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -693,7 +715,7 @@ export default function RPS() {
                 onClick={() => setShowStats(false)}
                 className="w-full rounded-full bg-neutral-800 py-2 text-sm font-semibold text-neutral-200 transition hover:bg-neutral-700 active:scale-95"
               >
-                Got it
+                <Trans id="rps.stats.gotit" message="Got it" />
               </button>
             </div>
           </div>
@@ -708,12 +730,20 @@ export default function RPS() {
 function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
   const lines: React.ReactNode[] = [];
   if (round.heal > 0)
-    lines.push(<span className="text-emerald-300">💚 Healed {round.heal}</span>);
+    lines.push(
+      <span className="text-emerald-300">
+        💚 <Trans id="rps.banner.healed" message="Healed {amount}" values={{ amount: round.heal }} />
+      </span>,
+    );
 
   if (round.outcome === "draw") {
     lines.push(
       <span className="text-amber-300">
-        {round.doubled ? "Stalemate — stance deepens!" : "Stalemate!"}
+        {round.doubled ? (
+          <Trans id="rps.banner.stalemate_deep" message="Stalemate — stance deepens!" />
+        ) : (
+          <Trans id="rps.banner.stalemate" message="Stalemate!" />
+        )}
       </span>,
     );
     return (
@@ -728,20 +758,45 @@ function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
   }
   // Skip the damage-multiplier call-outs when the move healed — its damage is a flat ×1.
   if (round.heal === 0 && round.mult >= 1.15)
-    lines.push(<span className="text-amber-300">⚔ Stakes ×{round.mult.toFixed(1)}!</span>);
+    lines.push(
+      <span className="text-amber-300">
+        ⚔{" "}
+        <Trans
+          id="rps.banner.stakes"
+          message="Stakes ×{mult}!"
+          values={{ mult: round.mult.toFixed(1) }}
+        />
+      </span>,
+    );
   else if (round.heal === 0 && round.mult >= 0 && round.mult <= 0.85)
-    lines.push(<span className="text-sky-300">Softened ×{round.mult.toFixed(1)}</span>);
+    lines.push(
+      <span className="text-sky-300">
+        <Trans
+          id="rps.banner.softened"
+          message="Softened ×{mult}"
+          values={{ mult: round.mult.toFixed(1) }}
+        />
+      </span>,
+    );
   if (round.faster)
     lines.push(
       <span className="text-amber-300">
-        {round.attacker === "you" ? "You're faster!" : `${foe.name} is faster!`}{" "}
+        {round.attacker === "you" ? (
+          <Trans id="rps.banner.faster_you" message="You're faster!" />
+        ) : (
+          <Trans id="rps.banner.faster_foe" message="{name} is faster!" values={{ name: foe.name }} />
+        )}{" "}
         <span className="text-amber-200">×2</span>
       </span>,
     );
   if (lines.length === 0)
     lines.push(
       <span className={round.attacker === "you" ? "text-emerald-400" : "text-rose-400"}>
-        {round.attacker === "you" ? "Hit!" : "You're hit!"}
+        {round.attacker === "you" ? (
+          <Trans id="rps.banner.hit" message="Hit!" />
+        ) : (
+          <Trans id="rps.banner.youhit" message="You're hit!" />
+        )}
       </span>,
     );
   return (
