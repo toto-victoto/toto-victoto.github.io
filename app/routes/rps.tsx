@@ -62,11 +62,12 @@ const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 2 };
 // climb factor while the defensive move (the one the anchor beats) SUBTRACTS the
 // drop step; the third holds. DEX quickens both (+0.1 each). The defensive move
 // has NO floor: past 0 it turns negative and, when used, heals instead of
-// scaling damage — |value|% of the player's max HP.
+// scaling damage — |value| × HEAL_RATE % of the player's max HP.
 const CLIMB = 1.2; // base offensive multiplier growth per application
 const DROP = 0.2; // base defensive multiplier decay per application
 const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
 const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
+const HEAL_RATE = 10; // a negative move heals |value| × this % of max HP
 type Mults = Record<Move, number>;
 const FRESH_MULTS: Mults = { rock: 1, paper: 1, scissors: 1 };
 
@@ -301,7 +302,7 @@ export default function RPS() {
     // outcome) and makes this exchange's damage a flat ×1; otherwise the
     // multiplier scales damage dealt on a win / taken on a loss.
     const stk = mults[move];
-    const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) / 100) * player.maxHp)) : 0;
+    const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) * HEAL_RATE / 100) * player.maxHp)) : 0;
     const dmgMult = stk < 0 ? 1 : stk;
 
     let attacker: "you" | "foe" | null = null;
@@ -633,7 +634,7 @@ export default function RPS() {
                     heals ? "text-emerald-300" : ROLE_COLOR[role]
                   }`}
                 >
-                  {heals ? `♥${Math.abs(val).toFixed(1)}%` : `×${val.toFixed(1)}`}
+                  {heals ? `♥${(Math.abs(val) * HEAL_RATE).toFixed(0)}%` : `×${val.toFixed(1)}`}
                 </span>
               </button>
             );
