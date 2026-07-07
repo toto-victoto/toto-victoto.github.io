@@ -71,7 +71,7 @@ const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 0 };
 // has NO floor: past 0 it turns negative and, when used, heals instead of
 // scaling damage — |value| × HEAL_RATE % of the player's max HP.
 const CLIMB = 1.2; // base offensive multiplier growth per application
-const DROP = 0.1; // base defensive multiplier decay per application
+const DROP = 0.2; // base defensive multiplier decay per application
 const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
 const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
 const HEAL_RATE = 10; // a negative move heals |value| × this % of max HP
@@ -139,7 +139,7 @@ function makeFoe(index: number): Foe {
   };
 }
 
-const pointsForLevel = (level: number) => 2 + Math.floor(level / 3);
+const pointsForLevel = (level: number) => 3 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
 
 export function meta({}: Route.MetaArgs) {
@@ -574,11 +574,7 @@ export default function RPS() {
                 />
               </p>
               <p className="text-sm font-semibold text-amber-300">
-                <Trans
-                  id="rps.rpg.best"
-                  message="Best: level {level}"
-                  values={{ level: stored.bestLevel }}
-                />
+                <Trans id="common.best" message="Best" /> · Lv {stored.bestLevel}
               </p>
               <button
                 onClick={restart}
