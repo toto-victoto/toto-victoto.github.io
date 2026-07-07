@@ -52,11 +52,18 @@ const STAT_LABEL: Record<StatKey, string> = {
   agi: "AGI",
   dex: "DEX",
 };
+const STAT_HELP: Record<StatKey, string> = {
+  hp: "Health. Hit 0 and you're defeated.",
+  str: "Attack power — your base damage.",
+  def: "Cuts the damage you take.",
+  agi: "Outspeed your foe to strike twice.",
+  dex: "How fast your move multipliers climb and fall.",
+};
 const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 2, def: 2, agi: 1, dex: 1 };
 
 // Numbers run on a ~10× scale: a level-1 hero has 100 HP and lands ~10 base
 // damage, so a turtled ×0.1 hit chips 1 and an escalated one bites deep.
-const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 2 };
+const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 0 };
 
 // Stakes tuning. Each application the offensive (anchor) move MULTIPLIES by the
 // climb factor while the defensive move (the one the anchor beats) SUBTRACTS the
@@ -64,7 +71,7 @@ const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 2 };
 // has NO floor: past 0 it turns negative and, when used, heals instead of
 // scaling damage — |value| × HEAL_RATE % of the player's max HP.
 const CLIMB = 1.2; // base offensive multiplier growth per application
-const DROP = 0.2; // base defensive multiplier decay per application
+const DROP = 0.1; // base defensive multiplier decay per application
 const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
 const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
 const HEAL_RATE = 10; // a negative move heals |value| × this % of max HP
@@ -195,7 +202,8 @@ export default function RPS() {
   // Per-move stakes multipliers + the anchor they pivot around.
   const [mults, setMults] = useState<Mults>(FRESH_MULTS);
   const [anchor, setAnchor] = useState<Move | null>(null);
-  const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
+  const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
+  const [showStats, setShowStats] = useState(false);
 
   useEffect(() => {
     if (phase !== "intro") return;
@@ -564,6 +572,13 @@ export default function RPS() {
                   values={{ level }}
                 />
               </p>
+              <p className="text-sm font-semibold text-amber-300">
+                <Trans
+                  id="rps.rpg.best"
+                  message="Best: level {level}"
+                  values={{ level: stored.bestLevel }}
+                />
+              </p>
               <button
                 onClick={restart}
                 className="rounded-full bg-sky-500 px-8 py-3 font-semibold text-neutral-950 transition hover:bg-sky-400 active:scale-95"
@@ -600,7 +615,17 @@ export default function RPS() {
             </div>
           )}
           <HpBar hp={hp} max={player.maxHp} className="bg-emerald-500" />
-          <StatLine stats={player} highlight />
+          <div className="flex items-center justify-center gap-2">
+            <StatLine stats={player} highlight />
+            <button
+              type="button"
+              onClick={() => setShowStats(true)}
+              aria-label="What do the stats mean?"
+              className="flex h-4 w-4 items-center justify-center rounded-full bg-neutral-800 text-[10px] font-bold text-neutral-400 transition hover:bg-neutral-700 hover:text-neutral-200"
+            >
+              ?
+            </button>
+          </div>
         </section>
 
         <section
@@ -640,6 +665,35 @@ export default function RPS() {
             );
           })}
         </section>
+
+        {showStats && (
+          <div
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-6"
+            onClick={() => setShowStats(false)}
+          >
+            <div
+              className="w-full max-w-xs space-y-3 rounded-2xl bg-neutral-900 p-5 ring-1 ring-neutral-700"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-lg font-semibold text-neutral-100">Stats</h2>
+              <dl className="space-y-2 text-sm">
+                {STAT_KEYS.map((k) => (
+                  <div key={k} className="flex gap-3">
+                    <dt className="w-9 shrink-0 font-bold text-neutral-300">{STAT_LABEL[k]}</dt>
+                    <dd className="text-neutral-400">{STAT_HELP[k]}</dd>
+                  </div>
+                ))}
+              </dl>
+              <button
+                type="button"
+                onClick={() => setShowStats(false)}
+                className="w-full rounded-full bg-neutral-800 py-2 text-sm font-semibold text-neutral-200 transition hover:bg-neutral-700 active:scale-95"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
       </GameLayout>
     </>
   );
