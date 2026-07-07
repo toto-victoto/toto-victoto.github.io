@@ -25,8 +25,9 @@ const MOVES: { id: Move; emoji: string }[] = [
 ];
 const BEATS: Record<Move, Move> = { rock: "scissors", paper: "rock", scissors: "paper" };
 
-// Stakes change relative to your LAST move (not a fixed one): repeat it to
-// escalate, play the move it beats to soften, play the third to hold.
+// Stakes change relative to your LAST decisive move (not a fixed one): repeat
+// it to escalate, play the move it beats to soften, play the third to hold. A
+// draw deepens your lean but keeps the anchor, so a stance stays put across it.
 const roleOf = (m: Move, last: Move | null): "up" | "down" | "flat" =>
   last === null ? "flat" : m === last ? "up" : m === BEATS[last] ? "down" : "flat";
 const ROLE_COLOR: Record<"up" | "down" | "flat", string> = {
@@ -221,7 +222,10 @@ export default function RPS() {
       setHit(null);
       // Commit the new stakes now — after the exchange has resolved.
       setStakes(r.newStakes);
-      setLastMove(r.player);
+      // A draw isn't a commitment, so it keeps the SAME anchor — otherwise the
+      // move you just played would flip to "repeat" (escalate) next turn and a
+      // held defensive stance would start climbing. Only a decisive round moves it.
+      if (r.outcome !== "draw") setLastMove(r.player);
       if (r.resultFoeHp <= 0) {
         const nl = level + 1;
         setLevel(nl);
