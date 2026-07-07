@@ -7,13 +7,13 @@ import { useStoredGame } from "../storage";
 import { sfx } from "../sound";
 
 // An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
-// strategy is a REPETITION stakes multiplier that scales BOTH damage dealt and
-// taken: repeat a move to escalate the stakes (hit harder but also take harder
-// — aggressive), play the move it beats to soften them (deal less, take less —
-// defensive), play the third to hold. A DRAW reapplies that same shift once
-// more, deepening whichever stance you leaned into (an aggressive draw grows
-// more aggressive, a defensive one more defensive, a neutral one holds). DEX
-// governs how fast the stakes move. First POC — numbers to tune.
+// strategy is PER-MOVE stakes: each move carries its own multiplier that scales
+// the exchange you commit it to (damage dealt on a win, taken on a loss).
+// Around an ANCHOR move: the anchor is OFFENSIVE and climbs ×1.2 each time you
+// repeat it; the move it beats is DEFENSIVE and sheds 0.1 toward a floor; the
+// third holds at 1. Repeat to push your lean (a draw pushes it once more);
+// switch to a new move to cash the current factors, then reset all three to 1
+// and re-anchor. First POC — numbers to tune.
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
@@ -25,11 +25,10 @@ const MOVES: { id: Move; emoji: string }[] = [
 ];
 const BEATS: Record<Move, Move> = { rock: "scissors", paper: "rock", scissors: "paper" };
 
-// Stakes change relative to your LAST decisive move (not a fixed one): repeat
-// it to escalate, play the move it beats to soften, play the third to hold. A
-// draw deepens your lean but keeps the anchor, so a stance stays put across it.
-const roleOf = (m: Move, last: Move | null): "up" | "down" | "flat" =>
-  last === null ? "flat" : m === last ? "up" : m === BEATS[last] ? "down" : "flat";
+// A move's role is set by the anchor: the anchor itself is offensive (climbing),
+// the move it beats is defensive (shrinking), the third is neutral.
+const roleOf = (m: Move, anchor: Move | null): "up" | "down" | "flat" =>
+  anchor === null ? "flat" : m === anchor ? "up" : m === BEATS[anchor] ? "down" : "flat";
 const ROLE_COLOR: Record<"up" | "down" | "flat", string> = {
   up: "text-amber-300",
   down: "text-sky-300",
@@ -59,18 +58,24 @@ const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 2, def: 2, agi: 1, dex
 // damage, so a turtled ×0.1 hit chips 1 and an escalated one bites deep.
 const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 2 };
 
-// Stakes tuning. Escalating MULTIPLIES (almost exponential up); softening
-// SUBTRACTS a flat step (a steady 0.9, 0.8, 0.7…) down to a defensive cap.
-// DEX quickens both.
-const STAKE_MAX = 64;
-const DEF_CAP = 0.1; // softening can't take stakes below this — the defensive cap
-const escalateStakes = (s: number, dex: number) =>
-  Math.min(STAKE_MAX, s * (1.5 + dex * 0.13));
-const softenStakes = (s: number, dex: number) =>
-  Math.max(DEF_CAP, s - (0.1 + dex * 0.04));
-// One shift step in the direction a move implies (up=escalate, down=soften).
-const applyShift = (s: number, shift: "up" | "down" | "flat", dex: number) =>
-  shift === "up" ? escalateStakes(s, dex) : shift === "down" ? softenStakes(s, dex) : s;
+// Stakes tuning. The offensive (anchor) move MULTIPLIES by CLIMB each round;
+// the defensive move (the one the anchor beats) SUBTRACTS DROP; the third holds.
+const CLIMB = 1.2; // offensive multiplier growth per application
+const DROP = 0.1; // defensive multiplier decay per application
+const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
+const DEF_CAP = 0.1; // floor on the shrinking defensive multiplier
+type Mults = Record<Move, number>;
+const FRESH_MULTS: Mults = { rock: 1, paper: 1, scissors: 1 };
+
+// One round of factors around an anchor: the anchor climbs, the move it beats
+// drops, the third is untouched.
+const applyFactors = (m: Mults, anchor: Move): Mults => {
+  const next = { ...m };
+  next[anchor] = Math.min(STAKE_MAX, next[anchor] * CLIMB);
+  const victim = BEATS[anchor];
+  next[victim] = Math.max(DEF_CAP, next[victim] - DROP);
+  return next;
+};
 
 const ROSTER: Foe[] = [
   { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
@@ -154,9 +159,10 @@ type Round = {
   dmg: number;
   hits: number[]; // split into two on an AGI double
   faster: boolean;
-  mult: number; // stakes multiplier applied to this exchange
-  doubled: boolean; // a draw deepened the stance (reapplied the shift)
-  newStakes: number; // stakes to commit once the round finishes (not before)
+  mult: number; // the played move's multiplier, resolving this exchange
+  doubled: boolean; // a draw reapplied the factors (repeat only)
+  newMults: Mults; // per-move multipliers to commit once the round finishes
+  newAnchor: Move; // anchor to commit once the round finishes
   resultFoeHp: number;
   resultHp: number;
 };
@@ -181,10 +187,9 @@ export default function RPS() {
     agi: 0,
     dex: 0,
   });
-  // One stakes multiplier scales both damage dealt and taken. It shifts each
-  // round by your move's relation to the last; a draw reapplies that shift.
-  const [stakes, setStakes] = useState(1);
-  const [lastMove, setLastMove] = useState<Move | null>(null);
+  // Per-move stakes multipliers + the anchor they pivot around.
+  const [mults, setMults] = useState<Mults>(FRESH_MULTS);
+  const [anchor, setAnchor] = useState<Move | null>(null);
   const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
 
   useEffect(() => {
@@ -220,12 +225,9 @@ export default function RPS() {
 
     const finish = () => {
       setHit(null);
-      // Commit the new stakes now — after the exchange has resolved.
-      setStakes(r.newStakes);
-      // A draw isn't a commitment, so it keeps the SAME anchor — otherwise the
-      // move you just played would flip to "repeat" (escalate) next turn and a
-      // held defensive stance would start climbing. Only a decisive round moves it.
-      if (r.outcome !== "draw") setLastMove(r.player);
+      // Commit the evolved multipliers + anchor now — after the exchange resolved.
+      setMults(r.newMults);
+      setAnchor(r.newAnchor);
       if (r.resultFoeHp <= 0) {
         const nl = level + 1;
         setLevel(nl);
@@ -280,15 +282,13 @@ export default function RPS() {
     const foeMove = randomMove();
     const outcome = judge(move, foeMove);
 
-    // Shift the stakes by this throw's relation to the last move (one round).
-    const shift = roleOf(move, lastMove); // up=escalate, down=soften, flat=hold
-    let stk = applyShift(stakes, shift, player.dex);
+    // Resolve with the multiplier the played move already carries (what its
+    // button shows) — scales damage dealt on a win, taken on a loss.
+    const stk = mults[move];
 
     let attacker: "you" | "foe" | null = null;
     let dmg = 0;
     let faster = false;
-    let mult = stk;
-    let doubled = false;
     let resultFoeHp = foeHp;
     let resultHp = hp;
 
@@ -306,18 +306,32 @@ export default function RPS() {
       if (faster) b *= 2;
       dmg = Math.max(1, Math.round(b * stk));
       resultHp = Math.max(0, hp - dmg);
-    } else {
-      // draw — reapply the same shift once more, deepening the stance you leaned
-      // into (aggressive grows, defensive shrinks, neutral holds).
-      stk = applyShift(stk, shift, player.dex);
-      mult = stk;
-      doubled = shift !== "flat";
     }
 
-    // NB: the stakes state is only committed once the round animation ends
+    // Evolve the multipliers for next turn.
+    let newMults: Mults;
+    let newAnchor: Move;
+    let doubled = false;
+    if (anchor === move) {
+      // Repeat the anchor: apply the factors again (offence climbs, defence
+      // drops). A draw reapplies them once more, fast-forwarding the lean.
+      newAnchor = anchor;
+      newMults = applyFactors(mults, anchor);
+      if (outcome === "draw") {
+        newMults = applyFactors(newMults, anchor);
+        doubled = true;
+      }
+    } else {
+      // Switch: the exchange above already cashed the current factors; now
+      // re-anchor on this move, reset all three to 1, and apply once.
+      newAnchor = move;
+      newMults = applyFactors(FRESH_MULTS, move);
+    }
+
+    // NB: the multipliers are only committed once the round animation ends
     // (in the strike effect), so the shown ×N matches what's resolving.
     const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult, doubled, newStakes: stk, resultFoeHp, resultHp });
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult: stk, doubled, newMults, newAnchor, resultFoeHp, resultHp });
     setCount(3);
     setPhase("count");
   };
@@ -330,8 +344,8 @@ export default function RPS() {
   };
 
   const nextFoe = () => {
-    setStakes(1);
-    setLastMove(null);
+    setMults(FRESH_MULTS);
+    setAnchor(null);
   };
 
   const confirmLevelUp = () => {
@@ -370,9 +384,6 @@ export default function RPS() {
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
-  // What the stakes would become for one round if you played each move now.
-  const projectStakes = (m: Move): number =>
-    applyShift(stakes, roleOf(m, lastMove), player.dex);
 
   return (
     <>
@@ -569,8 +580,8 @@ export default function RPS() {
           style={youHit ? { animation: "rps-shake 440ms ease-out" } : undefined}
         >
           {MOVES.map((m) => {
-            const role = roleOf(m.id, lastMove);
-            const proj = projectStakes(m.id);
+            const role = roleOf(m.id, anchor);
+            const proj = mults[m.id];
             return (
               <button
                 key={m.id}
@@ -598,14 +609,13 @@ export default function RPS() {
   );
 }
 
-// The combat call-outs — the streak multiplier, the AGI double, or a draw's
-// doubled stakes all get a pop.
+// The combat call-outs — the move's multiplier, the AGI double, or a draw's
+// deepened stance all get a pop.
 function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
   if (round.outcome === "draw") {
-    const deepened = round.mult >= 1.15 ? "text-amber-300" : round.mult <= 0.85 ? "text-sky-300" : "text-neutral-400";
     return (
-      <p className={`text-lg font-bold ${deepened} motion-safe:animate-rps-tick`}>
-        Stalemate — stakes ×{round.mult.toFixed(1)}
+      <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
+        {round.doubled ? "Stalemate — stance deepens!" : "Stalemate!"}
       </p>
     );
   }
