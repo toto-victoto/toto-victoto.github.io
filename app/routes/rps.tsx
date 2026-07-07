@@ -58,22 +58,24 @@ const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 2, def: 2, agi: 1, dex
 // damage, so a turtled ×0.1 hit chips 1 and an escalated one bites deep.
 const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 2 };
 
-// Stakes tuning. The offensive (anchor) move MULTIPLIES by CLIMB each round;
-// the defensive move (the one the anchor beats) SUBTRACTS DROP; the third holds.
-const CLIMB = 1.2; // offensive multiplier growth per application
-const DROP = 0.1; // defensive multiplier decay per application
+// Stakes tuning. Each application the offensive (anchor) move MULTIPLIES by the
+// climb factor while the defensive move (the one the anchor beats) SUBTRACTS the
+// drop step; the third holds. DEX quickens both (+0.1 each). The defensive move
+// has NO floor: past 0 it turns negative and, when used, heals instead of
+// scaling damage — |value|% of the player's max HP.
+const CLIMB = 1.2; // base offensive multiplier growth per application
+const DROP = 0.2; // base defensive multiplier decay per application
+const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
 const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
-const DEF_CAP = 0.1; // floor on the shrinking defensive multiplier
 type Mults = Record<Move, number>;
 const FRESH_MULTS: Mults = { rock: 1, paper: 1, scissors: 1 };
 
 // One round of factors around an anchor: the anchor climbs, the move it beats
-// drops, the third is untouched.
-const applyFactors = (m: Mults, anchor: Move): Mults => {
+// drops (and may cross into negative → healing), the third is untouched.
+const applyFactors = (m: Mults, anchor: Move, dex: number): Mults => {
   const next = { ...m };
-  next[anchor] = Math.min(STAKE_MAX, next[anchor] * CLIMB);
-  const victim = BEATS[anchor];
-  next[victim] = Math.max(DEF_CAP, next[victim] - DROP);
+  next[anchor] = Math.min(STAKE_MAX, next[anchor] * (CLIMB + dex * DEX_STEP));
+  next[BEATS[anchor]] = next[BEATS[anchor]] - (DROP + dex * DEX_STEP);
   return next;
 };
 
@@ -161,6 +163,7 @@ type Round = {
   faster: boolean;
   mult: number; // the played move's multiplier, resolving this exchange
   doubled: boolean; // a draw reapplied the factors (repeat only)
+  heal: number; // HP restored this round (a negative move heals, else 0)
   newMults: Mults; // per-move multipliers to commit once the round finishes
   newAnchor: Move; // anchor to commit once the round finishes
   resultFoeHp: number;
@@ -179,6 +182,7 @@ export default function RPS() {
   const [count, setCount] = useState(0);
   const [round, setRound] = useState<Round | null>(null);
   const [hit, setHit] = useState<Hit | null>(null);
+  const [healPop, setHealPop] = useState<{ key: number; amount: number } | null>(null);
   const [points, setPoints] = useState(0);
   const [alloc, setAlloc] = useState<Record<StatKey, number>>({
     hp: 0,
@@ -222,9 +226,11 @@ export default function RPS() {
     if (phase !== "strike" || !round) return;
     const r = round;
     const timers: ReturnType<typeof setTimeout>[] = [];
+    const healedHp = Math.min(player.maxHp, hp + r.heal);
 
     const finish = () => {
       setHit(null);
+      setHealPop(null);
       // Commit the evolved multipliers + anchor now — after the exchange resolved.
       setMults(r.newMults);
       setAnchor(r.newAnchor);
@@ -244,15 +250,23 @@ export default function RPS() {
       }
     };
 
+    // A negative move heals FIRST — pop a green +N and lift the player's HP.
+    if (r.heal > 0) {
+      setHp(healedHp);
+      setHealPop({ key: Date.now(), amount: r.heal });
+      sfx.score();
+    }
+    const startDelay = r.heal > 0 ? 500 : 0; // let the heal read before damage lands
+
     if (r.outcome === "draw") {
       setHit(null);
-      sfx.ui();
-      timers.push(setTimeout(finish, 700));
+      if (r.heal === 0) sfx.ui();
+      timers.push(setTimeout(finish, startDelay + 700));
       return () => timers.forEach(clearTimeout);
     }
 
     const target: "foe" | "you" = r.outcome === "win" ? "foe" : "you";
-    const base = target === "foe" ? foeHp : hp;
+    const base = target === "foe" ? foeHp : healedHp; // player damage lands on the healed HP
     const apply = target === "foe" ? setFoeHp : setHp;
     let cum = 0;
     r.hits.forEach((c, i) => {
@@ -263,10 +277,10 @@ export default function RPS() {
           setHit({ key: Date.now() + i, dmg: c, target, move: r.player });
           if (target === "foe") sfx.score();
           else sfx.ui();
-        }, i * 300),
+        }, startDelay + i * 300),
       );
     });
-    timers.push(setTimeout(finish, (r.hits.length - 1) * 300 + 1050));
+    timers.push(setTimeout(finish, startDelay + (r.hits.length - 1) * 300 + 1050));
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -283,29 +297,33 @@ export default function RPS() {
     const outcome = judge(move, foeMove);
 
     // Resolve with the multiplier the played move already carries (what its
-    // button shows) — scales damage dealt on a win, taken on a loss.
+    // button shows). A NEGATIVE multiplier HEALS |value|% of max HP (on any
+    // outcome) and makes this exchange's damage a flat ×1; otherwise the
+    // multiplier scales damage dealt on a win / taken on a loss.
     const stk = mults[move];
+    const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) / 100) * player.maxHp)) : 0;
+    const dmgMult = stk < 0 ? 1 : stk;
 
     let attacker: "you" | "foe" | null = null;
     let dmg = 0;
     let faster = false;
     let resultFoeHp = foeHp;
-    let resultHp = hp;
+    let resultHp = Math.min(player.maxHp, hp + heal); // healing lands first
 
     if (outcome === "win") {
       attacker = "you";
       faster = player.agi > foe.agi;
       let b = Math.max(1, player.str - foe.def);
       if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * stk));
+      dmg = Math.max(1, Math.round(b * dmgMult));
       resultFoeHp = Math.max(0, foeHp - dmg);
     } else if (outcome === "lose") {
       attacker = "foe";
       faster = foe.agi > player.agi;
       let b = Math.max(1, foe.str - player.def);
       if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * stk));
-      resultHp = Math.max(0, hp - dmg);
+      dmg = Math.max(1, Math.round(b * dmgMult));
+      resultHp = Math.max(0, resultHp - dmg); // damage after the heal
     }
 
     // Evolve the multipliers for next turn.
@@ -316,22 +334,22 @@ export default function RPS() {
       // Repeat the anchor: apply the factors again (offence climbs, defence
       // drops). A draw reapplies them once more, fast-forwarding the lean.
       newAnchor = anchor;
-      newMults = applyFactors(mults, anchor);
+      newMults = applyFactors(mults, anchor, player.dex);
       if (outcome === "draw") {
-        newMults = applyFactors(newMults, anchor);
+        newMults = applyFactors(newMults, anchor, player.dex);
         doubled = true;
       }
     } else {
       // Switch: the exchange above already cashed the current factors; now
       // re-anchor on this move, reset all three to 1, and apply once.
       newAnchor = move;
-      newMults = applyFactors(FRESH_MULTS, move);
+      newMults = applyFactors(FRESH_MULTS, move, player.dex);
     }
 
     // NB: the multipliers are only committed once the round animation ends
     // (in the strike effect), so the shown ×N matches what's resolving.
     const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult: stk, doubled, newMults, newAnchor, resultFoeHp, resultHp });
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult: stk, doubled, heal, newMults, newAnchor, resultFoeHp, resultHp });
     setCount(3);
     setPhase("count");
   };
@@ -570,6 +588,16 @@ export default function RPS() {
               -{hit.dmg}
             </div>
           )}
+          {healPop && (
+            <div
+              key={`heal-${healPop.key}`}
+              className="pointer-events-none absolute inset-x-0 -top-11 text-center text-lg font-black text-emerald-300"
+              style={{ animation: "rps-float 1100ms ease-out forwards" }}
+              aria-hidden="true"
+            >
+              +{healPop.amount}
+            </div>
+          )}
           <HpBar hp={hp} max={player.maxHp} className="bg-emerald-500" />
           <StatLine stats={player} highlight />
         </section>
@@ -581,7 +609,8 @@ export default function RPS() {
         >
           {MOVES.map((m) => {
             const role = roleOf(m.id, anchor);
-            const proj = mults[m.id];
+            const val = mults[m.id];
+            const heals = val < 0; // dropped past 0 → this move now heals
             return (
               <button
                 key={m.id}
@@ -589,16 +618,22 @@ export default function RPS() {
                 disabled={phase !== "choose"}
                 aria-label={m.id}
                 className={`flex aspect-square flex-col items-center justify-center gap-1.5 rounded-2xl text-5xl ring-2 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
-                  role === "up"
-                    ? "bg-neutral-700 ring-amber-400"
-                    : role === "down"
-                      ? "bg-neutral-800 ring-sky-500/40 hover:bg-neutral-700"
-                      : "bg-neutral-800 ring-transparent hover:bg-neutral-700"
+                  heals
+                    ? "bg-emerald-900/40 ring-emerald-400 hover:bg-emerald-900/60"
+                    : role === "up"
+                      ? "bg-neutral-700 ring-amber-400"
+                      : role === "down"
+                        ? "bg-neutral-800 ring-sky-500/40 hover:bg-neutral-700"
+                        : "bg-neutral-800 ring-transparent hover:bg-neutral-700"
                 }`}
               >
                 <span aria-hidden="true">{m.emoji}</span>
-                <span className={`pt-1 text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
-                  ×{proj.toFixed(1)}
+                <span
+                  className={`pt-1 text-xs font-bold tabular-nums ${
+                    heals ? "text-emerald-300" : ROLE_COLOR[role]
+                  }`}
+                >
+                  {heals ? `♥${Math.abs(val).toFixed(1)}%` : `×${val.toFixed(1)}`}
                 </span>
               </button>
             );
@@ -612,17 +647,30 @@ export default function RPS() {
 // The combat call-outs — the move's multiplier, the AGI double, or a draw's
 // deepened stance all get a pop.
 function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
+  const lines: React.ReactNode[] = [];
+  if (round.heal > 0)
+    lines.push(<span className="text-emerald-300">💚 Healed {round.heal}</span>);
+
   if (round.outcome === "draw") {
-    return (
-      <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
+    lines.push(
+      <span className="text-amber-300">
         {round.doubled ? "Stalemate — stance deepens!" : "Stalemate!"}
-      </p>
+      </span>,
+    );
+    return (
+      <div className="space-y-1 text-lg font-bold">
+        {lines.map((l, i) => (
+          <p key={i} className="motion-safe:animate-rps-tick">
+            {l}
+          </p>
+        ))}
+      </div>
     );
   }
-  const lines: React.ReactNode[] = [];
-  if (round.mult >= 1.15)
+  // Skip the damage-multiplier call-outs when the move healed — its damage is a flat ×1.
+  if (round.heal === 0 && round.mult >= 1.15)
     lines.push(<span className="text-amber-300">⚔ Stakes ×{round.mult.toFixed(1)}!</span>);
-  else if (round.mult <= 0.85)
+  else if (round.heal === 0 && round.mult >= 0 && round.mult <= 0.85)
     lines.push(<span className="text-sky-300">Softened ×{round.mult.toFixed(1)}</span>);
   if (round.faster)
     lines.push(
