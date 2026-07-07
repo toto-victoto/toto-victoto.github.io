@@ -7,11 +7,13 @@ import { useStoredGame } from "../storage";
 import { sfx } from "../sound";
 
 // An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
-// strategy is a REPETITION multiplier: repeat a move and its stakes climb
-// (almost exponentially), play the one it beats and they soften. Two stakes run
-// in lockstep — offence (damage dealt) and defence (damage taken) — except a
-// draw doubles ONLY the offence, so stalemating stores attack without exposure.
-// DEX governs how fast the stakes move. First POC — numbers to tune.
+// strategy is a REPETITION stakes multiplier that scales BOTH damage dealt and
+// taken: repeat a move to escalate the stakes (hit harder but also take harder
+// — aggressive), play the move it beats to soften them (deal less, take less —
+// defensive), play the third to hold. A DRAW reapplies that same shift once
+// more, deepening whichever stance you leaned into (an aggressive draw grows
+// more aggressive, a defensive one more defensive, a neutral one holds). DEX
+// governs how fast the stakes move. First POC — numbers to tune.
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
@@ -56,13 +58,16 @@ const START: Stats = { maxHp: 45, str: 6, def: 3, agi: 3, dex: 2 };
 
 // Stakes tuning. Escalating MULTIPLIES (almost exponential up); softening
 // SUBTRACTS a flat step (a steady 0.9, 0.8, 0.7…) down to a defensive cap.
-// DEX quickens both. Applied to offence and defence stakes alike.
+// DEX quickens both.
 const STAKE_MAX = 64;
 const DEF_CAP = 0.5; // softening can't take stakes below this — the defensive cap
 const escalateStakes = (s: number, dex: number) =>
   Math.min(STAKE_MAX, s * (1.5 + dex * 0.13));
 const softenStakes = (s: number, dex: number) =>
   Math.max(DEF_CAP, s - (0.1 + dex * 0.04));
+// One shift step in the direction a move implies (up=escalate, down=soften).
+const applyShift = (s: number, shift: "up" | "down" | "flat", dex: number) =>
+  shift === "up" ? escalateStakes(s, dex) : shift === "down" ? softenStakes(s, dex) : s;
 
 const ROSTER: Foe[] = [
   { emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 8, str: 2, def: 0, agi: 1, dex: 0 },
@@ -146,10 +151,9 @@ type Round = {
   dmg: number;
   hits: number[]; // split into two on an AGI double
   faster: boolean;
-  mult: number; // stakes multiplier applied to this exchange (off on a win, def on a loss)
-  doubled: boolean; // a draw doubled the offence stakes
-  newOff: number; // offence stakes to commit once the round finishes (not before)
-  newDef: number; // defence stakes to commit once the round finishes (not before)
+  mult: number; // stakes multiplier applied to this exchange
+  doubled: boolean; // a draw deepened the stance (reapplied the shift)
+  newStakes: number; // stakes to commit once the round finishes (not before)
   resultFoeHp: number;
   resultHp: number;
 };
@@ -174,10 +178,9 @@ export default function RPS() {
     agi: 0,
     dex: 0,
   });
-  // Two stakes multipliers: offStake scales damage dealt, defStake damage taken.
-  // Escalate/soften/hold move BOTH together; a draw doubles offStake only.
-  const [offStake, setOffStake] = useState(1);
-  const [defStake, setDefStake] = useState(1);
+  // One stakes multiplier scales both damage dealt and taken. It shifts each
+  // round by your move's relation to the last; a draw reapplies that shift.
+  const [stakes, setStakes] = useState(1);
   const [lastMove, setLastMove] = useState<Move | null>(null);
   const [, setStored] = useStoredGame("rps", { bestLevel: 0 });
 
@@ -215,8 +218,7 @@ export default function RPS() {
     const finish = () => {
       setHit(null);
       // Commit the new stakes now — after the exchange has resolved.
-      setOffStake(r.newOff);
-      setDefStake(r.newDef);
+      setStakes(r.newStakes);
       setLastMove(r.player);
       if (r.resultFoeHp <= 0) {
         const nl = level + 1;
@@ -272,26 +274,14 @@ export default function RPS() {
     const foeMove = randomMove();
     const outcome = judge(move, foeMove);
 
-    // Move both stakes based on this throw's relation to the last move.
-    let off = offStake;
-    let def = defStake;
-    if (lastMove !== null) {
-      if (move === lastMove) {
-        // repeat → escalate both
-        off = escalateStakes(off, player.dex);
-        def = escalateStakes(def, player.dex);
-      } else if (move === BEATS[lastMove]) {
-        // soften both
-        off = softenStakes(off, player.dex);
-        def = softenStakes(def, player.dex);
-      }
-      // the third move: unchanged (hold)
-    }
+    // Shift the stakes by this throw's relation to the last move (one round).
+    const shift = roleOf(move, lastMove); // up=escalate, down=soften, flat=hold
+    let stk = applyShift(stakes, shift, player.dex);
 
     let attacker: "you" | "foe" | null = null;
     let dmg = 0;
     let faster = false;
-    let mult = 1;
+    let mult = stk;
     let doubled = false;
     let resultFoeHp = foeHp;
     let resultHp = hp;
@@ -301,28 +291,27 @@ export default function RPS() {
       faster = player.agi > foe.agi;
       let b = Math.max(1, player.str - foe.def);
       if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * off)); // offence scales damage dealt
-      mult = off;
+      dmg = Math.max(1, Math.round(b * stk));
       resultFoeHp = Math.max(0, foeHp - dmg);
     } else if (outcome === "lose") {
       attacker = "foe";
       faster = foe.agi > player.agi;
       let b = Math.max(1, foe.str - player.def);
       if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * def)); // defence scales damage taken
-      mult = def;
+      dmg = Math.max(1, Math.round(b * stk));
       resultHp = Math.max(0, hp - dmg);
     } else {
-      // draw — double ONLY the offence for what comes next (no added exposure)
-      off = Math.min(STAKE_MAX, off * 2);
-      mult = off;
-      doubled = true;
+      // draw — reapply the same shift once more, deepening the stance you leaned
+      // into (aggressive grows, defensive shrinks, neutral holds).
+      stk = applyShift(stk, shift, player.dex);
+      mult = stk;
+      doubled = shift !== "flat";
     }
 
     // NB: the stakes state is only committed once the round animation ends
     // (in the strike effect), so the shown ×N matches what's resolving.
     const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult, doubled, newOff: off, newDef: def, resultFoeHp, resultHp });
+    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult, doubled, newStakes: stk, resultFoeHp, resultHp });
     setCount(3);
     setPhase("count");
   };
@@ -335,8 +324,7 @@ export default function RPS() {
   };
 
   const nextFoe = () => {
-    setOffStake(1);
-    setDefStake(1);
+    setStakes(1);
     setLastMove(null);
   };
 
@@ -376,14 +364,9 @@ export default function RPS() {
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
-  // What a stakes value would become if you played each move now (same
-  // escalate/soften/hold logic, applied to whichever base is passed in).
-  const projectVal = (base: number, m: Move): number => {
-    if (lastMove === null) return base;
-    if (m === lastMove) return escalateStakes(base, player.dex);
-    if (m === BEATS[lastMove]) return softenStakes(base, player.dex);
-    return base;
-  };
+  // What the stakes would become for one round if you played each move now.
+  const projectStakes = (m: Move): number =>
+    applyShift(stakes, roleOf(m, lastMove), player.dex);
 
   return (
     <>
@@ -581,10 +564,7 @@ export default function RPS() {
         >
           {MOVES.map((m) => {
             const role = roleOf(m.id, lastMove);
-            const projOff = projectVal(offStake, m.id);
-            const projDef = projectVal(defStake, m.id);
-            // Off and def only diverge once a draw has bumped offence alone.
-            const split = Math.abs(projOff - projDef) > 0.05;
+            const proj = projectStakes(m.id);
             return (
               <button
                 key={m.id}
@@ -600,16 +580,9 @@ export default function RPS() {
                 }`}
               >
                 <span aria-hidden="true">{m.emoji}</span>
-                {split ? (
-                  <span className="flex gap-1.5 pt-1 text-xs font-bold tabular-nums">
-                    <span className="text-amber-300">⚔{projOff.toFixed(1)}</span>
-                    <span className="text-sky-300">🛡{projDef.toFixed(1)}</span>
-                  </span>
-                ) : (
-                  <span className={`pt-1 text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
-                    ×{projOff.toFixed(1)}
-                  </span>
-                )}
+                <span className={`pt-1 text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
+                  ×{proj.toFixed(1)}
+                </span>
               </button>
             );
           })}
@@ -623,9 +596,10 @@ export default function RPS() {
 // doubled stakes all get a pop.
 function StrikeBanner({ round, foe }: { round: Round; foe: Foe }) {
   if (round.outcome === "draw") {
+    const deepened = round.mult >= 1.15 ? "text-amber-300" : round.mult <= 0.85 ? "text-sky-300" : "text-neutral-400";
     return (
-      <p className="text-lg font-bold text-amber-300 motion-safe:animate-rps-tick">
-        Stalemate — attack ×2!
+      <p className={`text-lg font-bold ${deepened} motion-safe:animate-rps-tick`}>
+        Stalemate — stakes ×{round.mult.toFixed(1)}
       </p>
     );
   }
