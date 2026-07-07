@@ -75,6 +75,7 @@ const DROP = 0.1; // base defensive multiplier decay per application
 const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
 const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
 const HEAL_RATE = 10; // a negative move heals |value| × this % of max HP
+const HEAL_DMG = 0.1; // …and its exchange deals/takes damage at this flat factor
 type Mults = Record<Move, number>;
 const FRESH_MULTS: Mults = { rock: 1, paper: 1, scissors: 1 };
 
@@ -306,12 +307,12 @@ export default function RPS() {
     const outcome = judge(move, foeMove);
 
     // Resolve with the multiplier the played move already carries (what its
-    // button shows). A NEGATIVE multiplier HEALS |value|% of max HP (on any
-    // outcome) and makes this exchange's damage a flat ×1; otherwise the
-    // multiplier scales damage dealt on a win / taken on a loss.
+    // button shows). A NEGATIVE multiplier HEALS (on any outcome) and softens
+    // this exchange's damage to a flat HEAL_DMG factor; otherwise the multiplier
+    // scales damage dealt on a win / taken on a loss.
     const stk = mults[move];
     const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) * HEAL_RATE / 100) * player.maxHp)) : 0;
-    const dmgMult = stk < 0 ? 1 : stk;
+    const dmgMult = stk < 0 ? HEAL_DMG : stk;
 
     let attacker: "you" | "foe" | null = null;
     let dmg = 0;
@@ -654,13 +655,20 @@ export default function RPS() {
                 }`}
               >
                 <span aria-hidden="true">{m.emoji}</span>
-                <span
-                  className={`pt-1 text-xs font-bold tabular-nums ${
-                    heals ? "text-emerald-300" : ROLE_COLOR[role]
-                  }`}
-                >
-                  {heals ? `♥${(Math.abs(val) * HEAL_RATE).toFixed(0)}%` : `×${val.toFixed(1)}`}
-                </span>
+                {heals ? (
+                  <span className="flex flex-col items-center pt-1 leading-none">
+                    <span className="text-[10px] font-bold tabular-nums text-sky-300">
+                      ×{HEAL_DMG}
+                    </span>
+                    <span className="pt-0.5 text-xs font-bold tabular-nums text-emerald-300">
+                      ♥{(Math.abs(val) * HEAL_RATE).toFixed(0)}%
+                    </span>
+                  </span>
+                ) : (
+                  <span className={`pt-1 text-xs font-bold tabular-nums ${ROLE_COLOR[role]}`}>
+                    ×{val.toFixed(1)}
+                  </span>
+                )}
               </button>
             );
           })}
