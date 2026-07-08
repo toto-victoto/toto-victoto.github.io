@@ -42,6 +42,8 @@ const emojiOf = (m: Move) => MOVES.find((x) => x.id === m)!.emoji;
 const MARKER: Record<Move, string> = { rock: "💥", paper: "👋", scissors: "✂️" };
 
 type Stats = { maxHp: number; str: number; def: number; agi: number; dex: number };
+// Elite tiers get a distinctive look (bigger, glowing) and beefier stats.
+type FoeTier = "semiboss" | "boss";
 // `key` slugs the foe's name id (rps.foe.<key>.name). The battle cry and last
 // words are drawn from shared pools (roster bosses keep their signature lines),
 // so each carries its own i18n id + English fallback.
@@ -53,6 +55,7 @@ type Foe = Stats & {
   cry: string;
   wordsId: string;
   lastWords: string;
+  tier?: FoeTier;
 };
 type StatKey = "hp" | "str" | "def" | "agi" | "dex";
 
@@ -110,51 +113,72 @@ const applyFactors = (m: Mults, anchor: Move, dex: number): Mults => {
   return next;
 };
 
-// The named story bosses (fixed order, hand-tuned stats, signature cry/words).
-// cryId/wordsId point at each boss's own catalog entry.
-const ROSTER: Foe[] = [
+// The named story cast (fixed order, hand-tuned stats, signature cry/words).
+// Two elites (semi-bosses) at levels 5 & 8, King Aldwin the boss (9), and Dread
+// Volk the hidden boss (10). cryId/wordsId point at each one's catalog entry.
+const ROSTER: Foe[] = ([
   { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
-  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 31, str: 5, def: 2, agi: 2, dex: 1 },
-  { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 49, str: 7, def: 3, agi: 2, dex: 1 },
-  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 67, str: 8, def: 7, agi: 4, dex: 2 },
-  { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 84, str: 12, def: 7, agi: 7, dex: 3 },
-  { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 111, str: 15, def: 10, agi: 5, dex: 3 },
-  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 142, str: 20, def: 13, agi: 6, dex: 3 },
-  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 189, str: 27, def: 17, agi: 9, dex: 4 },
-].map((f) => ({ ...f, cryId: `rps.foe.${f.key}.cry`, wordsId: `rps.foe.${f.key}.words` }));
+  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 30, str: 5, def: 2, agi: 2, dex: 1 },
+  { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 46, str: 7, def: 3, agi: 2, dex: 1 },
+  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 66, str: 9, def: 6, agi: 4, dex: 2 },
+  { key: "enchantress", emoji: "🧝‍♀️", name: "Morgause", cry: "You'll dance to my tune.", lastWords: "The threads… unravel…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
+  { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 108, str: 14, def: 8, agi: 8, dex: 3 },
+  { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
+  { key: "valkyrie", emoji: "🦸‍♀️", name: "Valkyra", cry: "The slain are mine.", lastWords: "A worthy… fall…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
+  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
+  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "boss" },
+] as Array<Omit<Foe, "cryId" | "wordsId">>).map((f) => ({
+  ...f,
+  cryId: `rps.foe.${f.key}.cry`,
+  wordsId: `rps.foe.${f.key}.words`,
+}));
 
-// Beyond the roster, foes are generated: a random archetype (emoji + name) with
-// a battle cry and last words pulled at random from shared pools.
-const ARCHETYPES: { key: string; emoji: string; name: string }[] = [
-  { key: "wanderer", emoji: "🧟", name: "Wanderer" },
-  { key: "brute", emoji: "👹", name: "Brute" },
-  { key: "reaver", emoji: "🤺", name: "Reaver" },
-  { key: "warden", emoji: "🧛", name: "Warden" },
-  { key: "fiend", emoji: "🦸", name: "Fiend" },
-  { key: "marauder", emoji: "👺", name: "Marauder" },
-  { key: "specter", emoji: "🧝", name: "Specter" },
-  { key: "troll", emoji: "🧌", name: "Troll" },
-  { key: "imp", emoji: "👿", name: "Imp" },
-  { key: "djinn", emoji: "🧞", name: "Djinn" },
-  { key: "tideborn", emoji: "🧜‍♂️", name: "Tideborn" },
-  { key: "wyrm", emoji: "🐉", name: "Wyrm" },
-  { key: "nightwing", emoji: "🦇", name: "Nightwing" },
-  { key: "weaver", emoji: "🕷️", name: "Weaver" },
-  { key: "stinger", emoji: "🦂", name: "Stinger" },
-  { key: "tusk", emoji: "🐗", name: "Tusk" },
-  { key: "maw", emoji: "🦈", name: "Maw" },
-  { key: "fang", emoji: "🐺", name: "Fang" },
-  { key: "kong", emoji: "🦍", name: "Kong" },
-  { key: "charger", emoji: "🦏", name: "Charger" },
-  { key: "snapper", emoji: "🐊", name: "Snapper" },
-  { key: "wisp", emoji: "👻", name: "Wisp" },
-  { key: "bonelord", emoji: "💀", name: "Bonelord" },
-  { key: "sentinel", emoji: "🤖", name: "Sentinel" },
-  { key: "invader", emoji: "👾", name: "Invader" },
-  { key: "hollow", emoji: "🎃", name: "Hollow" },
-  { key: "rex", emoji: "🦖", name: "Rex" },
-  { key: "kraken", emoji: "🐙", name: "Kraken" },
+// Beyond the roster, foes are generated. Each archetype (emoji + name) also
+// carries a combat PROFILE that shapes how its stat budget is spread — so a
+// Kong hits like a brute, a Fang darts, a Sentinel walls up. Battle cries and
+// last words are pulled at random from shared pools.
+type Profile = "strong" | "wall" | "swift" | "balanced" | "trickster";
+const ARCHETYPES: { key: string; emoji: string; name: string; profile: Profile }[] = [
+  { key: "wanderer", emoji: "🧟", name: "Wanderer", profile: "wall" },
+  { key: "brute", emoji: "👹", name: "Brute", profile: "strong" },
+  { key: "reaver", emoji: "🤺", name: "Reaver", profile: "swift" },
+  { key: "warden", emoji: "🧛", name: "Warden", profile: "balanced" },
+  { key: "fiend", emoji: "🦸", name: "Fiend", profile: "trickster" },
+  { key: "marauder", emoji: "👺", name: "Marauder", profile: "strong" },
+  { key: "specter", emoji: "🧝", name: "Specter", profile: "swift" },
+  { key: "troll", emoji: "🧌", name: "Troll", profile: "wall" },
+  { key: "imp", emoji: "👿", name: "Imp", profile: "trickster" },
+  { key: "djinn", emoji: "🧞", name: "Djinn", profile: "trickster" },
+  { key: "tideborn", emoji: "🧜‍♂️", name: "Tideborn", profile: "balanced" },
+  { key: "wyrm", emoji: "🐉", name: "Wyrm", profile: "strong" },
+  { key: "nightwing", emoji: "🦇", name: "Nightwing", profile: "swift" },
+  { key: "weaver", emoji: "🕷️", name: "Weaver", profile: "trickster" },
+  { key: "stinger", emoji: "🦂", name: "Stinger", profile: "swift" },
+  { key: "tusk", emoji: "🐗", name: "Tusk", profile: "strong" },
+  { key: "maw", emoji: "🦈", name: "Maw", profile: "strong" },
+  { key: "fang", emoji: "🐺", name: "Fang", profile: "swift" },
+  { key: "kong", emoji: "🦍", name: "Kong", profile: "strong" },
+  { key: "charger", emoji: "🦏", name: "Charger", profile: "strong" },
+  { key: "snapper", emoji: "🐊", name: "Snapper", profile: "wall" },
+  { key: "wisp", emoji: "👻", name: "Wisp", profile: "swift" },
+  { key: "bonelord", emoji: "💀", name: "Bonelord", profile: "balanced" },
+  { key: "sentinel", emoji: "🤖", name: "Sentinel", profile: "wall" },
+  { key: "invader", emoji: "👾", name: "Invader", profile: "balanced" },
+  { key: "hollow", emoji: "🎃", name: "Hollow", profile: "trickster" },
+  { key: "rex", emoji: "🦖", name: "Rex", profile: "strong" },
+  { key: "kraken", emoji: "🐙", name: "Kraken", profile: "wall" },
 ];
+
+// Each profile is an HP multiplier + how the combat budget (STR/DEF/AGI/DEX)
+// splits. HP and the combat budget are scaled separately from the player so the
+// ~10× HP scale never swamps the small combat stats.
+const PROFILES: Record<Profile, { hp: number; w: Record<Exclude<StatKey, "hp">, number> }> = {
+  strong: { hp: 1.0, w: { str: 0.55, def: 0.2, agi: 0.2, dex: 0.05 } },
+  wall: { hp: 1.35, w: { str: 0.2, def: 0.55, agi: 0.15, dex: 0.1 } },
+  swift: { hp: 0.85, w: { str: 0.32, def: 0.13, agi: 0.5, dex: 0.05 } },
+  balanced: { hp: 1.05, w: { str: 0.3, def: 0.3, agi: 0.25, dex: 0.15 } },
+  trickster: { hp: 0.9, w: { str: 0.28, def: 0.2, agi: 0.22, dex: 0.3 } },
+};
 
 const CRIES = [
   "You're finished!", "Come closer.", "This ends now.", "I've faced worse.",
@@ -181,13 +205,23 @@ const randOf = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 const vary = (base: number, swing: number, min: number) =>
   Math.max(min, Math.round(base * (1 + (Math.random() * 2 - 1) * swing)));
 
-function makeFoe(index: number): Foe {
+const FOE_RATIO = 1.25; // a normal foe's stat budget vs the current player's
+const FOE_BOSS_RATIO = 2; // a boss foe (every 10th depth past the roster)
+
+// A generated foe, scaled to the player who'll fight it: HP and the combat
+// budget (STR+DEF+AGI+DEX) each track the player's ×ratio, spread by the
+// archetype's profile, then jittered per stat by a depth-widening swing.
+function makeFoe(index: number, player: Stats = START): Foe {
   if (index < ROSTER.length) return ROSTER[index];
-  const t = index - ROSTER.length; // 0-based depth past the roster
+  const depth = index - ROSTER.length; // 0-based depth past the roster
+  const boss = depth > 0 && depth % 10 === 0;
+  const ratio = boss ? FOE_BOSS_RATIO : FOE_RATIO;
+  const swing = Math.min(0.45, 0.15 + depth * 0.02); // variance grows with depth
   const arch = randOf(ARCHETYPES);
+  const { hp: hpMult, w } = PROFILES[arch.profile];
+  const combat = ratio * Math.max(4, player.str + player.def + player.agi + player.dex);
   const cryIdx = Math.floor(Math.random() * CRIES.length);
   const wordIdx = Math.floor(Math.random() * DEATHS.length);
-  const swing = Math.min(0.45, 0.15 + t * 0.02); // stat variance grows with depth
   return {
     key: arch.key,
     emoji: arch.emoji,
@@ -196,11 +230,12 @@ function makeFoe(index: number): Foe {
     cry: CRIES[cryIdx],
     wordsId: `rps.death.${wordIdx}`,
     lastWords: DEATHS[wordIdx],
-    maxHp: vary(200 + t * 36, swing, 10),
-    str: vary(28 + t * 3, swing, 1),
-    def: vary(18 + t * 2, swing, 0),
-    agi: vary(10 + t, swing, 1),
-    dex: vary(4 + Math.floor(t / 2), swing, 0),
+    tier: boss ? "boss" : undefined,
+    maxHp: vary(ratio * player.maxHp * hpMult, swing, 10),
+    str: vary(combat * w.str, swing, 1),
+    def: vary(combat * w.def, swing, 0),
+    agi: vary(combat * w.agi, swing, 1),
+    dex: vary(combat * w.dex, swing, 0),
   };
 }
 
@@ -208,13 +243,36 @@ const pointsForLevel = (level: number) => 3 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
 
 const ROSTER_SIZE = ROSTER.length;
-// Infinite mode: skip straight to the first post-roster foe (level 9) with the
-// stat points 8 wins would have earned, then measure progress as levels past
-// the roster.
+// Infinite mode: skip past the whole roster with the stat points those wins
+// would have earned, then measure progress as depth (levels past the roster).
 const INFINITE_START_LEVEL = ROSTER_SIZE + 1;
 const INFINITE_POINTS = Array.from({ length: ROSTER_SIZE }, (_, i) =>
   pointsForLevel(i + 2),
 ).reduce((a, b) => a + b, 0);
+
+// Distinctive look for elites: a bigger, glowing emoji, a colored name, and a
+// tag. Normal foes render at text-7xl with no tag.
+const TIER_STYLE: Record<
+  FoeTier,
+  { emoji: string; glow: string; name: string; chip: string; chipId: string; chipMsg: string }
+> = {
+  semiboss: {
+    emoji: "text-8xl",
+    glow: "drop-shadow(0 0 14px rgba(251,191,36,0.5))",
+    name: "text-amber-200",
+    chip: "bg-amber-500/15 text-amber-300 ring-amber-500/40",
+    chipId: "rps.tier.semiboss",
+    chipMsg: "Elite",
+  },
+  boss: {
+    emoji: "text-9xl",
+    glow: "drop-shadow(0 0 22px rgba(244,63,94,0.6))",
+    name: "text-rose-300",
+    chip: "bg-rose-500/20 text-rose-200 ring-rose-500/50",
+    chipId: "rps.tier.boss",
+    chipMsg: "Boss",
+  },
+};
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -330,7 +388,7 @@ type Action =
   | { type: "deathDone" }
   | { type: "addPoint"; stat: StatKey }
   | { type: "confirmSetup" }
-  | { type: "confirmLevelUp"; foe: Foe };
+  | { type: "confirmLevelUp"; player: Stats; foe: Foe };
 
 // Pure resolution of one exchange, given the played move and the foe's roll.
 // The played move's carried multiplier scales the damage (or, when negative,
@@ -340,7 +398,9 @@ function resolveRound(state: GameState, move: Move, foeMove: Move): Round {
   const { player, foe, foeHp, hp, mults, anchor } = state;
   const outcome = judge(move, foeMove);
   const stk = mults[move];
-  const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) * HEAL_RATE) / 100 * player.maxHp)) : 0;
+  // Heal is |mult| × HEAL_RATE % of max HP, capped at a full 100%.
+  const healPct = stk < 0 ? Math.min(1, (Math.abs(stk) * HEAL_RATE) / 100) : 0;
+  const heal = stk < 0 ? Math.max(1, Math.round(healPct * player.maxHp)) : 0;
   const dmgMult = stk < 0 ? HEAL_DMG : stk;
 
   let attacker: "you" | "foe" | null = null;
@@ -475,12 +535,12 @@ function gameReducer(state: GameState, action: Action): GameState {
       const np = applyAlloc(state.player, state.alloc);
       return { ...state, player: np, hp: np.maxHp, alloc: ZERO_ALLOC, points: 0, phase: "intro" };
     }
-    case "confirmLevelUp": {
-      const np = applyAlloc(state.player, state.alloc);
+    case "confirmLevelUp":
+      // player + next foe (scaled to the allocated player) come from the handler.
       return {
         ...state,
-        player: np,
-        hp: np.maxHp,
+        player: action.player,
+        hp: action.player.maxHp,
         foeIndex: state.foeIndex + 1,
         foe: action.foe,
         foeHp: action.foe.maxHp,
@@ -489,7 +549,6 @@ function gameReducer(state: GameState, action: Action): GameState {
         alloc: ZERO_ALLOC,
         phase: "intro",
       };
-    }
     default:
       return state;
   }
@@ -531,10 +590,10 @@ export default function RPS() {
     setStored((s) => ({ ...s, save: undefined }));
   };
 
-  // Jump into infinite mode: seed the record (min 1), drop any story snapshot.
+  // Jump into infinite mode; drop any story snapshot (records survive).
   const startInfinite = () => {
     dispatch({ type: "startInfinite", foe: makeFoe(ROSTER_SIZE) });
-    setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, 1), save: undefined }));
+    setStored((s) => ({ ...s, save: undefined }));
   };
 
   // Snapshot the run every time we land on the move-choice screen — the one
@@ -554,7 +613,7 @@ export default function RPS() {
     if (phase === "death") {
       sfx.win();
       if (mode === "infinite")
-        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level - ROSTER_SIZE) }));
+        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level - INFINITE_START_LEVEL) }));
       else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level) }));
     } else if (phase === "gameover") {
       sfx.lose();
@@ -639,12 +698,19 @@ export default function RPS() {
   const remaining = points - spent;
   const addPoint = (k: StatKey) => dispatch({ type: "addPoint", stat: k });
   const confirmSetup = () => dispatch({ type: "confirmSetup" });
-  const confirmLevelUp = () => dispatch({ type: "confirmLevelUp", foe: makeFoe(foeIndex + 1) });
+  const confirmLevelUp = () => {
+    // Scale the next foe to the player they'll actually face (post-allocation).
+    const np = applyAlloc(player, alloc);
+    dispatch({ type: "confirmLevelUp", player: np, foe: makeFoe(foeIndex + 1, np) });
+  };
 
   const foeHitting = hit?.target === "foe";
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
-  const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
+  const showingTomb = phase === "death" || phase === "levelup";
+  const foeEmoji = showingTomb ? "🪦" : foe.emoji;
+  // Elite styling — suppressed while the foe is a gravestone.
+  const ts = !showingTomb && foe.tier ? TIER_STYLE[foe.tier] : null;
   // Localized foe flavor — the stored English literals are the fallbacks.
   const foeName = i18n._(`rps.foe.${foe.key}.name`, undefined, { message: foe.name });
   const foeCry = i18n._(foe.cryId, undefined, { message: foe.cry });
@@ -668,7 +734,10 @@ export default function RPS() {
                 <span aria-hidden="true">✋</span>
                 <span aria-hidden="true">✌️</span>
               </div>
-              <h1 className="bg-gradient-to-br from-amber-200 via-orange-400 to-rose-500 bg-clip-text text-6xl font-black tracking-tighter text-transparent drop-shadow-[0_2px_12px_rgba(251,146,60,0.35)]">
+              <h1
+                className="bg-gradient-to-br from-amber-200 via-orange-400 to-rose-500 bg-clip-text text-6xl font-black tracking-tighter text-transparent"
+                style={{ filter: "drop-shadow(0 2px 12px rgba(251,146,60,0.35))" }}
+              >
                 RPS Saga
               </h1>
               <p className="text-sm text-neutral-500">
@@ -732,8 +801,8 @@ export default function RPS() {
         <section className="relative space-y-1 text-center">
           <div
             key={foeHitting ? `foe-${hit.key}` : "foe-static"}
-            className="inline-block text-7xl leading-none will-change-transform"
-            style={foeAnim ? { animation: foeAnim } : undefined}
+            className={`inline-block leading-none will-change-transform ${ts ? ts.emoji : "text-7xl"}`}
+            style={{ animation: foeAnim, filter: ts?.glow }}
             aria-hidden="true"
           >
             {foeEmoji}
@@ -749,7 +818,14 @@ export default function RPS() {
               <span className="ml-1 text-rose-300">-{hit.dmg}</span>
             </div>
           )}
-          <div className="font-semibold text-neutral-200">{foeName}</div>
+          {ts && (
+            <div
+              className={`mx-auto w-fit rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ${ts.chip}`}
+            >
+              <Trans id={ts.chipId} message={ts.chipMsg} />
+            </div>
+          )}
+          <div className={`font-semibold ${ts ? ts.name : "text-neutral-200"}`}>{foeName}</div>
           <div
             key={foeHitting ? `bar-${hit.key}` : "bar"}
             style={foeHitting ? { animation: "rps-shake 380ms ease-out" } : undefined}
@@ -893,7 +969,7 @@ export default function RPS() {
                   <Trans
                     id="rps.infinite.reached"
                     message="Reached depth {n}"
-                    values={{ n: level - ROSTER_SIZE }}
+                    values={{ n: level - INFINITE_START_LEVEL }}
                   />
                 ) : (
                   <Trans id="rps.rpg.reached" message="Reached level {level}" values={{ level }} />
@@ -984,7 +1060,7 @@ export default function RPS() {
                       ×{HEAL_DMG}
                     </span>
                     <span className="pt-0.5 text-xs font-bold tabular-nums text-emerald-300">
-                      ♥{(Math.abs(val) * HEAL_RATE).toFixed(0)}%
+                      ♥{Math.min(100, Math.abs(val) * HEAL_RATE).toFixed(0)}%
                     </span>
                   </span>
                 ) : (

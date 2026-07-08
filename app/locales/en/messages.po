@@ -205,6 +205,30 @@ msgstr "Your story ends."
 msgid "rps.foe.villain.words"
 msgstr "But I had… a trilogy planned…"
 
+msgid "rps.foe.enchantress.name"
+msgstr "Morgause"
+
+msgid "rps.foe.enchantress.cry"
+msgstr "You'll dance to my tune."
+
+msgid "rps.foe.enchantress.words"
+msgstr "The threads… unravel…"
+
+msgid "rps.foe.valkyrie.name"
+msgstr "Valkyra"
+
+msgid "rps.foe.valkyrie.cry"
+msgstr "The slain are mine."
+
+msgid "rps.foe.valkyrie.words"
+msgstr "A worthy… fall…"
+
+msgid "rps.tier.semiboss"
+msgstr "Elite"
+
+msgid "rps.tier.boss"
+msgstr "Boss"
+
 msgid "rps.foe.wanderer.name"
 msgstr "Wanderer"
 

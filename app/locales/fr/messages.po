@@ -205,6 +205,30 @@ msgstr "Ton histoire s'achève."
 msgid "rps.foe.villain.words"
 msgstr "J'avais… une trilogie de prévue…"
 
+msgid "rps.foe.enchantress.name"
+msgstr "Morgause"
+
+msgid "rps.foe.enchantress.cry"
+msgstr "Tu danseras à ma cadence."
+
+msgid "rps.foe.enchantress.words"
+msgstr "Les fils… se défont…"
+
+msgid "rps.foe.valkyrie.name"
+msgstr "Valkyra"
+
+msgid "rps.foe.valkyrie.cry"
+msgstr "Les morts m'appartiennent."
+
+msgid "rps.foe.valkyrie.words"
+msgstr "Une chute… digne…"
+
+msgid "rps.tier.semiboss"
+msgstr "Élite"
+
+msgid "rps.tier.boss"
+msgstr "Boss"
+
 msgid "rps.foe.wanderer.name"
 msgstr "Vagabond"
 

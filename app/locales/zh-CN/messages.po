@@ -205,6 +205,30 @@ msgstr "你的故事到此为止。"
 msgid "rps.foe.villain.words"
 msgstr "可我……还计划了三部曲……"
 
+msgid "rps.foe.enchantress.name"
+msgstr "摩高斯"
+
+msgid "rps.foe.enchantress.cry"
+msgstr "你会随我的曲调起舞。"
+
+msgid "rps.foe.enchantress.words"
+msgstr "丝线……散了……"
+
+msgid "rps.foe.valkyrie.name"
+msgstr "瓦尔基娅"
+
+msgid "rps.foe.valkyrie.cry"
+msgstr "亡者归我。"
+
+msgid "rps.foe.valkyrie.words"
+msgstr "虽败……犹荣……"
+
+msgid "rps.tier.semiboss"
+msgstr "精英"
+
+msgid "rps.tier.boss"
+msgstr "首领"
+
 msgid "rps.foe.wanderer.name"
 msgstr "流浪者"
 
