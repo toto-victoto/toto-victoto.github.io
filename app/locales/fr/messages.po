@@ -328,6 +328,15 @@ msgstr "Atteins Lv 9 en Aventure"
 msgid "rps.setup.title"
 msgstr "Prépare-toi"
 
+msgid "rps.victory.title"
+msgstr "Victoire !"
+
+msgid "rps.victory.body"
+msgstr "Tu as vaincu le Seigneur des Ténèbres !"
+
+msgid "rps.victory.unlocked"
+msgstr "♾️ Mode infini débloqué !"
+
 msgid "rps.infinite.reached"
 msgstr "Profondeur {n} atteinte"
 

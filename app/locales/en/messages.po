@@ -328,6 +328,15 @@ msgstr "Reach Adventure Lv 9"
 msgid "rps.setup.title"
 msgstr "Gear up"
 
+msgid "rps.victory.title"
+msgstr "Victory!"
+
+msgid "rps.victory.body"
+msgstr "You vanquished the Dark Lord!"
+
+msgid "rps.victory.unlocked"
+msgstr "♾️ Infinite mode unlocked!"
+
 msgid "rps.infinite.reached"
 msgstr "Reached depth {n}"
 

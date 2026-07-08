@@ -287,6 +287,20 @@ const ROSTER_SIZE = ROSTER.length;
 // Infinite mode: fight post-roster foes (foeIndex starts at ROSTER_SIZE) but
 // count levels from 1, with a round war-chest of points to spend up front.
 const INFINITE_POINTS = 50;
+// Infinite unlocks by completing the adventure — beating the hidden boss (the
+// whole 10-foe roster), i.e. a record of ROSTER_SIZE.
+const INFINITE_UNLOCK = ROSTER_SIZE;
+
+// Victory-splash fireworks: emoji bursts at fixed spots with staggered, looping
+// delays. Positions are viewport-relative so they scatter across the screen.
+const FIREWORKS: { e: string; top: string; left: string; d: number }[] = [
+  { e: "🎆", top: "10%", left: "14%", d: 0 },
+  { e: "🎇", top: "16%", left: "76%", d: 260 },
+  { e: "✨", top: "38%", left: "8%", d: 520 },
+  { e: "🎆", top: "30%", left: "84%", d: 160 },
+  { e: "🎇", top: "58%", left: "22%", d: 420 },
+  { e: "✨", top: "64%", left: "70%", d: 680 },
+];
 
 // Distinctive look for elites: a bigger, glowing emoji, a colored name + tag,
 // a matching glow on the HP bar, and a subtly tinted arena. Normal foes render
@@ -352,6 +366,7 @@ type Phase =
   | "clash"
   | "strike"
   | "death"
+  | "victory" // beat the hidden boss — adventure complete
   | "levelup"
   | "gameover";
 type Mode = "story" | "infinite";
@@ -584,8 +599,16 @@ function gameReducer(state: GameState, action: Action): GameState {
       // Commit the evolved multipliers + anchor now — after the exchange resolved.
       const base = { ...state, hit: null, healPop: null, mults: r.newMults, anchor: r.newAnchor };
       if (r.resultFoeHp <= 0) {
-        const nl = state.level + 1;
-        return { ...base, level: nl, points: pointsForLevel(nl), alloc: ZERO_ALLOC, phase: "death" };
+        // Foe defeated. `level` stays put through the allocation screen — it
+        // only ticks up when the next foe is drawn (confirmLevelUp). Beating the
+        // hidden boss (last roster foe) in story mode triggers the victory splash.
+        const beatVolk = state.mode === "story" && state.foeIndex === ROSTER_SIZE - 1;
+        return {
+          ...base,
+          points: pointsForLevel(state.level + 1),
+          alloc: ZERO_ALLOC,
+          phase: beatVolk ? "victory" : "death",
+        };
       }
       if (r.resultHp <= 0) return { ...base, phase: "gameover" };
       return { ...base, phase: "choose" };
@@ -611,9 +634,11 @@ function gameReducer(state: GameState, action: Action): GameState {
         phase: "intro",
       };
     case "confirmLevelUp":
-      // player + next foe (scaled to the allocated player) come from the handler.
+      // Now the level ticks up, alongside the next foe (scaled to the allocated
+      // player, built in the handler).
       return {
         ...state,
+        level: state.level + 1,
         player: action.player,
         hp: action.player.maxHp,
         foeIndex: state.foeIndex + 1,
@@ -634,6 +659,8 @@ export default function RPS() {
   const { phase, mode, player, hp, level, foeIndex, foe, foeHp, count, round, hit, healPop, points, alloc, mults, anchor, seed } = state;
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
+  // True when the victory splash is the moment infinite mode gets unlocked.
+  const [justUnlocked, setJustUnlocked] = useState(false);
   const { i18n } = useLingui();
   const tLabel = (k: StatKey) =>
     i18n._(`rps.stat.label.${k}`, undefined, { message: STAT_LABEL[k] });
@@ -692,13 +719,15 @@ export default function RPS() {
   // Persist + sfx on the run's turning points: a kill records the best result
   // (per mode), a defeat drops the resume snapshot but keeps the records.
   useEffect(() => {
-    if (phase === "death") {
+    if (phase === "death" || phase === "victory") {
       sfx.win();
-      // Record foes DEFEATED (level - 1): on a kill `level` is already the next
-      // level, so `level - 1` is the one just cleared. Dying with no win → 0.
+      // `level` is the one you just cleared (no longer pre-incremented), so the
+      // record IS the level. Victory = beating the hidden boss (level 10);
+      // capture whether that's what unlocks infinite (was below the threshold).
+      if (phase === "victory") setJustUnlocked(stored.bestLevel < INFINITE_UNLOCK);
       if (mode === "infinite")
-        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level - 1) }));
-      else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level - 1) }));
+        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level) }));
+      else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level) }));
     } else if (phase === "gameover") {
       sfx.lose();
       // Run's over — clear only this mode's snapshot, keep records + the other mode.
@@ -803,7 +832,7 @@ export default function RPS() {
   const foeHitting = hit?.target === "foe";
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
-  const showingTomb = phase === "death" || phase === "levelup";
+  const showingTomb = phase === "death" || phase === "levelup" || phase === "victory";
   // During the infinite pre-fight, the foe is a mystery until points are spent.
   const hideFoe = phase === "setup";
   const foeEmoji = showingTomb ? "🪦" : hideFoe ? "❔" : foe.emoji;
@@ -820,8 +849,8 @@ export default function RPS() {
   // Infinite runs measure progress as levels past the roster.
   const infinite = mode === "infinite";
   const record = infinite ? stored.infiniteBest ?? 0 : stored.bestLevel;
-  // Infinite unlocks once the adventure record hits 9 (beat the King).
-  const infiniteUnlocked = stored.bestLevel >= 9;
+  // Infinite unlocks once the adventure is completed (hidden boss beaten).
+  const infiniteUnlocked = stored.bestLevel >= INFINITE_UNLOCK;
 
   // Title screen — shown on load, before any fight. Offers Continue (when a
   // run was interrupted) and Start / Restart.
@@ -909,6 +938,19 @@ export default function RPS() {
   return (
     <>
       <BackButton />
+      {phase === "victory" && (
+        <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" aria-hidden="true">
+          {FIREWORKS.map((f, i) => (
+            <span
+              key={i}
+              className="absolute text-4xl"
+              style={{ top: f.top, left: f.left, animation: `rps-firework 1300ms ease-out ${f.d}ms infinite` }}
+            >
+              {f.e}
+            </span>
+          ))}
+        </div>
+      )}
       <GameLayout tint={ts?.bg}>
         <header className="flex items-baseline justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -997,6 +1039,31 @@ export default function RPS() {
               <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300 motion-safe:animate-rps-tick">
                 “{foeWords}”
               </p>
+            </div>
+          )}
+
+          {phase === "victory" && (
+            <div className="space-y-3 text-center motion-safe:animate-rps-tick">
+              <p className="text-5xl" aria-hidden="true">
+                🎉
+              </p>
+              <p className="bg-gradient-to-br from-amber-200 via-orange-400 to-rose-400 bg-clip-text text-2xl font-black text-transparent">
+                <Trans id="rps.victory.title" message="Victory!" />
+              </p>
+              <p className="mx-auto max-w-xs text-sm text-neutral-300">
+                <Trans id="rps.victory.body" message="You vanquished the Dark Lord!" />
+              </p>
+              {justUnlocked && (
+                <p className="text-sm font-semibold text-fuchsia-300">
+                  <Trans id="rps.victory.unlocked" message="♾️ Infinite mode unlocked!" />
+                </p>
+              )}
+              <button
+                onClick={() => dispatch({ type: "deathDone" })}
+                className="mt-1 rounded-full bg-emerald-500 px-8 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
+              >
+                <Trans id="rps.rpg.continue" message="Continue" />
+              </button>
             </div>
           )}
 

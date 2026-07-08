@@ -209,3 +209,21 @@ body {
     opacity: 0;
   }
 }
+/* Victory fireworks: a burst that pops in and expands away. */
+@keyframes rps-firework {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.25);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
