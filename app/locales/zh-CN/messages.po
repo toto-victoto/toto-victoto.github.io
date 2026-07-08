@@ -370,6 +370,24 @@ msgstr "暴龙"
 msgid "rps.foe.kraken.name"
 msgstr "海妖"
 
+msgid "rps.foe.ghoul.name"
+msgstr "食尸鬼"
+
+msgid "rps.foe.countess.name"
+msgstr "伯爵夫人"
+
+msgid "rps.foe.sylph.name"
+msgstr "气精"
+
+msgid "rps.foe.siren.name"
+msgstr "塞壬"
+
+msgid "rps.foe.hexen.name"
+msgstr "女巫"
+
+msgid "rps.foe.jester.name"
+msgstr "弄臣"
+
 msgid "rps.cry.0"
 msgstr "你完蛋了！"
 

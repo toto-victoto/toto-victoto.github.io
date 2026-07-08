@@ -98,7 +98,7 @@ const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 0 };
 const CLIMB = 1.2; // base offensive multiplier growth per application
 const DROP = 0.2; // base defensive multiplier decay per application
 const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
-const STAKE_MAX = 64; // ceiling on the climbing offensive multiplier
+const STAKE_MAX = 50; // ceiling on the climbing offensive multiplier
 const HEAL_RATE = 10; // a negative move heals |value| × this % of max HP
 const HEAL_DMG = 0.1; // …and its exchange deals/takes damage at this flat factor
 type Mults = Record<Move, number>;
@@ -134,50 +134,70 @@ const ROSTER: Foe[] = ([
 }));
 
 // Beyond the roster, foes are generated. Each archetype (emoji + name) also
-// carries a combat PROFILE that shapes how its stat budget is spread — so a
-// Kong hits like a brute, a Fang darts, a Sentinel walls up. Battle cries and
-// last words are pulled at random from shared pools.
-type Profile = "strong" | "wall" | "swift" | "balanced" | "trickster";
+// carries a combat PROFILE that decides how its stat budget is spread — so a
+// Kong berserks, a Siren darts, a Troll turtles. Roughly 40% are human-faced
+// (undead, fae, merfolk…) for variety. Cries/last words come from shared pools.
+type Profile =
+  | "strong"
+  | "wall"
+  | "swift"
+  | "balanced"
+  | "trickster"
+  | "glass"
+  | "juggernaut"
+  | "berserker"
+  | "skirmisher"
+  | "warlock";
 const ARCHETYPES: { key: string; emoji: string; name: string; profile: Profile }[] = [
-  { key: "wanderer", emoji: "🧟", name: "Wanderer", profile: "wall" },
-  { key: "brute", emoji: "👹", name: "Brute", profile: "strong" },
-  { key: "reaver", emoji: "🤺", name: "Reaver", profile: "swift" },
+  // Human-faced / humanoid
+  { key: "wanderer", emoji: "🧟", name: "Wanderer", profile: "juggernaut" },
+  { key: "ghoul", emoji: "🧟‍♀️", name: "Ghoul", profile: "wall" },
+  { key: "reaver", emoji: "🤺", name: "Reaver", profile: "skirmisher" },
   { key: "warden", emoji: "🧛", name: "Warden", profile: "balanced" },
-  { key: "fiend", emoji: "🦸", name: "Fiend", profile: "trickster" },
-  { key: "marauder", emoji: "👺", name: "Marauder", profile: "strong" },
+  { key: "countess", emoji: "🧛‍♀️", name: "Countess", profile: "trickster" },
   { key: "specter", emoji: "🧝", name: "Specter", profile: "swift" },
-  { key: "troll", emoji: "🧌", name: "Troll", profile: "wall" },
-  { key: "imp", emoji: "👿", name: "Imp", profile: "trickster" },
-  { key: "djinn", emoji: "🧞", name: "Djinn", profile: "trickster" },
+  { key: "sylph", emoji: "🧚", name: "Sylph", profile: "skirmisher" },
+  { key: "djinn", emoji: "🧞", name: "Djinn", profile: "warlock" },
   { key: "tideborn", emoji: "🧜‍♂️", name: "Tideborn", profile: "balanced" },
-  { key: "wyrm", emoji: "🐉", name: "Wyrm", profile: "strong" },
-  { key: "nightwing", emoji: "🦇", name: "Nightwing", profile: "swift" },
-  { key: "weaver", emoji: "🕷️", name: "Weaver", profile: "trickster" },
-  { key: "stinger", emoji: "🦂", name: "Stinger", profile: "swift" },
-  { key: "tusk", emoji: "🐗", name: "Tusk", profile: "strong" },
-  { key: "maw", emoji: "🦈", name: "Maw", profile: "strong" },
-  { key: "fang", emoji: "🐺", name: "Fang", profile: "swift" },
-  { key: "kong", emoji: "🦍", name: "Kong", profile: "strong" },
-  { key: "charger", emoji: "🦏", name: "Charger", profile: "strong" },
-  { key: "snapper", emoji: "🐊", name: "Snapper", profile: "wall" },
+  { key: "siren", emoji: "🧜‍♀️", name: "Siren", profile: "swift" },
+  { key: "troll", emoji: "🧌", name: "Troll", profile: "juggernaut" },
+  { key: "hexen", emoji: "🧙‍♀️", name: "Hexen", profile: "warlock" },
+  { key: "jester", emoji: "🤡", name: "Jester", profile: "trickster" },
+  // Monstrous faces
+  { key: "brute", emoji: "👹", name: "Brute", profile: "strong" },
+  { key: "marauder", emoji: "👺", name: "Marauder", profile: "berserker" },
+  { key: "imp", emoji: "👿", name: "Imp", profile: "glass" },
   { key: "wisp", emoji: "👻", name: "Wisp", profile: "swift" },
   { key: "bonelord", emoji: "💀", name: "Bonelord", profile: "balanced" },
-  { key: "sentinel", emoji: "🤖", name: "Sentinel", profile: "wall" },
-  { key: "invader", emoji: "👾", name: "Invader", profile: "balanced" },
-  { key: "hollow", emoji: "🎃", name: "Hollow", profile: "trickster" },
+  { key: "invader", emoji: "👾", name: "Invader", profile: "trickster" },
+  { key: "sentinel", emoji: "🤖", name: "Sentinel", profile: "juggernaut" },
+  { key: "hollow", emoji: "🎃", name: "Hollow", profile: "glass" },
+  // Beasts
+  { key: "wyrm", emoji: "🐉", name: "Wyrm", profile: "strong" },
+  { key: "nightwing", emoji: "🦇", name: "Nightwing", profile: "skirmisher" },
+  { key: "stinger", emoji: "🦂", name: "Stinger", profile: "berserker" },
+  { key: "maw", emoji: "🦈", name: "Maw", profile: "strong" },
+  { key: "fang", emoji: "🐺", name: "Fang", profile: "swift" },
+  { key: "kong", emoji: "🦍", name: "Kong", profile: "berserker" },
+  { key: "snapper", emoji: "🐊", name: "Snapper", profile: "wall" },
   { key: "rex", emoji: "🦖", name: "Rex", profile: "strong" },
   { key: "kraken", emoji: "🐙", name: "Kraken", profile: "wall" },
 ];
 
 // Each profile is an HP multiplier + how the combat budget (STR/DEF/AGI/DEX)
-// splits. HP and the combat budget are scaled separately from the player so the
-// ~10× HP scale never swamps the small combat stats.
+// splits (weights sum to 1). HP and the combat budget are scaled separately
+// from the player so the ~10× HP scale never swamps the small combat stats.
 const PROFILES: Record<Profile, { hp: number; w: Record<Exclude<StatKey, "hp">, number> }> = {
-  strong: { hp: 1.0, w: { str: 0.55, def: 0.2, agi: 0.2, dex: 0.05 } },
-  wall: { hp: 1.35, w: { str: 0.2, def: 0.55, agi: 0.15, dex: 0.1 } },
-  swift: { hp: 0.85, w: { str: 0.32, def: 0.13, agi: 0.5, dex: 0.05 } },
-  balanced: { hp: 1.05, w: { str: 0.3, def: 0.3, agi: 0.25, dex: 0.15 } },
-  trickster: { hp: 0.9, w: { str: 0.28, def: 0.2, agi: 0.22, dex: 0.3 } },
+  strong: { hp: 1.0, w: { str: 0.55, def: 0.2, agi: 0.2, dex: 0.05 } }, // heavy hitter
+  wall: { hp: 1.35, w: { str: 0.2, def: 0.55, agi: 0.15, dex: 0.1 } }, // defensive
+  swift: { hp: 0.85, w: { str: 0.32, def: 0.13, agi: 0.5, dex: 0.05 } }, // fast, double-strikes
+  balanced: { hp: 1.05, w: { str: 0.3, def: 0.3, agi: 0.25, dex: 0.15 } }, // all-rounder
+  trickster: { hp: 0.9, w: { str: 0.28, def: 0.2, agi: 0.22, dex: 0.3 } }, // dexterous
+  glass: { hp: 0.6, w: { str: 0.62, def: 0.08, agi: 0.25, dex: 0.05 } }, // glass cannon
+  juggernaut: { hp: 1.7, w: { str: 0.22, def: 0.55, agi: 0.13, dex: 0.1 } }, // super tank
+  berserker: { hp: 0.95, w: { str: 0.48, def: 0.1, agi: 0.37, dex: 0.05 } }, // reckless offense
+  skirmisher: { hp: 0.8, w: { str: 0.35, def: 0.12, agi: 0.48, dex: 0.05 } }, // hit-and-run
+  warlock: { hp: 0.85, w: { str: 0.42, def: 0.18, agi: 0.15, dex: 0.25 } }, // caster
 };
 
 const CRIES = [
@@ -243,12 +263,10 @@ const pointsForLevel = (level: number) => 3 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
 
 const ROSTER_SIZE = ROSTER.length;
-// Infinite mode: skip past the whole roster with the stat points those wins
-// would have earned, then measure progress as depth (levels past the roster).
+// Infinite mode: skip past the whole roster with a round war-chest of points to
+// spend up front, then measure progress as depth (levels past the roster).
 const INFINITE_START_LEVEL = ROSTER_SIZE + 1;
-const INFINITE_POINTS = Array.from({ length: ROSTER_SIZE }, (_, i) =>
-  pointsForLevel(i + 2),
-).reduce((a, b) => a + b, 0);
+const INFINITE_POINTS = 50;
 
 // Distinctive look for elites: a bigger, glowing emoji, a colored name, and a
 // tag. Normal foes render at text-7xl with no tag.
@@ -708,9 +726,11 @@ export default function RPS() {
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
   const showingTomb = phase === "death" || phase === "levelup";
-  const foeEmoji = showingTomb ? "🪦" : foe.emoji;
-  // Elite styling — suppressed while the foe is a gravestone.
-  const ts = !showingTomb && foe.tier ? TIER_STYLE[foe.tier] : null;
+  // During the infinite pre-fight, the foe is a mystery until points are spent.
+  const hideFoe = phase === "setup";
+  const foeEmoji = showingTomb ? "🪦" : hideFoe ? "❔" : foe.emoji;
+  // Elite styling — suppressed while a gravestone or hidden.
+  const ts = !showingTomb && !hideFoe && foe.tier ? TIER_STYLE[foe.tier] : null;
   // Localized foe flavor — the stored English literals are the fallbacks.
   const foeName = i18n._(`rps.foe.${foe.key}.name`, undefined, { message: foe.name });
   const foeCry = i18n._(foe.cryId, undefined, { message: foe.cry });
@@ -794,7 +814,9 @@ export default function RPS() {
           <h1 className="text-2xl font-semibold tracking-tight">
             <Trans id="rps.title" message="RPS Saga" />
           </h1>
-          <span className="text-sm font-bold tabular-nums text-amber-300">Lv {level}</span>
+          <span className="text-sm font-bold tabular-nums text-amber-300">
+            {infinite ? `♾️ ${level - INFINITE_START_LEVEL}` : `Lv ${level}`}
+          </span>
         </header>
 
         {/* Foe */}
@@ -825,14 +847,37 @@ export default function RPS() {
               <Trans id={ts.chipId} message={ts.chipMsg} />
             </div>
           )}
-          <div className={`font-semibold ${ts ? ts.name : "text-neutral-200"}`}>{foeName}</div>
+          <div
+            className={`font-semibold ${ts ? ts.name : hideFoe ? "text-neutral-500" : "text-neutral-200"}`}
+          >
+            {hideFoe ? "???" : foeName}
+          </div>
           <div
             key={foeHitting ? `bar-${hit.key}` : "bar"}
             style={foeHitting ? { animation: "rps-shake 380ms ease-out" } : undefined}
           >
-            <HpBar hp={foeHp} max={foe.maxHp} className="bg-rose-500" />
+            {hideFoe ? (
+              <div className="space-y-0.5">
+                <div className="h-2 overflow-hidden rounded-full bg-neutral-800">
+                  <div className="h-full w-full rounded-full bg-neutral-700/50" />
+                </div>
+                <div className="text-right text-[11px] tabular-nums text-neutral-600">???</div>
+              </div>
+            ) : (
+              <HpBar hp={foeHp} max={foe.maxHp} className="bg-rose-500" />
+            )}
           </div>
-          <StatLine stats={foe} />
+          {hideFoe ? (
+            <div className="flex justify-center gap-3 text-[11px] tabular-nums text-neutral-600">
+              {STAT_KEYS.map((k) => (
+                <span key={k}>
+                  <span>{STAT_LABEL[k]}</span> ?
+                </span>
+              ))}
+            </div>
+          ) : (
+            <StatLine stats={foe} />
+          )}
         </section>
 
         {/* Middle — phase content */}

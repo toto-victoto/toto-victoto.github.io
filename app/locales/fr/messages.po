@@ -370,6 +370,24 @@ msgstr "Rex"
 msgid "rps.foe.kraken.name"
 msgstr "Kraken"
 
+msgid "rps.foe.ghoul.name"
+msgstr "Goule"
+
+msgid "rps.foe.countess.name"
+msgstr "Comtesse"
+
+msgid "rps.foe.sylph.name"
+msgstr "Sylphe"
+
+msgid "rps.foe.siren.name"
+msgstr "Sirène"
+
+msgid "rps.foe.hexen.name"
+msgstr "Sorcière"
+
+msgid "rps.foe.jester.name"
+msgstr "Bouffon"
+
 msgid "rps.cry.0"
 msgstr "Tu es fini !"
 
