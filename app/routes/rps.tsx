@@ -229,17 +229,23 @@ const randOf = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 const vary = (base: number, swing: number, min: number) =>
   Math.max(min, Math.round(base * (1 + (Math.random() * 2 - 1) * swing)));
 
-const FOE_RATIO = 1.25; // a normal foe's stat budget vs the current player's
-const FOE_BOSS_RATIO = 2; // a boss foe (every 10th depth past the roster)
+// A generated foe's stat budget relative to the player it'll face. Foes have no
+// DEX slot, so the same budget concentrates harder into STR/DEF/AGI — hence a
+// normal foe sits below the player, a semiboss level, a boss just above.
+const RATIO: Record<"normal" | "semiboss" | "boss", number> = {
+  normal: 0.75,
+  semiboss: 1.0,
+  boss: 1.25,
+};
 
 // A generated foe, scaled to the player who'll fight it: HP and the combat
 // budget (STR+DEF+AGI+DEX) each track the player's ×ratio, spread by the
-// archetype's profile, then jittered per stat by a depth-widening swing.
-function makeFoe(index: number, player: Stats = START): Foe {
+// archetype's profile, then jittered per stat by a depth-widening swing. The
+// elite tier is decided by the caller (see genTier).
+function makeFoe(index: number, player: Stats = START, tier?: "semiboss" | "boss"): Foe {
   if (index < ROSTER.length) return ROSTER[index];
   const depth = index - ROSTER.length; // 0-based depth past the roster
-  const boss = depth > 0 && depth % 10 === 0;
-  const ratio = boss ? FOE_BOSS_RATIO : FOE_RATIO;
+  const ratio = tier ? RATIO[tier] : RATIO.normal;
   const swing = Math.min(0.45, 0.15 + depth * 0.02); // variance grows with depth
   const arch = randOf(ARCHETYPES);
   const { hp: hpMult, w } = PROFILES[arch.profile];
@@ -254,13 +260,23 @@ function makeFoe(index: number, player: Stats = START): Foe {
     cry: CRIES[cryIdx],
     wordsId: `rps.death.${wordIdx}`,
     lastWords: DEATHS[wordIdx],
-    tier: boss ? "boss" : undefined,
+    tier,
     maxHp: vary(ratio * player.maxHp * hpMult, swing, 10),
     str: vary(combat * w.str, swing, 1),
     def: vary(combat * w.def, swing, 0),
     agi: vary(combat * w.agi, swing, 1),
     dex: 0, // DEX is a player-only stat — foes don't use or show it
   };
+}
+
+// Elite cadence for GENERATED foes: a boss every 10th level, plus one semiboss
+// per decade at a level among 6–9. `seed` (per run) varies which one, so it's
+// random run to run but consistent within a run.
+function genTier(level: number, seed: number): "semiboss" | "boss" | undefined {
+  if (level % 10 === 0) return "boss";
+  const decade = Math.floor((level - 1) / 10);
+  const semibossAt = 6 + (((seed ^ (decade * 0x9e3779b9)) >>> 0) % 4);
+  return level - decade * 10 === semibossAt ? "semiboss" : undefined;
 }
 
 const pointsForLevel = (level: number) => 3 + Math.floor(level / 3);
@@ -381,6 +397,7 @@ type GameState = {
   alloc: Record<StatKey, number>;
   mults: Mults;
   anchor: Move | null;
+  seed: number; // per-run seed driving the semiboss cadence (see genTier)
 };
 
 const ZERO_ALLOC: Record<StatKey, number> = { hp: 0, str: 0, def: 0, agi: 0, dex: 0 };
@@ -402,6 +419,7 @@ const initialState: GameState = {
   alloc: ZERO_ALLOC,
   mults: FRESH_MULTS,
   anchor: null,
+  seed: 0,
 };
 
 // Apply an allocation to a stat block. STAT_GAIN is per-point, so the numbers
@@ -415,9 +433,9 @@ const applyAlloc = (p: Stats, a: Record<StatKey, number>): Stats => ({
 });
 
 type Action =
-  | { type: "continue"; save: SavedRun }
-  | { type: "restart"; foe: Foe }
-  | { type: "startInfinite"; foe: Foe }
+  | { type: "continue"; save: SavedRun; seed: number }
+  | { type: "restart"; foe: Foe; seed: number }
+  | { type: "startInfinite"; foe: Foe; seed: number }
   | { type: "introDone" }
   | { type: "pick"; move: Move; foeMove: Move }
   | { type: "countTick" }
@@ -428,7 +446,7 @@ type Action =
   | { type: "finish" }
   | { type: "deathDone" }
   | { type: "addPoint"; stat: StatKey }
-  | { type: "confirmSetup" }
+  | { type: "confirmSetup"; player: Stats; foe: Foe }
   | { type: "confirmLevelUp"; player: Stats; foe: Foe };
 
 // Pure resolution of one exchange, given the played move and the foe's roll.
@@ -505,6 +523,7 @@ function gameReducer(state: GameState, action: Action): GameState {
         foeHp: s.foeHp,
         mults: s.mults,
         anchor: s.anchor,
+        seed: action.seed,
         round: null,
         hit: null,
         healPop: null,
@@ -512,10 +531,11 @@ function gameReducer(state: GameState, action: Action): GameState {
       };
     }
     case "restart":
-      return { ...initialState, mode: "story", foe: action.foe, foeHp: action.foe.maxHp, phase: "intro" };
+      return { ...initialState, mode: "story", foe: action.foe, foeHp: action.foe.maxHp, seed: action.seed, phase: "intro" };
     case "startInfinite":
       // Fight post-roster foes (foeIndex past the roster) but count levels from
-      // 1 like a fresh run, with a war-chest of points to spend up front.
+      // 1 like a fresh run, with a war-chest of points to spend up front. The
+      // placeholder foe is hidden and regenerated (scaled to you) on confirm.
       return {
         ...initialState,
         mode: "infinite",
@@ -524,6 +544,7 @@ function gameReducer(state: GameState, action: Action): GameState {
         foe: action.foe,
         foeHp: action.foe.maxHp,
         points: INFINITE_POINTS,
+        seed: action.seed,
         phase: "setup",
       };
     case "introDone":
@@ -572,11 +593,19 @@ function gameReducer(state: GameState, action: Action): GameState {
       if (spent >= state.points) return state;
       return { ...state, alloc: { ...state.alloc, [action.stat]: state.alloc[action.stat] + 1 } };
     }
-    case "confirmSetup": {
-      // Infinite pre-fight: bank the points, then fight the current foe.
-      const np = applyAlloc(state.player, state.alloc);
-      return { ...state, player: np, hp: np.maxHp, alloc: ZERO_ALLOC, points: 0, phase: "intro" };
-    }
+    case "confirmSetup":
+      // Infinite pre-fight: bank the points, then face a foe scaled to the
+      // just-allocated player (built in the handler, after allocation).
+      return {
+        ...state,
+        player: action.player,
+        hp: action.player.maxHp,
+        foe: action.foe,
+        foeHp: action.foe.maxHp,
+        alloc: ZERO_ALLOC,
+        points: 0,
+        phase: "intro",
+      };
     case "confirmLevelUp":
       // player + next foe (scaled to the allocated player) come from the handler.
       return {
@@ -598,7 +627,7 @@ function gameReducer(state: GameState, action: Action): GameState {
 
 export default function RPS() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
-  const { phase, mode, player, hp, level, foeIndex, foe, foeHp, count, round, hit, healPop, points, alloc, mults, anchor } = state;
+  const { phase, mode, player, hp, level, foeIndex, foe, foeHp, count, round, hit, healPop, points, alloc, mults, anchor, seed } = state;
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
   const { i18n } = useLingui();
@@ -622,19 +651,21 @@ export default function RPS() {
     return () => stopTitleTheme();
   }, [phase]);
 
+  const rollSeed = () => Math.floor(Math.random() * 0x7fffffff);
+
   const continueRun = () => {
-    if (savedRun) dispatch({ type: "continue", save: savedRun });
+    if (savedRun) dispatch({ type: "continue", save: savedRun, seed: savedRun.seed ?? rollSeed() });
   };
 
   // Start a fresh story run; drop the resume snapshot, keep the records.
   const restart = () => {
-    dispatch({ type: "restart", foe: makeFoe(0) });
+    dispatch({ type: "restart", foe: makeFoe(0), seed: rollSeed() });
     setStored((s) => ({ ...s, save: undefined }));
   };
 
   // Jump into infinite mode; drop any story snapshot (records survive).
   const startInfinite = () => {
-    dispatch({ type: "startInfinite", foe: makeFoe(ROSTER_SIZE) });
+    dispatch({ type: "startInfinite", foe: makeFoe(ROSTER_SIZE), seed: rollSeed() });
     setStored((s) => ({ ...s, save: undefined }));
   };
 
@@ -644,7 +675,7 @@ export default function RPS() {
     if (!resumed || phase !== "choose") return;
     setStored((s) => ({
       ...s,
-      save: { mode, player, hp, level, foeIndex, foe, foeHp, mults, anchor },
+      save: { mode, player, hp, level, foeIndex, foe, foeHp, mults, anchor, seed },
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumed, phase]);
@@ -741,11 +772,20 @@ export default function RPS() {
   const spent = STAT_KEYS.reduce((n, k) => n + alloc[k], 0);
   const remaining = points - spent;
   const addPoint = (k: StatKey) => dispatch({ type: "addPoint", stat: k });
-  const confirmSetup = () => dispatch({ type: "confirmSetup" });
-  const confirmLevelUp = () => {
-    // Scale the next foe to the player they'll actually face (post-allocation).
+  // The foe you'll fight is built HERE — after the allocation — so it's always
+  // scaled to the player who faces it, and never before your points are spent.
+  const confirmSetup = () => {
     const np = applyAlloc(player, alloc);
-    dispatch({ type: "confirmLevelUp", player: np, foe: makeFoe(foeIndex + 1, np) });
+    dispatch({ type: "confirmSetup", player: np, foe: makeFoe(foeIndex, np, genTier(level, seed)) });
+  };
+  const confirmLevelUp = () => {
+    const np = applyAlloc(player, alloc);
+    const nextLevel = level + 1;
+    dispatch({
+      type: "confirmLevelUp",
+      player: np,
+      foe: makeFoe(foeIndex + 1, np, genTier(nextLevel, seed)),
+    });
   };
 
   const foeHitting = hit?.target === "foe";

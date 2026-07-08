@@ -48,6 +48,7 @@ export type Persisted = {
       foeHp: number;
       mults: { rock: number; paper: number; scissors: number };
       anchor: "rock" | "paper" | "scissors" | null;
+      seed?: number;
     };
   };
   roulette: { best: number; balance: number; history: number[] };
