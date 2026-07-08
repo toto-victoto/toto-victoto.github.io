@@ -836,6 +836,7 @@ export default function RPS() {
                   onClick={continueRun}
                   className="w-full rounded-full bg-emerald-500 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
                 >
+                  {savedRun.mode === "infinite" && "♾️ "}
                   <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
                   <span className="tabular-nums">Lv {savedRun.level}</span>
                 </button>
@@ -861,7 +862,7 @@ export default function RPS() {
                 ♾️ <Trans id="rps.splash.infinite" message="Infinite" />
                 {(stored.infiniteBest ?? 0) > 0 && (
                   <span className="ml-1 text-fuchsia-400/70 tabular-nums">
-                    · {stored.infiniteBest}
+                    · 🏆 {stored.infiniteBest}
                   </span>
                 )}
               </button>
