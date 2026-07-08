@@ -124,10 +124,10 @@ const ROSTER: Foe[] = ([
   { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 30, str: 5, def: 2, agi: 2, dex: 1 },
   { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 46, str: 7, def: 3, agi: 2, dex: 1 },
   { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 66, str: 9, def: 6, agi: 4, dex: 2 },
-  { key: "enchantress", emoji: "🧝‍♀️", name: "Morgause", cry: "You'll dance to my tune.", lastWords: "The threads… unravel…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
+  { key: "enchantress", emoji: "🧙‍♀️", name: "Morgause", cry: "You'll dance to my tune.", lastWords: "The threads… unravel…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
   { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 108, str: 14, def: 8, agi: 8, dex: 3 },
   { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
-  { key: "valkyrie", emoji: "🦸‍♀️", name: "Valkyra", cry: "The slain are mine.", lastWords: "A worthy… fall…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
+  { key: "valkyrie", emoji: "🧝‍♀️", name: "Valkyra", cry: "The slain are mine.", lastWords: "A worthy… fall…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
   { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
   { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
 ] as Array<Omit<Foe, "cryId" | "wordsId">>).map((f) => ({
