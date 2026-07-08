@@ -19,13 +19,31 @@ export type Persisted = {
   threader: { best: number };
   rps: {
     bestLevel: number;
+    // Best "infinite" run, measured as levels reached past the roster.
+    infiniteBest?: number;
     // In-progress run, snapshotted whenever the player is at the move-choice
-    // screen, so a refresh mid-fight resumes instead of restarting.
+    // screen, so a refresh mid-fight resumes instead of restarting. The foe is
+    // stored whole (its stats/flavor are randomized, so it can't be regenerated).
     save?: {
+      mode: "story" | "infinite";
       player: { maxHp: number; str: number; def: number; agi: number; dex: number };
       hp: number;
       level: number;
       foeIndex: number;
+      foe: {
+        key: string;
+        emoji: string;
+        name: string;
+        cryId: string;
+        cry: string;
+        wordsId: string;
+        lastWords: string;
+        maxHp: number;
+        str: number;
+        def: number;
+        agi: number;
+        dex: number;
+      };
       foeHp: number;
       mults: { rock: number; paper: number; scissors: number };
       anchor: "rock" | "paper" | "scissors" | null;

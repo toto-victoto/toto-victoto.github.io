@@ -277,6 +277,243 @@ msgstr "Hors de ta portée."
 msgid "rps.foe.troll.words"
 msgstr "Glorieux…"
 
+msgid "rps.splash.infinite"
+msgstr "Infini"
+
+msgid "rps.setup.title"
+msgstr "Prépare-toi"
+
+msgid "rps.infinite.reached"
+msgstr "Profondeur {n} atteinte"
+
+msgid "rps.foe.imp.name"
+msgstr "Diablotin"
+
+msgid "rps.foe.djinn.name"
+msgstr "Djinn"
+
+msgid "rps.foe.tideborn.name"
+msgstr "Né-des-Marées"
+
+msgid "rps.foe.wyrm.name"
+msgstr "Guivre"
+
+msgid "rps.foe.nightwing.name"
+msgstr "Aile-Noire"
+
+msgid "rps.foe.weaver.name"
+msgstr "Tisseur"
+
+msgid "rps.foe.stinger.name"
+msgstr "Dardeur"
+
+msgid "rps.foe.tusk.name"
+msgstr "Défense"
+
+msgid "rps.foe.maw.name"
+msgstr "Gueule"
+
+msgid "rps.foe.fang.name"
+msgstr "Croc"
+
+msgid "rps.foe.kong.name"
+msgstr "Kong"
+
+msgid "rps.foe.charger.name"
+msgstr "Fonceur"
+
+msgid "rps.foe.snapper.name"
+msgstr "Happeur"
+
+msgid "rps.foe.wisp.name"
+msgstr "Feu-Follet"
+
+msgid "rps.foe.bonelord.name"
+msgstr "Seigneur d'Os"
+
+msgid "rps.foe.sentinel.name"
+msgstr "Sentinelle"
+
+msgid "rps.foe.invader.name"
+msgstr "Envahisseur"
+
+msgid "rps.foe.hollow.name"
+msgstr "Le Creux"
+
+msgid "rps.foe.rex.name"
+msgstr "Rex"
+
+msgid "rps.foe.kraken.name"
+msgstr "Kraken"
+
+msgid "rps.cry.0"
+msgstr "Tu es fini !"
+
+msgid "rps.cry.1"
+msgstr "Approche."
+
+msgid "rps.cry.2"
+msgstr "Ça se termine maintenant."
+
+msgid "rps.cry.3"
+msgstr "J'ai connu pire."
+
+msgid "rps.cry.4"
+msgstr "Aucune pitié."
+
+msgid "rps.cry.5"
+msgstr "Tu oses ?"
+
+msgid "rps.cry.6"
+msgstr "Rends ton dernier souffle."
+
+msgid "rps.cry.7"
+msgstr "Hors de ta portée."
+
+msgid "rps.cry.8"
+msgstr "Prépare-toi à tomber !"
+
+msgid "rps.cry.9"
+msgstr "Tu vas le regretter."
+
+msgid "rps.cry.10"
+msgstr "Je sens ta peur."
+
+msgid "rps.cry.11"
+msgstr "Nul ne me survit."
+
+msgid "rps.cry.12"
+msgstr "Ta chance s'épuise."
+
+msgid "rps.cry.13"
+msgstr "Plie ou romps."
+
+msgid "rps.cry.14"
+msgstr "Je vais adorer ça."
+
+msgid "rps.cry.15"
+msgstr "Trop lent !"
+
+msgid "rps.cry.16"
+msgstr "Le dernier debout."
+
+msgid "rps.cry.17"
+msgstr "Tu es à moi."
+
+msgid "rps.cry.18"
+msgstr "Défie-moi et saigne."
+
+msgid "rps.cry.19"
+msgstr "J'ai tué mieux que toi."
+
+msgid "rps.cry.20"
+msgstr "Nulle part où fuir."
+
+msgid "rps.cry.21"
+msgstr "Sens ma fureur !"
+
+msgid "rps.cry.22"
+msgstr "Voici ta fin."
+
+msgid "rps.cry.23"
+msgstr "Abandonne donc."
+
+msgid "rps.cry.24"
+msgstr "Je ne perds jamais."
+
+msgid "rps.cry.25"
+msgstr "Dis adieu."
+
+msgid "rps.cry.26"
+msgstr "Tu as mal choisi."
+
+msgid "rps.cry.27"
+msgstr "L'heure est venue de mourir."
+
+msgid "rps.death.0"
+msgstr "Aïe."
+
+msgid "rps.death.1"
+msgstr "C'est tout ?"
+
+msgid "rps.death.2"
+msgstr "Ça valait le coup."
+
+msgid "rps.death.3"
+msgstr "N'en parle à personne."
+
+msgid "rps.death.4"
+msgstr "Zut…"
+
+msgid "rps.death.5"
+msgstr "Ainsi tout s'achève."
+
+msgid "rps.death.6"
+msgstr "Je ne regrette… rien."
+
+msgid "rps.death.7"
+msgstr "Glorieux…"
+
+msgid "rps.death.8"
+msgstr "Impossible…"
+
+msgid "rps.death.9"
+msgstr "Pas comme ça…"
+
+msgid "rps.death.10"
+msgstr "Je reviendrai…"
+
+msgid "rps.death.11"
+msgstr "Mon… mon trésor…"
+
+msgid "rps.death.12"
+msgstr "Maman avait raison…"
+
+msgid "rps.death.13"
+msgstr "J'aurais dû fuir…"
+
+msgid "rps.death.14"
+msgstr "On m'a triché…"
+
+msgid "rps.death.15"
+msgstr "Si froid…"
+
+msgid "rps.death.16"
+msgstr "Souviens-toi de moi…"
+
+msgid "rps.death.17"
+msgstr "C'était… amusant…"
+
+msgid "rps.death.18"
+msgstr "C'est pas juste…"
+
+msgid "rps.death.19"
+msgstr "Vaincu… par toi…"
+
+msgid "rps.death.20"
+msgstr "La fin… déjà ?"
+
+msgid "rps.death.21"
+msgstr "Je me rends…"
+
+msgid "rps.death.22"
+msgstr "Sois maudit…"
+
+msgid "rps.death.23"
+msgstr "Ténèbres…"
+
+msgid "rps.death.24"
+msgstr "Bien joué…"
+
+msgid "rps.death.25"
+msgstr "Argh… enfin…"
+
+msgid "rps.death.26"
+msgstr "Raconte mon histoire…"
+
+msgid "rps.death.27"
+msgstr "Enfin… le repos…"
+
 msgid "snake.title"
 msgstr "Serpent"
 

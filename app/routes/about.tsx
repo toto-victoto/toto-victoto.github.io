@@ -17,13 +17,16 @@ export function meta({}: Route.MetaArgs) {
 // Headline stat per game, read straight from saved state (client-only).
 function readRecords(): Record<string, string> {
   const u = peekGame("ultimate")?.scores;
+  const rps = peekGame("rps");
   return {
     snake: String(peekGame("snake")?.best ?? 0),
     flappy: String(peekGame("flappy")?.best ?? 0),
     threader: String(peekGame("threader")?.best ?? 0),
     trias: String(peekGame("trias")?.best ?? 0),
     roulette: String(peekGame("roulette")?.best ?? 0),
-    rps: `Lv ${peekGame("rps")?.bestLevel ?? 0}`,
+    rps: rps?.infiniteBest
+      ? `Lv ${rps.bestLevel ?? 0} · ♾️${rps.infiniteBest}`
+      : `Lv ${rps?.bestLevel ?? 0}`,
     ultimate: `${u?.X ?? 0} · ${u?.O ?? 0} · ${u?.draws ?? 0}`,
   };
 }

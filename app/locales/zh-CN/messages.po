@@ -277,6 +277,243 @@ msgstr "你够不着。"
 msgid "rps.foe.troll.words"
 msgstr "壮哉……"
 
+msgid "rps.splash.infinite"
+msgstr "无限"
+
+msgid "rps.setup.title"
+msgstr "备战"
+
+msgid "rps.infinite.reached"
+msgstr "到达深度 {n}"
+
+msgid "rps.foe.imp.name"
+msgstr "小恶魔"
+
+msgid "rps.foe.djinn.name"
+msgstr "精灵"
+
+msgid "rps.foe.tideborn.name"
+msgstr "潮生者"
+
+msgid "rps.foe.wyrm.name"
+msgstr "巨龙"
+
+msgid "rps.foe.nightwing.name"
+msgstr "夜翼"
+
+msgid "rps.foe.weaver.name"
+msgstr "织网者"
+
+msgid "rps.foe.stinger.name"
+msgstr "蜇刺"
+
+msgid "rps.foe.tusk.name"
+msgstr "獠牙"
+
+msgid "rps.foe.maw.name"
+msgstr "巨口"
+
+msgid "rps.foe.fang.name"
+msgstr "尖牙"
+
+msgid "rps.foe.kong.name"
+msgstr "金刚"
+
+msgid "rps.foe.charger.name"
+msgstr "冲锋兽"
+
+msgid "rps.foe.snapper.name"
+msgstr "咬颚"
+
+msgid "rps.foe.wisp.name"
+msgstr "鬼火"
+
+msgid "rps.foe.bonelord.name"
+msgstr "骨王"
+
+msgid "rps.foe.sentinel.name"
+msgstr "哨戒机"
+
+msgid "rps.foe.invader.name"
+msgstr "入侵者"
+
+msgid "rps.foe.hollow.name"
+msgstr "空心"
+
+msgid "rps.foe.rex.name"
+msgstr "暴龙"
+
+msgid "rps.foe.kraken.name"
+msgstr "海妖"
+
+msgid "rps.cry.0"
+msgstr "你完蛋了！"
+
+msgid "rps.cry.1"
+msgstr "过来吧。"
+
+msgid "rps.cry.2"
+msgstr "现在就结束。"
+
+msgid "rps.cry.3"
+msgstr "我见过更糟的。"
+
+msgid "rps.cry.4"
+msgstr "绝不留情。"
+
+msgid "rps.cry.5"
+msgstr "你敢？"
+
+msgid "rps.cry.6"
+msgstr "咽下最后一口气吧。"
+
+msgid "rps.cry.7"
+msgstr "你够不着。"
+
+msgid "rps.cry.8"
+msgstr "准备倒下吧！"
+
+msgid "rps.cry.9"
+msgstr "你会后悔的。"
+
+msgid "rps.cry.10"
+msgstr "我闻到了恐惧。"
+
+msgid "rps.cry.11"
+msgstr "没人能在我手下活命。"
+
+msgid "rps.cry.12"
+msgstr "你的运气到头了。"
+
+msgid "rps.cry.13"
+msgstr "臣服或者粉身碎骨。"
+
+msgid "rps.cry.14"
+msgstr "我会好好享受的。"
+
+msgid "rps.cry.15"
+msgstr "太慢了！"
+
+msgid "rps.cry.16"
+msgstr "笑到最后的人。"
+
+msgid "rps.cry.17"
+msgstr "你是我的了。"
+
+msgid "rps.cry.18"
+msgstr "惹我者流血。"
+
+msgid "rps.cry.19"
+msgstr "我杀过比你强的。"
+
+msgid "rps.cry.20"
+msgstr "无处可逃。"
+
+msgid "rps.cry.21"
+msgstr "感受我的怒火！"
+
+msgid "rps.cry.22"
+msgstr "这就是你的终点。"
+
+msgid "rps.cry.23"
+msgstr "认输吧。"
+
+msgid "rps.cry.24"
+msgstr "我从不落败。"
+
+msgid "rps.cry.25"
+msgstr "说再见吧。"
+
+msgid "rps.cry.26"
+msgstr "你选错了对手。"
+
+msgid "rps.cry.27"
+msgstr "受死吧。"
+
+msgid "rps.death.0"
+msgstr "哎哟。"
+
+msgid "rps.death.1"
+msgstr "就这？"
+
+msgid "rps.death.2"
+msgstr "值了。"
+
+msgid "rps.death.3"
+msgstr "别告诉任何人。"
+
+msgid "rps.death.4"
+msgstr "可恶……"
+
+msgid "rps.death.5"
+msgstr "就这样结束了。"
+
+msgid "rps.death.6"
+msgstr "我……毫不后悔。"
+
+msgid "rps.death.7"
+msgstr "壮哉……"
+
+msgid "rps.death.8"
+msgstr "不可能……"
+
+msgid "rps.death.9"
+msgstr "不该是这样……"
+
+msgid "rps.death.10"
+msgstr "我会回来的……"
+
+msgid "rps.death.11"
+msgstr "我的……我的宝藏……"
+
+msgid "rps.death.12"
+msgstr "妈妈说得对……"
+
+msgid "rps.death.13"
+msgstr "早该逃的……"
+
+msgid "rps.death.14"
+msgstr "有诈……"
+
+msgid "rps.death.15"
+msgstr "好冷……"
+
+msgid "rps.death.16"
+msgstr "记住我……"
+
+msgid "rps.death.17"
+msgstr "挺……有趣的……"
+
+msgid "rps.death.18"
+msgstr "不公平……"
+
+msgid "rps.death.19"
+msgstr "竟败……在你手里……"
+
+msgid "rps.death.20"
+msgstr "这就……结束了？"
+
+msgid "rps.death.21"
+msgstr "我认输……"
+
+msgid "rps.death.22"
+msgstr "诅咒你……"
+
+msgid "rps.death.23"
+msgstr "黑暗……"
+
+msgid "rps.death.24"
+msgstr "打得好……"
+
+msgid "rps.death.25"
+msgstr "唔……终于……"
+
+msgid "rps.death.26"
+msgstr "讲述我的故事……"
+
+msgid "rps.death.27"
+msgstr "终于……可以安息了……"
+
 msgid "snake.title"
 msgstr "贪吃蛇"
 

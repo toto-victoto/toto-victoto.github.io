@@ -4,7 +4,7 @@ import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
 import { peekGame, useStoredGame, type Persisted } from "../storage";
-import { sfx } from "../sound";
+import { sfx, startTitleTheme, stopTitleTheme } from "../sound";
 
 // An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
 // strategy is PER-MOVE stakes: each move carries its own multiplier that scales
@@ -42,9 +42,18 @@ const emojiOf = (m: Move) => MOVES.find((x) => x.id === m)!.emoji;
 const MARKER: Record<Move, string> = { rock: "💥", paper: "👋", scissors: "✂️" };
 
 type Stats = { maxHp: number; str: number; def: number; agi: number; dex: number };
-// `key` slugs the foe for its i18n ids (rps.foe.<key>.name/.cry/.words); the
-// name/cry/lastWords literals are the English fallbacks.
-type Foe = Stats & { key: string; emoji: string; name: string; cry: string; lastWords: string };
+// `key` slugs the foe's name id (rps.foe.<key>.name). The battle cry and last
+// words are drawn from shared pools (roster bosses keep their signature lines),
+// so each carries its own i18n id + English fallback.
+type Foe = Stats & {
+  key: string;
+  emoji: string;
+  name: string;
+  cryId: string;
+  cry: string;
+  wordsId: string;
+  lastWords: string;
+};
 type StatKey = "hp" | "str" | "def" | "agi" | "dex";
 
 const STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi", "dex"];
@@ -70,7 +79,9 @@ const STAT_HELP_ID: Record<StatKey, string> = {
   agi: "rps.stat.agi",
   dex: "rps.stat.dex",
 };
-const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 2, def: 2, agi: 1, dex: 1 };
+// Applied gain per allocated point — shown on the level-up screen AND used to
+// apply the allocation, so the two can't drift apart.
+const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 1, def: 1, agi: 1, dex: 1 };
 
 // Numbers run on a ~10× scale: a level-1 hero has 100 HP and lands ~10 base
 // damage, so a turtled ×0.1 hit chips 1 and an escalated one bites deep.
@@ -99,6 +110,8 @@ const applyFactors = (m: Mults, anchor: Move, dex: number): Mults => {
   return next;
 };
 
+// The named story bosses (fixed order, hand-tuned stats, signature cry/words).
+// cryId/wordsId point at each boss's own catalog entry.
 const ROSTER: Foe[] = [
   { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
   { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 31, str: 5, def: 2, agi: 2, dex: 1 },
@@ -108,52 +121,100 @@ const ROSTER: Foe[] = [
   { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 111, str: 15, def: 10, agi: 5, dex: 3 },
   { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 142, str: 20, def: 13, agi: 6, dex: 3 },
   { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 189, str: 27, def: 17, agi: 9, dex: 4 },
+].map((f) => ({ ...f, cryId: `rps.foe.${f.key}.cry`, wordsId: `rps.foe.${f.key}.words` }));
+
+// Beyond the roster, foes are generated: a random archetype (emoji + name) with
+// a battle cry and last words pulled at random from shared pools.
+const ARCHETYPES: { key: string; emoji: string; name: string }[] = [
+  { key: "wanderer", emoji: "🧟", name: "Wanderer" },
+  { key: "brute", emoji: "👹", name: "Brute" },
+  { key: "reaver", emoji: "🤺", name: "Reaver" },
+  { key: "warden", emoji: "🧛", name: "Warden" },
+  { key: "fiend", emoji: "🦸", name: "Fiend" },
+  { key: "marauder", emoji: "👺", name: "Marauder" },
+  { key: "specter", emoji: "🧝", name: "Specter" },
+  { key: "troll", emoji: "🧌", name: "Troll" },
+  { key: "imp", emoji: "👿", name: "Imp" },
+  { key: "djinn", emoji: "🧞", name: "Djinn" },
+  { key: "tideborn", emoji: "🧜‍♂️", name: "Tideborn" },
+  { key: "wyrm", emoji: "🐉", name: "Wyrm" },
+  { key: "nightwing", emoji: "🦇", name: "Nightwing" },
+  { key: "weaver", emoji: "🕷️", name: "Weaver" },
+  { key: "stinger", emoji: "🦂", name: "Stinger" },
+  { key: "tusk", emoji: "🐗", name: "Tusk" },
+  { key: "maw", emoji: "🦈", name: "Maw" },
+  { key: "fang", emoji: "🐺", name: "Fang" },
+  { key: "kong", emoji: "🦍", name: "Kong" },
+  { key: "charger", emoji: "🦏", name: "Charger" },
+  { key: "snapper", emoji: "🐊", name: "Snapper" },
+  { key: "wisp", emoji: "👻", name: "Wisp" },
+  { key: "bonelord", emoji: "💀", name: "Bonelord" },
+  { key: "sentinel", emoji: "🤖", name: "Sentinel" },
+  { key: "invader", emoji: "👾", name: "Invader" },
+  { key: "hollow", emoji: "🎃", name: "Hollow" },
+  { key: "rex", emoji: "🦖", name: "Rex" },
+  { key: "kraken", emoji: "🐙", name: "Kraken" },
 ];
 
-const EXTRA_EMOJI = ["🧟", "👹", "🤺", "🧛", "🦸", "👺", "🧝", "🧌"];
-const EXTRA_KEY = ["wanderer", "brute", "reaver", "warden", "fiend", "marauder", "specter", "troll"];
-const EXTRA_NAME = ["Wanderer", "Brute", "Reaver", "Warden", "Fiend", "Marauder", "Specter", "Troll"];
-const EXTRA_CRY = [
-  "You're finished!",
-  "Come closer.",
-  "This ends now.",
-  "I've faced worse.",
-  "No mercy.",
-  "You dare?",
-  "Breathe your last.",
-  "Beyond your reach.",
+const CRIES = [
+  "You're finished!", "Come closer.", "This ends now.", "I've faced worse.",
+  "No mercy.", "You dare?", "Breathe your last.", "Beyond your reach.",
+  "Prepare to fall!", "You'll regret this.", "I smell fear.", "None survive me.",
+  "Your luck runs out.", "Bow or break.", "I'll enjoy this.", "Too slow!",
+  "Last one standing.", "You're mine now.", "Cross me and bleed.", "I've killed better.",
+  "Nowhere to run.", "Feel my wrath!", "This is your end.", "Give up already.",
+  "I never lose.", "Say goodbye.", "You picked wrong.", "Time to die.",
 ];
-const EXTRA_LASTWORDS = [
-  "Ow.",
-  "That's it?",
-  "Worth it.",
-  "Tell no one.",
-  "Rats…",
-  "So it ends.",
-  "I regret… nothing.",
-  "Glorious…",
+
+const DEATHS = [
+  "Ow.", "That's it?", "Worth it.", "Tell no one.",
+  "Rats…", "So it ends.", "I regret… nothing.", "Glorious…",
+  "Impossible…", "Not like this…", "I'll be back…", "My… my treasure…",
+  "Mother was right…", "Should've run…", "Cheated…", "So cold…",
+  "Remember me…", "It was… fun…", "No fair…", "Beaten… by you…",
+  "The end… already?", "I yield…", "Curse you…", "Darkness…",
+  "Well played…", "Ugh… finally…", "Tell my tale…", "At last… rest…",
 ];
+
+const randOf = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+// Random ± swing around a base, widening a little with the run's depth.
+const vary = (base: number, swing: number, min: number) =>
+  Math.max(min, Math.round(base * (1 + (Math.random() * 2 - 1) * swing)));
 
 function makeFoe(index: number): Foe {
   if (index < ROSTER.length) return ROSTER[index];
-  const t = index - ROSTER.length;
-  const i = t % EXTRA_EMOJI.length;
+  const t = index - ROSTER.length; // 0-based depth past the roster
+  const arch = randOf(ARCHETYPES);
+  const cryIdx = Math.floor(Math.random() * CRIES.length);
+  const wordIdx = Math.floor(Math.random() * DEATHS.length);
+  const swing = Math.min(0.45, 0.15 + t * 0.02); // stat variance grows with depth
   return {
-    key: EXTRA_KEY[i],
-    emoji: EXTRA_EMOJI[i],
-    name: EXTRA_NAME[i],
-    cry: EXTRA_CRY[i],
-    lastWords: EXTRA_LASTWORDS[i],
-    maxHp: 200 + t * 36,
-    str: 28 + t * 3,
-    def: 18 + t * 2,
-    agi: 10 + t,
-    dex: 4 + Math.floor(t / 2),
+    key: arch.key,
+    emoji: arch.emoji,
+    name: arch.name,
+    cryId: `rps.cry.${cryIdx}`,
+    cry: CRIES[cryIdx],
+    wordsId: `rps.death.${wordIdx}`,
+    lastWords: DEATHS[wordIdx],
+    maxHp: vary(200 + t * 36, swing, 10),
+    str: vary(28 + t * 3, swing, 1),
+    def: vary(18 + t * 2, swing, 0),
+    agi: vary(10 + t, swing, 1),
+    dex: vary(4 + Math.floor(t / 2), swing, 0),
   };
 }
 
 const pointsForLevel = (level: number) => 3 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
+
+const ROSTER_SIZE = ROSTER.length;
+// Infinite mode: skip straight to the first post-roster foe (level 9) with the
+// stat points 8 wins would have earned, then measure progress as levels past
+// the roster.
+const INFINITE_START_LEVEL = ROSTER_SIZE + 1;
+const INFINITE_POINTS = Array.from({ length: ROSTER_SIZE }, (_, i) =>
+  pointsForLevel(i + 2),
+).reduce((a, b) => a + b, 0);
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -168,6 +229,7 @@ export function meta({}: Route.MetaArgs) {
 
 type Phase =
   | "splash"
+  | "setup" // infinite-mode pre-fight point allocation
   | "intro"
   | "choose"
   | "count"
@@ -176,6 +238,7 @@ type Phase =
   | "death"
   | "levelup"
   | "gameover";
+type Mode = "story" | "infinite";
 // The snapshot persisted at the move-choice screen (see storage's Persisted.rps).
 type SavedRun = NonNullable<Persisted["rps"]["save"]>;
 type Round = {
@@ -204,6 +267,7 @@ type Hit = { key: number; dmg: number; target: "foe" | "you"; move: Move };
 // *dispatch* here; the reducer itself is pure.
 type GameState = {
   phase: Phase;
+  mode: Mode;
   player: Stats;
   hp: number;
   level: number;
@@ -224,6 +288,7 @@ const ZERO_ALLOC: Record<StatKey, number> = { hp: 0, str: 0, def: 0, agi: 0, dex
 
 const initialState: GameState = {
   phase: "splash",
+  mode: "story",
   player: START,
   hp: START.maxHp,
   level: 1,
@@ -240,9 +305,20 @@ const initialState: GameState = {
   anchor: null,
 };
 
+// Apply an allocation to a stat block. STAT_GAIN is per-point, so the numbers
+// shown while allocating (alloc × STAT_GAIN) match exactly what lands here.
+const applyAlloc = (p: Stats, a: Record<StatKey, number>): Stats => ({
+  maxHp: p.maxHp + a.hp * STAT_GAIN.hp,
+  str: p.str + a.str * STAT_GAIN.str,
+  def: p.def + a.def * STAT_GAIN.def,
+  agi: p.agi + a.agi * STAT_GAIN.agi,
+  dex: p.dex + a.dex * STAT_GAIN.dex,
+});
+
 type Action =
   | { type: "continue"; save: SavedRun }
-  | { type: "restart" }
+  | { type: "restart"; foe: Foe }
+  | { type: "startInfinite"; foe: Foe }
   | { type: "introDone" }
   | { type: "pick"; move: Move; foeMove: Move }
   | { type: "countTick" }
@@ -253,7 +329,8 @@ type Action =
   | { type: "finish" }
   | { type: "deathDone" }
   | { type: "addPoint"; stat: StatKey }
-  | { type: "confirmLevelUp" };
+  | { type: "confirmSetup" }
+  | { type: "confirmLevelUp"; foe: Foe };
 
 // Pure resolution of one exchange, given the played move and the foe's roll.
 // The played move's carried multiplier scales the damage (or, when negative,
@@ -318,11 +395,12 @@ function gameReducer(state: GameState, action: Action): GameState {
       const s = action.save;
       return {
         ...state,
+        mode: s.mode,
         player: s.player,
         hp: s.hp,
         level: s.level,
         foeIndex: s.foeIndex,
-        foe: makeFoe(s.foeIndex),
+        foe: s.foe,
         foeHp: s.foeHp,
         mults: s.mults,
         anchor: s.anchor,
@@ -333,7 +411,19 @@ function gameReducer(state: GameState, action: Action): GameState {
       };
     }
     case "restart":
-      return { ...initialState, foe: makeFoe(0), foeHp: makeFoe(0).maxHp, phase: "intro" };
+      return { ...initialState, mode: "story", foe: action.foe, foeHp: action.foe.maxHp, phase: "intro" };
+    case "startInfinite":
+      // Jump past the roster with a war-chest of points to spend up front.
+      return {
+        ...initialState,
+        mode: "infinite",
+        level: INFINITE_START_LEVEL,
+        foeIndex: ROSTER_SIZE,
+        foe: action.foe,
+        foeHp: action.foe.maxHp,
+        points: INFINITE_POINTS,
+        phase: "setup",
+      };
     case "introDone":
       return { ...state, phase: "choose" };
     case "pick":
@@ -380,24 +470,20 @@ function gameReducer(state: GameState, action: Action): GameState {
       if (spent >= state.points) return state;
       return { ...state, alloc: { ...state.alloc, [action.stat]: state.alloc[action.stat] + 1 } };
     }
+    case "confirmSetup": {
+      // Infinite pre-fight: bank the points, then fight the current foe.
+      const np = applyAlloc(state.player, state.alloc);
+      return { ...state, player: np, hp: np.maxHp, alloc: ZERO_ALLOC, points: 0, phase: "intro" };
+    }
     case "confirmLevelUp": {
-      const a = state.alloc;
-      const np: Stats = {
-        maxHp: state.player.maxHp + a.hp * STAT_GAIN.hp,
-        str: state.player.str + a.str,
-        def: state.player.def + a.def,
-        agi: state.player.agi + a.agi,
-        dex: state.player.dex + a.dex,
-      };
-      const next = state.foeIndex + 1;
-      const nf = makeFoe(next);
+      const np = applyAlloc(state.player, state.alloc);
       return {
         ...state,
         player: np,
         hp: np.maxHp,
-        foeIndex: next,
-        foe: nf,
-        foeHp: nf.maxHp,
+        foeIndex: state.foeIndex + 1,
+        foe: action.foe,
+        foeHp: action.foe.maxHp,
         mults: FRESH_MULTS,
         anchor: null,
         alloc: ZERO_ALLOC,
@@ -411,7 +497,7 @@ function gameReducer(state: GameState, action: Action): GameState {
 
 export default function RPS() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
-  const { phase, player, hp, level, foeIndex, foe, foeHp, count, round, hit, healPop, points, alloc, mults, anchor } = state;
+  const { phase, mode, player, hp, level, foeIndex, foe, foeHp, count, round, hit, healPop, points, alloc, mults, anchor } = state;
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
   const { i18n } = useLingui();
@@ -428,14 +514,27 @@ export default function RPS() {
     setResumed(true);
   }, []);
 
+  // The looping title jingle plays while the splash is up.
+  useEffect(() => {
+    if (phase !== "splash") return;
+    startTitleTheme();
+    return () => stopTitleTheme();
+  }, [phase]);
+
   const continueRun = () => {
     if (savedRun) dispatch({ type: "continue", save: savedRun });
   };
 
-  // Start a fresh run and drop any resume snapshot (the record survives).
+  // Start a fresh story run; drop the resume snapshot, keep the records.
   const restart = () => {
-    dispatch({ type: "restart" });
-    setStored((s) => ({ bestLevel: s.bestLevel }));
+    dispatch({ type: "restart", foe: makeFoe(0) });
+    setStored((s) => ({ ...s, save: undefined }));
+  };
+
+  // Jump into infinite mode: seed the record (min 1), drop any story snapshot.
+  const startInfinite = () => {
+    dispatch({ type: "startInfinite", foe: makeFoe(ROSTER_SIZE) });
+    setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, 1), save: undefined }));
   };
 
   // Snapshot the run every time we land on the move-choice screen — the one
@@ -444,20 +543,22 @@ export default function RPS() {
     if (!resumed || phase !== "choose") return;
     setStored((s) => ({
       ...s,
-      save: { player, hp, level, foeIndex, foeHp, mults, anchor },
+      save: { mode, player, hp, level, foeIndex, foe, foeHp, mults, anchor },
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumed, phase]);
 
-  // Persist + sfx on the run's turning points: a kill records the best level,
-  // a defeat drops the resume snapshot.
+  // Persist + sfx on the run's turning points: a kill records the best result
+  // (per mode), a defeat drops the resume snapshot but keeps the records.
   useEffect(() => {
     if (phase === "death") {
       sfx.win();
-      setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level) }));
+      if (mode === "infinite")
+        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level - ROSTER_SIZE) }));
+      else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level) }));
     } else if (phase === "gameover") {
       sfx.lose();
-      setStored((s) => ({ bestLevel: s.bestLevel }));
+      setStored((s) => ({ ...s, save: undefined }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -537,7 +638,8 @@ export default function RPS() {
   const spent = STAT_KEYS.reduce((n, k) => n + alloc[k], 0);
   const remaining = points - spent;
   const addPoint = (k: StatKey) => dispatch({ type: "addPoint", stat: k });
-  const confirmLevelUp = () => dispatch({ type: "confirmLevelUp" });
+  const confirmSetup = () => dispatch({ type: "confirmSetup" });
+  const confirmLevelUp = () => dispatch({ type: "confirmLevelUp", foe: makeFoe(foeIndex + 1) });
 
   const foeHitting = hit?.target === "foe";
   const youHit = hit?.target === "you";
@@ -545,8 +647,12 @@ export default function RPS() {
   const foeEmoji = phase === "death" || phase === "levelup" ? "🪦" : foe.emoji;
   // Localized foe flavor — the stored English literals are the fallbacks.
   const foeName = i18n._(`rps.foe.${foe.key}.name`, undefined, { message: foe.name });
-  const foeCry = i18n._(`rps.foe.${foe.key}.cry`, undefined, { message: foe.cry });
-  const foeWords = i18n._(`rps.foe.${foe.key}.words`, undefined, { message: foe.lastWords });
+  const foeCry = i18n._(foe.cryId, undefined, { message: foe.cry });
+  const foeWords = i18n._(foe.wordsId, undefined, { message: foe.lastWords });
+
+  // Infinite runs measure progress as levels past the roster.
+  const infinite = mode === "infinite";
+  const record = infinite ? stored.infiniteBest ?? 0 : stored.bestLevel;
 
   // Title screen — shown on load, before any fight. Offers Continue (when a
   // run was interrupted) and Start / Restart.
@@ -591,6 +697,17 @@ export default function RPS() {
                   <Trans id="rps.splash.restart" message="Restart" />
                 ) : (
                   <Trans id="rps.splash.start" message="Start" />
+                )}
+              </button>
+              <button
+                onClick={startInfinite}
+                className="w-full rounded-full bg-neutral-800 py-3 font-semibold text-fuchsia-300 ring-1 ring-fuchsia-500/40 transition hover:bg-neutral-700 active:scale-95"
+              >
+                ♾️ <Trans id="rps.splash.infinite" message="Infinite" />
+                {(stored.infiniteBest ?? 0) > 0 && (
+                  <span className="ml-1 text-fuchsia-400/70 tabular-nums">
+                    · {stored.infiniteBest}
+                  </span>
                 )}
               </button>
             </div>
@@ -717,11 +834,15 @@ export default function RPS() {
             </div>
           )}
 
-          {phase === "levelup" && (
+          {(phase === "levelup" || phase === "setup") && (
             <div className="w-full max-w-xs space-y-3">
               <div className="text-center">
                 <p className="text-xl font-bold text-amber-300">
-                  <Trans id="rps.rpg.levelup" message="Level up!" />
+                  {phase === "setup" ? (
+                    <Trans id="rps.setup.title" message="Gear up" />
+                  ) : (
+                    <Trans id="rps.rpg.levelup" message="Level up!" />
+                  )}
                 </p>
                 <p className="text-sm text-neutral-400">
                   <Trans id="rps.rpg.spend" message="Spend your points" /> ·{" "}
@@ -749,11 +870,15 @@ export default function RPS() {
                 ))}
               </div>
               <button
-                onClick={confirmLevelUp}
+                onClick={phase === "setup" ? confirmSetup : confirmLevelUp}
                 disabled={remaining > 0}
                 className="w-full rounded-full bg-emerald-500 py-2.5 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95 disabled:opacity-40"
               >
-                <Trans id="rps.rpg.continue" message="Continue" />
+                {phase === "setup" ? (
+                  <Trans id="rps.rpg.fight" message="Fight!" />
+                ) : (
+                  <Trans id="rps.rpg.continue" message="Continue" />
+                )}
               </button>
             </div>
           )}
@@ -764,17 +889,22 @@ export default function RPS() {
                 <Trans id="rps.rpg.defeated" message="You were defeated" />
               </p>
               <p className="text-sm text-neutral-400">
-                <Trans
-                  id="rps.rpg.reached"
-                  message="Reached level {level}"
-                  values={{ level }}
-                />
+                {infinite ? (
+                  <Trans
+                    id="rps.infinite.reached"
+                    message="Reached depth {n}"
+                    values={{ n: level - ROSTER_SIZE }}
+                  />
+                ) : (
+                  <Trans id="rps.rpg.reached" message="Reached level {level}" values={{ level }} />
+                )}
               </p>
               <p className="text-sm font-semibold text-amber-300">
-                <Trans id="common.best" message="Best" /> · Lv {stored.bestLevel}
+                <Trans id="common.best" message="Best" /> · {infinite ? null : "Lv "}
+                <span className="tabular-nums">{record}</span>
               </p>
               <button
-                onClick={restart}
+                onClick={infinite ? startInfinite : restart}
                 className="rounded-full bg-sky-500 px-8 py-3 font-semibold text-neutral-950 transition hover:bg-sky-400 active:scale-95"
               >
                 <Trans id="rps.rpg.tryagain" message="Try again" />

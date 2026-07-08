@@ -277,6 +277,243 @@ msgstr "Beyond your reach."
 msgid "rps.foe.troll.words"
 msgstr "Glorious…"
 
+msgid "rps.splash.infinite"
+msgstr "Infinite"
+
+msgid "rps.setup.title"
+msgstr "Gear up"
+
+msgid "rps.infinite.reached"
+msgstr "Reached depth {n}"
+
+msgid "rps.foe.imp.name"
+msgstr "Imp"
+
+msgid "rps.foe.djinn.name"
+msgstr "Djinn"
+
+msgid "rps.foe.tideborn.name"
+msgstr "Tideborn"
+
+msgid "rps.foe.wyrm.name"
+msgstr "Wyrm"
+
+msgid "rps.foe.nightwing.name"
+msgstr "Nightwing"
+
+msgid "rps.foe.weaver.name"
+msgstr "Weaver"
+
+msgid "rps.foe.stinger.name"
+msgstr "Stinger"
+
+msgid "rps.foe.tusk.name"
+msgstr "Tusk"
+
+msgid "rps.foe.maw.name"
+msgstr "Maw"
+
+msgid "rps.foe.fang.name"
+msgstr "Fang"
+
+msgid "rps.foe.kong.name"
+msgstr "Kong"
+
+msgid "rps.foe.charger.name"
+msgstr "Charger"
+
+msgid "rps.foe.snapper.name"
+msgstr "Snapper"
+
+msgid "rps.foe.wisp.name"
+msgstr "Wisp"
+
+msgid "rps.foe.bonelord.name"
+msgstr "Bonelord"
+
+msgid "rps.foe.sentinel.name"
+msgstr "Sentinel"
+
+msgid "rps.foe.invader.name"
+msgstr "Invader"
+
+msgid "rps.foe.hollow.name"
+msgstr "Hollow"
+
+msgid "rps.foe.rex.name"
+msgstr "Rex"
+
+msgid "rps.foe.kraken.name"
+msgstr "Kraken"
+
+msgid "rps.cry.0"
+msgstr "You're finished!"
+
+msgid "rps.cry.1"
+msgstr "Come closer."
+
+msgid "rps.cry.2"
+msgstr "This ends now."
+
+msgid "rps.cry.3"
+msgstr "I've faced worse."
+
+msgid "rps.cry.4"
+msgstr "No mercy."
+
+msgid "rps.cry.5"
+msgstr "You dare?"
+
+msgid "rps.cry.6"
+msgstr "Breathe your last."
+
+msgid "rps.cry.7"
+msgstr "Beyond your reach."
+
+msgid "rps.cry.8"
+msgstr "Prepare to fall!"
+
+msgid "rps.cry.9"
+msgstr "You'll regret this."
+
+msgid "rps.cry.10"
+msgstr "I smell fear."
+
+msgid "rps.cry.11"
+msgstr "None survive me."
+
+msgid "rps.cry.12"
+msgstr "Your luck runs out."
+
+msgid "rps.cry.13"
+msgstr "Bow or break."
+
+msgid "rps.cry.14"
+msgstr "I'll enjoy this."
+
+msgid "rps.cry.15"
+msgstr "Too slow!"
+
+msgid "rps.cry.16"
+msgstr "Last one standing."
+
+msgid "rps.cry.17"
+msgstr "You're mine now."
+
+msgid "rps.cry.18"
+msgstr "Cross me and bleed."
+
+msgid "rps.cry.19"
+msgstr "I've killed better."
+
+msgid "rps.cry.20"
+msgstr "Nowhere to run."
+
+msgid "rps.cry.21"
+msgstr "Feel my wrath!"
+
+msgid "rps.cry.22"
+msgstr "This is your end."
+
+msgid "rps.cry.23"
+msgstr "Give up already."
+
+msgid "rps.cry.24"
+msgstr "I never lose."
+
+msgid "rps.cry.25"
+msgstr "Say goodbye."
+
+msgid "rps.cry.26"
+msgstr "You picked wrong."
+
+msgid "rps.cry.27"
+msgstr "Time to die."
+
+msgid "rps.death.0"
+msgstr "Ow."
+
+msgid "rps.death.1"
+msgstr "That's it?"
+
+msgid "rps.death.2"
+msgstr "Worth it."
+
+msgid "rps.death.3"
+msgstr "Tell no one."
+
+msgid "rps.death.4"
+msgstr "Rats…"
+
+msgid "rps.death.5"
+msgstr "So it ends."
+
+msgid "rps.death.6"
+msgstr "I regret… nothing."
+
+msgid "rps.death.7"
+msgstr "Glorious…"
+
+msgid "rps.death.8"
+msgstr "Impossible…"
+
+msgid "rps.death.9"
+msgstr "Not like this…"
+
+msgid "rps.death.10"
+msgstr "I'll be back…"
+
+msgid "rps.death.11"
+msgstr "My… my treasure…"
+
+msgid "rps.death.12"
+msgstr "Mother was right…"
+
+msgid "rps.death.13"
+msgstr "Should've run…"
+
+msgid "rps.death.14"
+msgstr "Cheated…"
+
+msgid "rps.death.15"
+msgstr "So cold…"
+
+msgid "rps.death.16"
+msgstr "Remember me…"
+
+msgid "rps.death.17"
+msgstr "It was… fun…"
+
+msgid "rps.death.18"
+msgstr "No fair…"
+
+msgid "rps.death.19"
+msgstr "Beaten… by you…"
+
+msgid "rps.death.20"
+msgstr "The end… already?"
+
+msgid "rps.death.21"
+msgstr "I yield…"
+
+msgid "rps.death.22"
+msgstr "Curse you…"
+
+msgid "rps.death.23"
+msgstr "Darkness…"
+
+msgid "rps.death.24"
+msgstr "Well played…"
+
+msgid "rps.death.25"
+msgstr "Ugh… finally…"
+
+msgid "rps.death.26"
+msgstr "Tell my tale…"
+
+msgid "rps.death.27"
+msgstr "At last… rest…"
+
 msgid "snake.title"
 msgstr "Snake"
 
