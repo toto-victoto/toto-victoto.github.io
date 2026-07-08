@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Trans, useLingui } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
@@ -196,29 +196,222 @@ type Round = {
 };
 type Hit = { key: number; dmg: number; target: "foe" | "you"; move: Move };
 
+// ---- Run state machine -----------------------------------------------------
+// One reducer owns everything that moves together during a run — the phase plus
+// all the combat state. Independent UI concerns (the stats modal, the persisted
+// record, the splash's saved-run) stay as plain useState in the component.
+// Side effects (timers, sfx, localStorage) live in effects/handlers and only
+// *dispatch* here; the reducer itself is pure.
+type GameState = {
+  phase: Phase;
+  player: Stats;
+  hp: number;
+  level: number;
+  foeIndex: number;
+  foe: Foe;
+  foeHp: number;
+  count: number;
+  round: Round | null;
+  hit: Hit | null;
+  healPop: { key: number; amount: number } | null;
+  points: number;
+  alloc: Record<StatKey, number>;
+  mults: Mults;
+  anchor: Move | null;
+};
+
+const ZERO_ALLOC: Record<StatKey, number> = { hp: 0, str: 0, def: 0, agi: 0, dex: 0 };
+
+const initialState: GameState = {
+  phase: "splash",
+  player: START,
+  hp: START.maxHp,
+  level: 1,
+  foeIndex: 0,
+  foe: makeFoe(0),
+  foeHp: makeFoe(0).maxHp,
+  count: 0,
+  round: null,
+  hit: null,
+  healPop: null,
+  points: 0,
+  alloc: ZERO_ALLOC,
+  mults: FRESH_MULTS,
+  anchor: null,
+};
+
+type Action =
+  | { type: "continue"; save: SavedRun }
+  | { type: "restart" }
+  | { type: "introDone" }
+  | { type: "pick"; move: Move; foeMove: Move }
+  | { type: "countTick" }
+  | { type: "startClash" }
+  | { type: "startStrike" }
+  | { type: "heal"; amount: number; key: number }
+  | { type: "damage"; target: "foe" | "you"; amount: number; move: Move; key: number }
+  | { type: "finish" }
+  | { type: "deathDone" }
+  | { type: "addPoint"; stat: StatKey }
+  | { type: "confirmLevelUp" };
+
+// Pure resolution of one exchange, given the played move and the foe's roll.
+// The played move's carried multiplier scales the damage (or, when negative,
+// heals and softens to a flat HEAL_DMG); then the per-move factors evolve
+// around the anchor. Nothing here is committed until the "finish" action.
+function resolveRound(state: GameState, move: Move, foeMove: Move): Round {
+  const { player, foe, foeHp, hp, mults, anchor } = state;
+  const outcome = judge(move, foeMove);
+  const stk = mults[move];
+  const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) * HEAL_RATE) / 100 * player.maxHp)) : 0;
+  const dmgMult = stk < 0 ? HEAL_DMG : stk;
+
+  let attacker: "you" | "foe" | null = null;
+  let dmg = 0;
+  let faster = false;
+  let resultFoeHp = foeHp;
+  let resultHp = Math.min(player.maxHp, hp + heal); // healing lands first
+
+  if (outcome === "win") {
+    attacker = "you";
+    faster = player.agi > foe.agi;
+    let b = Math.max(1, player.str - foe.def);
+    if (faster) b *= 2;
+    dmg = Math.max(1, Math.round(b * dmgMult));
+    resultFoeHp = Math.max(0, foeHp - dmg);
+  } else if (outcome === "lose") {
+    attacker = "foe";
+    faster = foe.agi > player.agi;
+    let b = Math.max(1, foe.str - player.def);
+    if (faster) b *= 2;
+    dmg = Math.max(1, Math.round(b * dmgMult));
+    resultHp = Math.max(0, resultHp - dmg); // damage after the heal
+  }
+
+  // Evolve the multipliers for next turn.
+  let newMults: Mults;
+  let newAnchor: Move;
+  let doubled = false;
+  if (anchor === move) {
+    // Repeat the anchor: apply the factors again (offence climbs, defence
+    // drops). A draw reapplies them once more, fast-forwarding the lean.
+    newAnchor = anchor;
+    newMults = applyFactors(mults, anchor, player.dex);
+    if (outcome === "draw") {
+      newMults = applyFactors(newMults, anchor, player.dex);
+      doubled = true;
+    }
+  } else {
+    // Switch: the exchange already cashed the current factors; re-anchor on
+    // this move, reset all three to 1, and apply once.
+    newAnchor = move;
+    newMults = applyFactors(FRESH_MULTS, move, player.dex);
+  }
+
+  const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
+  return { player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult: stk, doubled, heal, newMults, newAnchor, resultFoeHp, resultHp };
+}
+
+function gameReducer(state: GameState, action: Action): GameState {
+  switch (action.type) {
+    case "continue": {
+      const s = action.save;
+      return {
+        ...state,
+        player: s.player,
+        hp: s.hp,
+        level: s.level,
+        foeIndex: s.foeIndex,
+        foe: makeFoe(s.foeIndex),
+        foeHp: s.foeHp,
+        mults: s.mults,
+        anchor: s.anchor,
+        round: null,
+        hit: null,
+        healPop: null,
+        phase: "choose",
+      };
+    }
+    case "restart":
+      return { ...initialState, foe: makeFoe(0), foeHp: makeFoe(0).maxHp, phase: "intro" };
+    case "introDone":
+      return { ...state, phase: "choose" };
+    case "pick":
+      return {
+        ...state,
+        round: resolveRound(state, action.move, action.foeMove),
+        count: 3,
+        phase: "count",
+      };
+    case "countTick":
+      return { ...state, count: Math.max(0, state.count - 1) };
+    case "startClash":
+      return { ...state, phase: "clash" };
+    case "startStrike":
+      return { ...state, phase: "strike" };
+    case "heal":
+      return {
+        ...state,
+        hp: Math.min(state.player.maxHp, state.hp + action.amount),
+        healPop: { key: action.key, amount: action.amount },
+      };
+    case "damage": {
+      const hit: Hit = { key: action.key, dmg: action.amount, target: action.target, move: action.move };
+      return action.target === "foe"
+        ? { ...state, foeHp: Math.max(0, state.foeHp - action.amount), hit }
+        : { ...state, hp: Math.max(0, state.hp - action.amount), hit };
+    }
+    case "finish": {
+      const r = state.round;
+      if (!r) return state;
+      // Commit the evolved multipliers + anchor now — after the exchange resolved.
+      const base = { ...state, hit: null, healPop: null, mults: r.newMults, anchor: r.newAnchor };
+      if (r.resultFoeHp <= 0) {
+        const nl = state.level + 1;
+        return { ...base, level: nl, points: pointsForLevel(nl), alloc: ZERO_ALLOC, phase: "death" };
+      }
+      if (r.resultHp <= 0) return { ...base, phase: "gameover" };
+      return { ...base, phase: "choose" };
+    }
+    case "deathDone":
+      return { ...state, phase: "levelup" };
+    case "addPoint": {
+      const spent = STAT_KEYS.reduce((n, k) => n + state.alloc[k], 0);
+      if (spent >= state.points) return state;
+      return { ...state, alloc: { ...state.alloc, [action.stat]: state.alloc[action.stat] + 1 } };
+    }
+    case "confirmLevelUp": {
+      const a = state.alloc;
+      const np: Stats = {
+        maxHp: state.player.maxHp + a.hp * STAT_GAIN.hp,
+        str: state.player.str + a.str,
+        def: state.player.def + a.def,
+        agi: state.player.agi + a.agi,
+        dex: state.player.dex + a.dex,
+      };
+      const next = state.foeIndex + 1;
+      const nf = makeFoe(next);
+      return {
+        ...state,
+        player: np,
+        hp: np.maxHp,
+        foeIndex: next,
+        foe: nf,
+        foeHp: nf.maxHp,
+        mults: FRESH_MULTS,
+        anchor: null,
+        alloc: ZERO_ALLOC,
+        phase: "intro",
+      };
+    }
+    default:
+      return state;
+  }
+}
+
 export default function RPS() {
-  const [player, setPlayer] = useState<Stats>(START);
-  const [hp, setHp] = useState(START.maxHp);
-  const [level, setLevel] = useState(1);
-  const [foeIndex, setFoeIndex] = useState(0);
-  const [foe, setFoe] = useState<Foe>(() => makeFoe(0));
-  const [foeHp, setFoeHp] = useState(() => makeFoe(0).maxHp);
-  const [phase, setPhase] = useState<Phase>("splash");
-  const [count, setCount] = useState(0);
-  const [round, setRound] = useState<Round | null>(null);
-  const [hit, setHit] = useState<Hit | null>(null);
-  const [healPop, setHealPop] = useState<{ key: number; amount: number } | null>(null);
-  const [points, setPoints] = useState(0);
-  const [alloc, setAlloc] = useState<Record<StatKey, number>>({
-    hp: 0,
-    str: 0,
-    def: 0,
-    agi: 0,
-    dex: 0,
-  });
-  // Per-move stakes multipliers + the anchor they pivot around.
-  const [mults, setMults] = useState<Mults>(FRESH_MULTS);
-  const [anchor, setAnchor] = useState<Move | null>(null);
+  const [state, dispatch] = useReducer(gameReducer, initialState);
+  const { phase, player, hp, level, foeIndex, foe, foeHp, count, round, hit, healPop, points, alloc, mults, anchor } = state;
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
   const { i18n } = useLingui();
@@ -235,19 +428,14 @@ export default function RPS() {
     setResumed(true);
   }, []);
 
-  // Resume the snapshotted run and drop straight into the move-choice screen.
   const continueRun = () => {
-    if (!savedRun) return;
-    setPlayer(savedRun.player);
-    setHp(savedRun.hp);
-    setLevel(savedRun.level);
-    setFoeIndex(savedRun.foeIndex);
-    setFoe(makeFoe(savedRun.foeIndex));
-    setFoeHp(savedRun.foeHp);
-    setMults(savedRun.mults);
-    setAnchor(savedRun.anchor);
-    setRound(null);
-    setPhase("choose");
+    if (savedRun) dispatch({ type: "continue", save: savedRun });
+  };
+
+  // Start a fresh run and drop any resume snapshot (the record survives).
+  const restart = () => {
+    dispatch({ type: "restart" });
+    setStored((s) => ({ bestLevel: s.bestLevel }));
   };
 
   // Snapshot the run every time we land on the move-choice screen — the one
@@ -261,210 +449,95 @@ export default function RPS() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumed, phase]);
 
+  // Persist + sfx on the run's turning points: a kill records the best level,
+  // a defeat drops the resume snapshot.
+  useEffect(() => {
+    if (phase === "death") {
+      sfx.win();
+      setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level) }));
+    } else if (phase === "gameover") {
+      sfx.lose();
+      setStored((s) => ({ bestLevel: s.bestLevel }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   useEffect(() => {
     if (phase !== "intro") return;
     sfx.ui();
-    const t = setTimeout(() => setPhase("choose"), 1600);
+    const t = setTimeout(() => dispatch({ type: "introDone" }), 1600);
     return () => clearTimeout(t);
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "count") return;
     if (count <= 0) {
-      setPhase("clash");
+      dispatch({ type: "startClash" });
       return;
     }
     const t = setTimeout(() => {
       sfx.ui();
-      setCount((c) => c - 1);
+      dispatch({ type: "countTick" });
     }, 260);
     return () => clearTimeout(t);
   }, [phase, count]);
 
   useEffect(() => {
     if (phase !== "clash") return;
-    const t = setTimeout(() => setPhase("strike"), 500);
+    const t = setTimeout(() => dispatch({ type: "startStrike" }), 500);
     return () => clearTimeout(t);
   }, [phase]);
 
+  // Drive the strike animation: heal pop, staggered hit(s), then finish. Each
+  // step dispatches into the reducer; the timing and sfx stay here.
   useEffect(() => {
     if (phase !== "strike" || !round) return;
     const r = round;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const healedHp = Math.min(player.maxHp, hp + r.heal);
-
-    const finish = () => {
-      setHit(null);
-      setHealPop(null);
-      // Commit the evolved multipliers + anchor now — after the exchange resolved.
-      setMults(r.newMults);
-      setAnchor(r.newAnchor);
-      if (r.resultFoeHp <= 0) {
-        const nl = level + 1;
-        setLevel(nl);
-        setPoints(pointsForLevel(nl));
-        setAlloc({ hp: 0, str: 0, def: 0, agi: 0, dex: 0 });
-        setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, nl) }));
-        setPhase("death");
-        sfx.win();
-      } else if (r.resultHp <= 0) {
-        // Run's over — keep the best-level record, drop the resume snapshot.
-        setStored((s) => ({ bestLevel: s.bestLevel }));
-        setPhase("gameover");
-        sfx.lose();
-      } else {
-        setPhase("choose");
-      }
-    };
 
     // A negative move heals FIRST — pop a green +N and lift the player's HP.
     if (r.heal > 0) {
-      setHp(healedHp);
-      setHealPop({ key: Date.now(), amount: r.heal });
+      dispatch({ type: "heal", amount: r.heal, key: Date.now() });
       sfx.score();
     }
     const startDelay = r.heal > 0 ? 500 : 0; // let the heal read before damage lands
 
     if (r.outcome === "draw") {
-      setHit(null);
       if (r.heal === 0) sfx.ui();
-      timers.push(setTimeout(finish, startDelay + 700));
+      timers.push(setTimeout(() => dispatch({ type: "finish" }), startDelay + 700));
       return () => timers.forEach(clearTimeout);
     }
 
     const target: "foe" | "you" = r.outcome === "win" ? "foe" : "you";
-    const base = target === "foe" ? foeHp : healedHp; // player damage lands on the healed HP
-    const apply = target === "foe" ? setFoeHp : setHp;
-    let cum = 0;
     r.hits.forEach((c, i) => {
       timers.push(
         setTimeout(() => {
-          cum += c;
-          apply(Math.max(0, base - cum));
-          setHit({ key: Date.now() + i, dmg: c, target, move: r.player });
+          dispatch({ type: "damage", target, amount: c, move: r.player, key: Date.now() + i });
           if (target === "foe") sfx.score();
           else sfx.ui();
         }, startDelay + i * 300),
       );
     });
-    timers.push(setTimeout(finish, startDelay + (r.hits.length - 1) * 300 + 1050));
+    timers.push(setTimeout(() => dispatch({ type: "finish" }), startDelay + (r.hits.length - 1) * 300 + 1050));
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "death") return;
-    const t = setTimeout(() => setPhase("levelup"), 1700);
+    const t = setTimeout(() => dispatch({ type: "deathDone" }), 1700);
     return () => clearTimeout(t);
   }, [phase]);
 
   const pick = (move: Move) => {
     if (phase !== "choose") return;
-    const foeMove = randomMove();
-    const outcome = judge(move, foeMove);
-
-    // Resolve with the multiplier the played move already carries (what its
-    // button shows). A NEGATIVE multiplier HEALS (on any outcome) and softens
-    // this exchange's damage to a flat HEAL_DMG factor; otherwise the multiplier
-    // scales damage dealt on a win / taken on a loss.
-    const stk = mults[move];
-    const heal = stk < 0 ? Math.max(1, Math.round((Math.abs(stk) * HEAL_RATE / 100) * player.maxHp)) : 0;
-    const dmgMult = stk < 0 ? HEAL_DMG : stk;
-
-    let attacker: "you" | "foe" | null = null;
-    let dmg = 0;
-    let faster = false;
-    let resultFoeHp = foeHp;
-    let resultHp = Math.min(player.maxHp, hp + heal); // healing lands first
-
-    if (outcome === "win") {
-      attacker = "you";
-      faster = player.agi > foe.agi;
-      let b = Math.max(1, player.str - foe.def);
-      if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * dmgMult));
-      resultFoeHp = Math.max(0, foeHp - dmg);
-    } else if (outcome === "lose") {
-      attacker = "foe";
-      faster = foe.agi > player.agi;
-      let b = Math.max(1, foe.str - player.def);
-      if (faster) b *= 2;
-      dmg = Math.max(1, Math.round(b * dmgMult));
-      resultHp = Math.max(0, resultHp - dmg); // damage after the heal
-    }
-
-    // Evolve the multipliers for next turn.
-    let newMults: Mults;
-    let newAnchor: Move;
-    let doubled = false;
-    if (anchor === move) {
-      // Repeat the anchor: apply the factors again (offence climbs, defence
-      // drops). A draw reapplies them once more, fast-forwarding the lean.
-      newAnchor = anchor;
-      newMults = applyFactors(mults, anchor, player.dex);
-      if (outcome === "draw") {
-        newMults = applyFactors(newMults, anchor, player.dex);
-        doubled = true;
-      }
-    } else {
-      // Switch: the exchange above already cashed the current factors; now
-      // re-anchor on this move, reset all three to 1, and apply once.
-      newAnchor = move;
-      newMults = applyFactors(FRESH_MULTS, move, player.dex);
-    }
-
-    // NB: the multipliers are only committed once the round animation ends
-    // (in the strike effect), so the shown ×N matches what's resolving.
-    const hits = faster && dmg > 1 ? [Math.floor(dmg / 2), dmg - Math.floor(dmg / 2)] : [dmg];
-    setRound({ player: move, foe: foeMove, outcome, attacker, dmg, hits, faster, mult: stk, doubled, heal, newMults, newAnchor, resultFoeHp, resultHp });
-    setCount(3);
-    setPhase("count");
+    dispatch({ type: "pick", move, foeMove: randomMove() });
   };
 
   const spent = STAT_KEYS.reduce((n, k) => n + alloc[k], 0);
   const remaining = points - spent;
-  const addPoint = (k: StatKey) => {
-    if (remaining <= 0) return;
-    setAlloc((a) => ({ ...a, [k]: a[k] + 1 }));
-  };
-
-  const nextFoe = () => {
-    setMults(FRESH_MULTS);
-    setAnchor(null);
-  };
-
-  const confirmLevelUp = () => {
-    const np: Stats = {
-      maxHp: player.maxHp + alloc.hp * STAT_GAIN.hp,
-      str: player.str + alloc.str,
-      def: player.def + alloc.def,
-      agi: player.agi + alloc.agi,
-      dex: player.dex + alloc.dex,
-    };
-    setPlayer(np);
-    setHp(np.maxHp);
-    const next = foeIndex + 1;
-    setFoeIndex(next);
-    const nf = makeFoe(next);
-    setFoe(nf);
-    setFoeHp(nf.maxHp);
-    nextFoe();
-    setPhase("intro");
-  };
-
-  const restart = () => {
-    setPlayer(START);
-    setHp(START.maxHp);
-    setLevel(1);
-    setFoeIndex(0);
-    const nf = makeFoe(0);
-    setFoe(nf);
-    setFoeHp(nf.maxHp);
-    setRound(null);
-    nextFoe();
-    setStored((s) => ({ bestLevel: s.bestLevel }));
-    setPhase("intro");
-  };
+  const addPoint = (k: StatKey) => dispatch({ type: "addPoint", stat: k });
+  const confirmLevelUp = () => dispatch({ type: "confirmLevelUp" });
 
   const foeHitting = hit?.target === "foe";
   const youHit = hit?.target === "you";
