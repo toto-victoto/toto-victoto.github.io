@@ -120,16 +120,16 @@ const applyFactors = (m: Mults, anchor: Move, dex: number): Mults => {
 // Two elites (semi-bosses) at levels 5 & 8, King Aldwin the boss (9), and Dread
 // Volk the hidden boss (10). cryId/wordsId point at each one's catalog entry.
 const ROSTER: Foe[] = ([
-  { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Get off my field!", lastWords: "Tell the cows… I tried.", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
-  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You'll be minced!", lastWords: "My soufflé… collapses…", maxHp: 30, str: 5, def: 2, agi: 2, dex: 1 },
+  { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Time to reap what you sow!", lastWords: "Well… I bought the farm…", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
+  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You're getting roasted!", lastWords: "My soufflé… collapses…", maxHp: 30, str: 5, def: 2, agi: 2, dex: 1 },
   { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 46, str: 7, def: 3, agi: 2, dex: 1 },
-  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "The trail ends here.", lastWords: "The butler… did it…", maxHp: 66, str: 9, def: 6, agi: 4, dex: 2 },
-  { key: "enchantress", emoji: "🧙‍♀️", name: "Morgause", cry: "You'll dance to my tune.", lastWords: "The threads… unravel…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
+  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "Elementary. You lose.", lastWords: "The butler… did it…", maxHp: 66, str: 9, def: 6, agi: 4, dex: 2 },
+  { key: "enchantress", emoji: "🧙‍♀️", name: "Morgause", cry: "Abraca-DIE-bra!", lastWords: "The threads… unravel…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
   { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 108, str: 14, def: 8, agi: 8, dex: 3 },
-  { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
-  { key: "valkyrie", emoji: "🧝‍♀️", name: "Valkyra", cry: "The slain are mine.", lastWords: "A worthy… fall…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
-  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
-  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
+  { key: "magus", emoji: "🧑‍🎨", name: "Van Gore", cry: "I'll paint the town red.", lastWords: "Not my finest… stroke…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
+  { key: "valkyrie", emoji: "🧝‍♀️", name: "Valkyra", cry: "Winging it, as usual!", lastWords: "Clipped my… wings…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
+  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Bow to the crown!", lastWords: "Heavy is… the head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
+  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Behold my villain arc!", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
 ] as Array<Omit<Foe, "cryId" | "wordsId">>).map((f) => ({
   ...f,
   cryId: `rps.foe.${f.key}.cry`,
@@ -164,7 +164,7 @@ const ARCHETYPES: { key: string; emoji: string; name: string; profile: Profile }
   { key: "tideborn", emoji: "🧜‍♂️", name: "Tideborn", profile: "balanced" },
   { key: "siren", emoji: "🧜‍♀️", name: "Siren", profile: "swift" },
   { key: "troll", emoji: "🧌", name: "Troll", profile: "juggernaut" },
-  { key: "hexen", emoji: "🧙‍♀️", name: "Hexen", profile: "warlock" },
+  { key: "hexen", emoji: "🧙‍♂️", name: "Hexen", profile: "warlock" },
   { key: "jester", emoji: "🤡", name: "Jester", profile: "trickster" },
   // Monstrous faces
   { key: "brute", emoji: "👹", name: "Brute", profile: "strong" },
@@ -205,23 +205,23 @@ const PROFILES: Record<Profile, { hp: number; w: Record<"str" | "def" | "agi", n
 };
 
 const CRIES = [
-  "You're finished!", "Come closer.", "This ends now.", "I've faced worse.",
-  "No mercy.", "You dare?", "Breathe your last.", "Beyond your reach.",
-  "Prepare to fall!", "You'll regret this.", "I smell fear.", "None survive me.",
-  "Your luck runs out.", "Bow or break.", "I'll enjoy this.", "Too slow!",
-  "Last one standing.", "You're mine now.", "Cross me and bleed.", "I've killed better.",
-  "Nowhere to run.", "Feel my wrath!", "This is your end.", "Give up already.",
-  "I never lose.", "Say goodbye.", "You picked wrong.", "Time to die.",
+  "You're toast!", "Come get a hug!", "Spoiler: you lose.", "I've fought scarier sneezes.",
+  "No refunds!", "Bold of you to show up.", "Say your prayers!", "Out of your league, pal.",
+  "Mind the gap — you're in it.", "This'll leave a mark.", "Is that fear, or cologne?", "My win rate is rude.",
+  "Luck's on a break.", "Bow, or I rearrange you.", "I've been dying to win.", "Blink if you're scared.",
+  "I called dibs on winning.", "Wrong doorbell, buddy.", "Cross me and cry.", "I've beaten tougher NPCs.",
+  "Cardio won't save you.", "Feel my mild annoyance!", "Thanks for playing!", "You can still ragequit.",
+  "Undefeated since breakfast.", "Wave bye-bye!", "Wrong opponent, champ.", "Time to git gud.",
 ];
 
 const DEATHS = [
-  "Ow.", "That's it?", "Worth it.", "Tell no one.",
-  "Rats…", "So it ends.", "I regret… nothing.", "Glorious…",
-  "Impossible…", "Not like this…", "I'll be back…", "My… my treasure…",
-  "Mother was right…", "Should've run…", "Cheated…", "So cold…",
-  "Remember me…", "It was… fun…", "No fair…", "Beaten… by you…",
-  "The end… already?", "I yield…", "Curse you…", "Darkness…",
-  "Well played…", "Ugh… finally…", "Tell my tale…", "At last… rest…",
+  "Ow. Rude.", "That's… allowed?", "Worth it. Mostly.", "Tell no one. Especially mum.",
+  "Nerf this…", "GG…", "I regret… some things…", "Screenshot… that…",
+  "That wasn't… in the tutorial…", "Not like this… lag…", "Respawning… surely…", "My loot… was rented…",
+  "Mum said… desk job…", "Should've… dodged…", "Hacks… clearly…", "Rage… quitting… reality…",
+  "Rate me… five stars…", "Was that… ranked…?", "Unsubscribe…", "Beaten… by YOU…?",
+  "Skill issue… mine…", "GG no re…", "One-star… review…", "Loading… afterlife…",
+  "Well… memed…", "Finally… a nap…", "Post this… clip…", "AFK… forever…",
 ];
 
 const randOf = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
@@ -669,7 +669,7 @@ export default function RPS() {
   useEffect(() => {
     if (phase !== "intro") return;
     sfx.ui();
-    const t = setTimeout(() => dispatch({ type: "introDone" }), 1600);
+    const t = setTimeout(() => dispatch({ type: "introDone" }), 2200);
     return () => clearTimeout(t);
   }, [phase]);
 

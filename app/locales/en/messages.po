@@ -137,16 +137,16 @@ msgid "rps.foe.farmhand.name"
 msgstr "Pip the Farmhand"
 
 msgid "rps.foe.farmhand.cry"
-msgstr "Get off my field!"
+msgstr "Time to reap what you sow!"
 
 msgid "rps.foe.farmhand.words"
-msgstr "Tell the cows… I tried."
+msgstr "Well… I bought the farm…"
 
 msgid "rps.foe.chef.name"
 msgstr "Chef Renard"
 
 msgid "rps.foe.chef.cry"
-msgstr "You'll be minced!"
+msgstr "You're getting roasted!"
 
 msgid "rps.foe.chef.words"
 msgstr "My soufflé… collapses…"
@@ -164,7 +164,7 @@ msgid "rps.foe.inspector.name"
 msgstr "Insp. Mora"
 
 msgid "rps.foe.inspector.cry"
-msgstr "The trail ends here."
+msgstr "Elementary. You lose."
 
 msgid "rps.foe.inspector.words"
 msgstr "The butler… did it…"
@@ -179,19 +179,19 @@ msgid "rps.foe.ninja.words"
 msgstr "Didn't see… that one…"
 
 msgid "rps.foe.magus.name"
-msgstr "Magus Orin"
+msgstr "Van Gore"
 
 msgid "rps.foe.magus.cry"
-msgstr "Feel the arcane!"
+msgstr "I'll paint the town red."
 
 msgid "rps.foe.magus.words"
-msgstr "My magic… was 60% vibes…"
+msgstr "Not my finest… stroke…"
 
 msgid "rps.foe.king.name"
 msgstr "King Aldwin"
 
 msgid "rps.foe.king.cry"
-msgstr "Kneel before me!"
+msgstr "Bow to the crown!"
 
 msgid "rps.foe.king.words"
 msgstr "Heavy is… the head…"
@@ -200,7 +200,7 @@ msgid "rps.foe.villain.name"
 msgstr "Dread Volk"
 
 msgid "rps.foe.villain.cry"
-msgstr "Your story ends."
+msgstr "Behold my villain arc!"
 
 msgid "rps.foe.villain.words"
 msgstr "But I had… a trilogy planned…"
@@ -209,7 +209,7 @@ msgid "rps.foe.enchantress.name"
 msgstr "Morgause"
 
 msgid "rps.foe.enchantress.cry"
-msgstr "You'll dance to my tune."
+msgstr "Abraca-DIE-bra!"
 
 msgid "rps.foe.enchantress.words"
 msgstr "The threads… unravel…"
@@ -218,10 +218,10 @@ msgid "rps.foe.valkyrie.name"
 msgstr "Valkyra"
 
 msgid "rps.foe.valkyrie.cry"
-msgstr "The slain are mine."
+msgstr "Winging it, as usual!"
 
 msgid "rps.foe.valkyrie.words"
-msgstr "A worthy… fall…"
+msgstr "Clipped my… wings…"
 
 msgid "rps.tier.semiboss"
 msgstr "Elite"
@@ -392,172 +392,172 @@ msgid "rps.foe.jester.name"
 msgstr "Jester"
 
 msgid "rps.cry.0"
-msgstr "You're finished!"
+msgstr "You're toast!"
 
 msgid "rps.cry.1"
-msgstr "Come closer."
+msgstr "Come get a hug!"
 
 msgid "rps.cry.2"
-msgstr "This ends now."
+msgstr "Spoiler: you lose."
 
 msgid "rps.cry.3"
-msgstr "I've faced worse."
+msgstr "I've fought scarier sneezes."
 
 msgid "rps.cry.4"
-msgstr "No mercy."
+msgstr "No refunds!"
 
 msgid "rps.cry.5"
-msgstr "You dare?"
+msgstr "Bold of you to show up."
 
 msgid "rps.cry.6"
-msgstr "Breathe your last."
+msgstr "Say your prayers!"
 
 msgid "rps.cry.7"
-msgstr "Beyond your reach."
+msgstr "Out of your league, pal."
 
 msgid "rps.cry.8"
-msgstr "Prepare to fall!"
+msgstr "Mind the gap — you're in it."
 
 msgid "rps.cry.9"
-msgstr "You'll regret this."
+msgstr "This'll leave a mark."
 
 msgid "rps.cry.10"
-msgstr "I smell fear."
+msgstr "Is that fear, or cologne?"
 
 msgid "rps.cry.11"
-msgstr "None survive me."
+msgstr "My win rate is rude."
 
 msgid "rps.cry.12"
-msgstr "Your luck runs out."
+msgstr "Luck's on a break."
 
 msgid "rps.cry.13"
-msgstr "Bow or break."
+msgstr "Bow, or I rearrange you."
 
 msgid "rps.cry.14"
-msgstr "I'll enjoy this."
+msgstr "I've been dying to win."
 
 msgid "rps.cry.15"
-msgstr "Too slow!"
+msgstr "Blink if you're scared."
 
 msgid "rps.cry.16"
-msgstr "Last one standing."
+msgstr "I called dibs on winning."
 
 msgid "rps.cry.17"
-msgstr "You're mine now."
+msgstr "Wrong doorbell, buddy."
 
 msgid "rps.cry.18"
-msgstr "Cross me and bleed."
+msgstr "Cross me and cry."
 
 msgid "rps.cry.19"
-msgstr "I've killed better."
+msgstr "I've beaten tougher NPCs."
 
 msgid "rps.cry.20"
-msgstr "Nowhere to run."
+msgstr "Cardio won't save you."
 
 msgid "rps.cry.21"
-msgstr "Feel my wrath!"
+msgstr "Feel my mild annoyance!"
 
 msgid "rps.cry.22"
-msgstr "This is your end."
+msgstr "Thanks for playing!"
 
 msgid "rps.cry.23"
-msgstr "Give up already."
+msgstr "You can still ragequit."
 
 msgid "rps.cry.24"
-msgstr "I never lose."
+msgstr "Undefeated since breakfast."
 
 msgid "rps.cry.25"
-msgstr "Say goodbye."
+msgstr "Wave bye-bye!"
 
 msgid "rps.cry.26"
-msgstr "You picked wrong."
+msgstr "Wrong opponent, champ."
 
 msgid "rps.cry.27"
-msgstr "Time to die."
+msgstr "Time to git gud."
 
 msgid "rps.death.0"
-msgstr "Ow."
+msgstr "Ow. Rude."
 
 msgid "rps.death.1"
-msgstr "That's it?"
+msgstr "That's… allowed?"
 
 msgid "rps.death.2"
-msgstr "Worth it."
+msgstr "Worth it. Mostly."
 
 msgid "rps.death.3"
-msgstr "Tell no one."
+msgstr "Tell no one. Especially mum."
 
 msgid "rps.death.4"
-msgstr "Rats…"
+msgstr "Nerf this…"
 
 msgid "rps.death.5"
-msgstr "So it ends."
+msgstr "GG…"
 
 msgid "rps.death.6"
-msgstr "I regret… nothing."
+msgstr "I regret… some things…"
 
 msgid "rps.death.7"
-msgstr "Glorious…"
+msgstr "Screenshot… that…"
 
 msgid "rps.death.8"
-msgstr "Impossible…"
+msgstr "That wasn't… in the tutorial…"
 
 msgid "rps.death.9"
-msgstr "Not like this…"
+msgstr "Not like this… lag…"
 
 msgid "rps.death.10"
-msgstr "I'll be back…"
+msgstr "Respawning… surely…"
 
 msgid "rps.death.11"
-msgstr "My… my treasure…"
+msgstr "My loot… was rented…"
 
 msgid "rps.death.12"
-msgstr "Mother was right…"
+msgstr "Mum said… desk job…"
 
 msgid "rps.death.13"
-msgstr "Should've run…"
+msgstr "Should've… dodged…"
 
 msgid "rps.death.14"
-msgstr "Cheated…"
+msgstr "Hacks… clearly…"
 
 msgid "rps.death.15"
-msgstr "So cold…"
+msgstr "Rage… quitting… reality…"
 
 msgid "rps.death.16"
-msgstr "Remember me…"
+msgstr "Rate me… five stars…"
 
 msgid "rps.death.17"
-msgstr "It was… fun…"
+msgstr "Was that… ranked…?"
 
 msgid "rps.death.18"
-msgstr "No fair…"
+msgstr "Unsubscribe…"
 
 msgid "rps.death.19"
-msgstr "Beaten… by you…"
+msgstr "Beaten… by YOU…?"
 
 msgid "rps.death.20"
-msgstr "The end… already?"
+msgstr "Skill issue… mine…"
 
 msgid "rps.death.21"
-msgstr "I yield…"
+msgstr "GG no re…"
 
 msgid "rps.death.22"
-msgstr "Curse you…"
+msgstr "One-star… review…"
 
 msgid "rps.death.23"
-msgstr "Darkness…"
+msgstr "Loading… afterlife…"
 
 msgid "rps.death.24"
-msgstr "Well played…"
+msgstr "Well… memed…"
 
 msgid "rps.death.25"
-msgstr "Ugh… finally…"
+msgstr "Finally… a nap…"
 
 msgid "rps.death.26"
-msgstr "Tell my tale…"
+msgstr "Post this… clip…"
 
 msgid "rps.death.27"
-msgstr "At last… rest…"
+msgstr "AFK… forever…"
 
 msgid "snake.title"
 msgstr "Snake"

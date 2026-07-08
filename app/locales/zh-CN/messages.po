@@ -137,16 +137,16 @@ msgid "rps.foe.farmhand.name"
 msgstr "农夫皮普"
 
 msgid "rps.foe.farmhand.cry"
-msgstr "滚出我的田地！"
+msgstr "自食其果吧！"
 
 msgid "rps.foe.farmhand.words"
-msgstr "告诉奶牛们……我尽力了。"
+msgstr "唉……回老家……种地了……"
 
 msgid "rps.foe.chef.name"
 msgstr "雷纳尔大厨"
 
 msgid "rps.foe.chef.cry"
-msgstr "把你剁成肉馅！"
+msgstr "把你烤了！"
 
 msgid "rps.foe.chef.words"
 msgstr "我的舒芙蕾……塌了……"
@@ -164,7 +164,7 @@ msgid "rps.foe.inspector.name"
 msgstr "莫拉探长"
 
 msgid "rps.foe.inspector.cry"
-msgstr "线索到此为止。"
+msgstr "小事一桩，你输了。"
 
 msgid "rps.foe.inspector.words"
 msgstr "是管家……干的……"
@@ -179,19 +179,19 @@ msgid "rps.foe.ninja.words"
 msgstr "没看清……那一招……"
 
 msgid "rps.foe.magus.name"
-msgstr "法师奥林"
+msgstr "梵血"
 
 msgid "rps.foe.magus.cry"
-msgstr "感受奥术之力！"
+msgstr "我给你上点……红色！"
 
 msgid "rps.foe.magus.words"
-msgstr "我的魔法……六成靠氛围……"
+msgstr "唉……败笔……"
 
 msgid "rps.foe.king.name"
 msgstr "奥德温国王"
 
 msgid "rps.foe.king.cry"
-msgstr "向我下跪！"
+msgstr "向王冠下跪！"
 
 msgid "rps.foe.king.words"
 msgstr "欲戴王冠……必承其重……"
@@ -200,7 +200,7 @@ msgid "rps.foe.villain.name"
 msgstr "恐惧沃尔克"
 
 msgid "rps.foe.villain.cry"
-msgstr "你的故事到此为止。"
+msgstr "看我的反派……名场面！"
 
 msgid "rps.foe.villain.words"
 msgstr "可我……还计划了三部曲……"
@@ -209,19 +209,19 @@ msgid "rps.foe.enchantress.name"
 msgstr "摩高斯"
 
 msgid "rps.foe.enchantress.cry"
-msgstr "你会随我的曲调起舞。"
+msgstr "阿布拉卡——完蛋吧！"
 
 msgid "rps.foe.enchantress.words"
-msgstr "丝线……散了……"
+msgstr "咒语……散了……"
 
 msgid "rps.foe.valkyrie.name"
 msgstr "瓦尔基娅"
 
 msgid "rps.foe.valkyrie.cry"
-msgstr "亡者归我。"
+msgstr "老规矩，随性而战！"
 
 msgid "rps.foe.valkyrie.words"
-msgstr "虽败……犹荣……"
+msgstr "翅膀……被剪了……"
 
 msgid "rps.tier.semiboss"
 msgstr "精英"
@@ -395,169 +395,169 @@ msgid "rps.cry.0"
 msgstr "你完蛋了！"
 
 msgid "rps.cry.1"
-msgstr "过来吧。"
+msgstr "来抱一个！"
 
 msgid "rps.cry.2"
-msgstr "现在就结束。"
+msgstr "剧透：你输了。"
 
 msgid "rps.cry.3"
-msgstr "我见过更糟的。"
+msgstr "我见过更吓人的喷嚏。"
 
 msgid "rps.cry.4"
-msgstr "绝不留情。"
+msgstr "概不退款！"
 
 msgid "rps.cry.5"
-msgstr "你敢？"
+msgstr "你还敢来，有胆量。"
 
 msgid "rps.cry.6"
-msgstr "咽下最后一口气吧。"
+msgstr "祈祷吧！"
 
 msgid "rps.cry.7"
-msgstr "你够不着。"
+msgstr "你不在一个段位，伙计。"
 
 msgid "rps.cry.8"
-msgstr "准备倒下吧！"
+msgstr "小心脚下——你已经掉进去了。"
 
 msgid "rps.cry.9"
-msgstr "你会后悔的。"
+msgstr "这会留个印子。"
 
 msgid "rps.cry.10"
-msgstr "我闻到了恐惧。"
+msgstr "那是恐惧，还是你的香水？"
 
 msgid "rps.cry.11"
-msgstr "没人能在我手下活命。"
+msgstr "我的胜率高得离谱。"
 
 msgid "rps.cry.12"
-msgstr "你的运气到头了。"
+msgstr "幸运女神休假了。"
 
 msgid "rps.cry.13"
-msgstr "臣服或者粉身碎骨。"
+msgstr "下跪，不然我重组你。"
 
 msgid "rps.cry.14"
-msgstr "我会好好享受的。"
+msgstr "我早就想赢了。"
 
 msgid "rps.cry.15"
-msgstr "太慢了！"
+msgstr "怕的话就眨眨眼。"
 
 msgid "rps.cry.16"
-msgstr "笑到最后的人。"
+msgstr "赢这事，我先占了。"
 
 msgid "rps.cry.17"
-msgstr "你是我的了。"
+msgstr "你按错门铃了，伙计。"
 
 msgid "rps.cry.18"
-msgstr "惹我者流血。"
+msgstr "惹我，你会哭。"
 
 msgid "rps.cry.19"
-msgstr "我杀过比你强的。"
+msgstr "我打过更硬的NPC。"
 
 msgid "rps.cry.20"
-msgstr "无处可逃。"
+msgstr "练心肺也救不了你。"
 
 msgid "rps.cry.21"
-msgstr "感受我的怒火！"
+msgstr "感受我小小的不爽！"
 
 msgid "rps.cry.22"
-msgstr "这就是你的终点。"
+msgstr "谢谢游玩！"
 
 msgid "rps.cry.23"
-msgstr "认输吧。"
+msgstr "你还能愤怒退游。"
 
 msgid "rps.cry.24"
-msgstr "我从不落败。"
+msgstr "从早饭起就没输过。"
 
 msgid "rps.cry.25"
-msgstr "说再见吧。"
+msgstr "挥手说拜拜！"
 
 msgid "rps.cry.26"
-msgstr "你选错了对手。"
+msgstr "找错对手了，冠军。"
 
 msgid "rps.cry.27"
-msgstr "受死吧。"
+msgstr "该练练技术了。"
 
 msgid "rps.death.0"
-msgstr "哎哟。"
+msgstr "哎哟。真没礼貌。"
 
 msgid "rps.death.1"
-msgstr "就这？"
+msgstr "这……也行？"
 
 msgid "rps.death.2"
-msgstr "值了。"
+msgstr "值了。大概吧。"
 
 msgid "rps.death.3"
-msgstr "别告诉任何人。"
+msgstr "别告诉任何人。尤其是我妈。"
 
 msgid "rps.death.4"
-msgstr "可恶……"
+msgstr "这个得削……"
 
 msgid "rps.death.5"
-msgstr "就这样结束了。"
+msgstr "GG……"
 
 msgid "rps.death.6"
-msgstr "我……毫不后悔。"
+msgstr "我后悔……一些事……"
 
 msgid "rps.death.7"
-msgstr "壮哉……"
+msgstr "把那个……截图……"
 
 msgid "rps.death.8"
-msgstr "不可能……"
+msgstr "教程里……没这招……"
 
 msgid "rps.death.9"
-msgstr "不该是这样……"
+msgstr "不该这样……卡了……"
 
 msgid "rps.death.10"
-msgstr "我会回来的……"
+msgstr "总会……复活的吧……"
 
 msgid "rps.death.11"
-msgstr "我的……我的宝藏……"
+msgstr "我的战利品……是租的……"
 
 msgid "rps.death.12"
-msgstr "妈妈说得对……"
+msgstr "我妈说……找份坐办公室的工作……"
 
 msgid "rps.death.13"
-msgstr "早该逃的……"
+msgstr "早该……闪开的……"
 
 msgid "rps.death.14"
-msgstr "有诈……"
+msgstr "肯定……开挂了……"
 
 msgid "rps.death.15"
-msgstr "好冷……"
+msgstr "愤怒退出……现实……"
 
 msgid "rps.death.16"
-msgstr "记住我……"
+msgstr "给我……五星好评……"
 
 msgid "rps.death.17"
-msgstr "挺……有趣的……"
+msgstr "这是……排位赛吗……？"
 
 msgid "rps.death.18"
-msgstr "不公平……"
+msgstr "取关了……"
 
 msgid "rps.death.19"
-msgstr "竟败……在你手里……"
+msgstr "竟然……输给你……？"
 
 msgid "rps.death.20"
-msgstr "这就……结束了？"
+msgstr "技术问题……我的……"
 
 msgid "rps.death.21"
-msgstr "我认输……"
+msgstr "GG，不打了……"
 
 msgid "rps.death.22"
-msgstr "诅咒你……"
+msgstr "给个……一星差评……"
 
 msgid "rps.death.23"
-msgstr "黑暗……"
+msgstr "正在加载……来世……"
 
 msgid "rps.death.24"
-msgstr "打得好……"
+msgstr "这波……成梗了……"
 
 msgid "rps.death.25"
-msgstr "唔……终于……"
+msgstr "终于……能睡了……"
 
 msgid "rps.death.26"
-msgstr "讲述我的故事……"
+msgstr "把这段……发出去……"
 
 msgid "rps.death.27"
-msgstr "终于……可以安息了……"
+msgstr "永久……挂机了……"
 
 msgid "snake.title"
 msgstr "贪吃蛇"

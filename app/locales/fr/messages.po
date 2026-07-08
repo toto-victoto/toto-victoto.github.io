@@ -137,16 +137,16 @@ msgid "rps.foe.farmhand.name"
 msgstr "Pip le fermier"
 
 msgid "rps.foe.farmhand.cry"
-msgstr "Hors de mon champ !"
+msgstr "On récolte ce que l'on sème !"
 
 msgid "rps.foe.farmhand.words"
-msgstr "Dites aux vaches… que j'ai essayé."
+msgstr "Les pissenlits… par la racine…"
 
 msgid "rps.foe.chef.name"
 msgstr "Chef Renard"
 
 msgid "rps.foe.chef.cry"
-msgstr "Tu vas être haché !"
+msgstr "Tu vas déguster !"
 
 msgid "rps.foe.chef.words"
 msgstr "Mon soufflé… retombe…"
@@ -155,7 +155,7 @@ msgid "rps.foe.sentry.name"
 msgstr "Cole la sentinelle"
 
 msgid "rps.foe.sentry.cry"
-msgstr "Nul ne passera !"
+msgstr "Vous ne passerez pas !"
 
 msgid "rps.foe.sentry.words"
 msgstr "J'avais… une seule mission…"
@@ -164,7 +164,7 @@ msgid "rps.foe.inspector.name"
 msgstr "Insp. Mora"
 
 msgid "rps.foe.inspector.cry"
-msgstr "La piste s'arrête ici."
+msgstr "Élémentaire. Tu perds."
 
 msgid "rps.foe.inspector.words"
 msgstr "C'est le majordome… le coupable…"
@@ -173,25 +173,25 @@ msgid "rps.foe.ninja.name"
 msgstr "Kaze"
 
 msgid "rps.foe.ninja.cry"
-msgstr "Un clignement et tu disparais."
+msgstr "Un battement de cils… et pouf."
 
 msgid "rps.foe.ninja.words"
 msgstr "Je ne l'ai pas… vu venir…"
 
 msgid "rps.foe.magus.name"
-msgstr "Mage Orin"
+msgstr "Van Gore"
 
 msgid "rps.foe.magus.cry"
-msgstr "Goûte à l'arcane !"
+msgstr "Je vais te croquer !"
 
 msgid "rps.foe.magus.words"
-msgstr "Ma magie… c'était 60% de vibes…"
+msgstr "Pas mon plus beau… coup de pinceau…"
 
 msgid "rps.foe.king.name"
 msgstr "Roi Aldwin"
 
 msgid "rps.foe.king.cry"
-msgstr "À genoux devant moi !"
+msgstr "À genoux devant la couronne !"
 
 msgid "rps.foe.king.words"
 msgstr "Lourde est… la couronne…"
@@ -200,7 +200,7 @@ msgid "rps.foe.villain.name"
 msgstr "Volk l'Effroi"
 
 msgid "rps.foe.villain.cry"
-msgstr "Ton histoire s'achève."
+msgstr "Place à mon arc de méchant !"
 
 msgid "rps.foe.villain.words"
 msgstr "J'avais… une trilogie de prévue…"
@@ -209,19 +209,19 @@ msgid "rps.foe.enchantress.name"
 msgstr "Morgause"
 
 msgid "rps.foe.enchantress.cry"
-msgstr "Tu danseras à ma cadence."
+msgstr "Abracada-BOUM !"
 
 msgid "rps.foe.enchantress.words"
-msgstr "Les fils… se défont…"
+msgstr "Le sortilège… se défait…"
 
 msgid "rps.foe.valkyrie.name"
 msgstr "Valkyra"
 
 msgid "rps.foe.valkyrie.cry"
-msgstr "Les morts m'appartiennent."
+msgstr "J'improvise à tire-d'aile !"
 
 msgid "rps.foe.valkyrie.words"
-msgstr "Une chute… digne…"
+msgstr "On m'a rogné… les ailes…"
 
 msgid "rps.tier.semiboss"
 msgstr "Élite"
@@ -392,172 +392,172 @@ msgid "rps.foe.jester.name"
 msgstr "Bouffon"
 
 msgid "rps.cry.0"
-msgstr "Tu es fini !"
+msgstr "T'es cuit !"
 
 msgid "rps.cry.1"
-msgstr "Approche."
+msgstr "Viens faire un câlin !"
 
 msgid "rps.cry.2"
-msgstr "Ça se termine maintenant."
+msgstr "Spoiler : tu perds."
 
 msgid "rps.cry.3"
-msgstr "J'ai connu pire."
+msgstr "J'ai vu des éternuements plus flippants."
 
 msgid "rps.cry.4"
-msgstr "Aucune pitié."
+msgstr "Pas de remboursement !"
 
 msgid "rps.cry.5"
-msgstr "Tu oses ?"
+msgstr "Culotté d'être venu."
 
 msgid "rps.cry.6"
-msgstr "Rends ton dernier souffle."
+msgstr "Fais ta prière !"
 
 msgid "rps.cry.7"
-msgstr "Hors de ta portée."
+msgstr "Hors catégorie, mon grand."
 
 msgid "rps.cry.8"
-msgstr "Prépare-toi à tomber !"
+msgstr "Attention à la marche… tu tombes."
 
 msgid "rps.cry.9"
-msgstr "Tu vas le regretter."
+msgstr "Ça va laisser des traces."
 
 msgid "rps.cry.10"
-msgstr "Je sens ta peur."
+msgstr "C'est la peur ou ton parfum ?"
 
 msgid "rps.cry.11"
-msgstr "Nul ne me survit."
+msgstr "Mon taux de victoire est indécent."
 
 msgid "rps.cry.12"
-msgstr "Ta chance s'épuise."
+msgstr "La chance est en pause."
 
 msgid "rps.cry.13"
-msgstr "Plie ou romps."
+msgstr "Incline-toi, ou je te réarrange."
 
 msgid "rps.cry.14"
-msgstr "Je vais adorer ça."
+msgstr "Je meurs d'envie de gagner."
 
 msgid "rps.cry.15"
-msgstr "Trop lent !"
+msgstr "Cligne si t'as peur."
 
 msgid "rps.cry.16"
-msgstr "Le dernier debout."
+msgstr "La victoire, c'est chasse gardée."
 
 msgid "rps.cry.17"
-msgstr "Tu es à moi."
+msgstr "T'as sonné à la mauvaise porte."
 
 msgid "rps.cry.18"
-msgstr "Défie-moi et saigne."
+msgstr "Cherche-moi, et pleure."
 
 msgid "rps.cry.19"
-msgstr "J'ai tué mieux que toi."
+msgstr "J'ai battu des PNJ plus coriaces."
 
 msgid "rps.cry.20"
-msgstr "Nulle part où fuir."
+msgstr "Le cardio te sauvera pas."
 
 msgid "rps.cry.21"
-msgstr "Sens ma fureur !"
+msgstr "Ressens mon léger agacement !"
 
 msgid "rps.cry.22"
-msgstr "Voici ta fin."
+msgstr "Merci d'avoir joué !"
 
 msgid "rps.cry.23"
-msgstr "Abandonne donc."
+msgstr "Tu peux encore rage-quit."
 
 msgid "rps.cry.24"
-msgstr "Je ne perds jamais."
+msgstr "Invaincu depuis le petit-déj."
 
 msgid "rps.cry.25"
-msgstr "Dis adieu."
+msgstr "Fais coucou, au revoir !"
 
 msgid "rps.cry.26"
-msgstr "Tu as mal choisi."
+msgstr "Mauvais adversaire, champion."
 
 msgid "rps.cry.27"
-msgstr "L'heure est venue de mourir."
+msgstr "Faut t'améliorer, là."
 
 msgid "rps.death.0"
-msgstr "Aïe."
+msgstr "Aïe. Malpoli."
 
 msgid "rps.death.1"
-msgstr "C'est tout ?"
+msgstr "C'est… autorisé, ça ?"
 
 msgid "rps.death.2"
-msgstr "Ça valait le coup."
+msgstr "Ça valait le coup. À peu près."
 
 msgid "rps.death.3"
-msgstr "N'en parle à personne."
+msgstr "N'en parle à personne. Surtout à maman."
 
 msgid "rps.death.4"
-msgstr "Zut…"
+msgstr "Faut nerf ça…"
 
 msgid "rps.death.5"
-msgstr "Ainsi tout s'achève."
+msgstr "GG…"
 
 msgid "rps.death.6"
-msgstr "Je ne regrette… rien."
+msgstr "Je regrette… certaines choses…"
 
 msgid "rps.death.7"
-msgstr "Glorieux…"
+msgstr "Capture… ça…"
 
 msgid "rps.death.8"
-msgstr "Impossible…"
+msgstr "C'était pas… dans le tuto…"
 
 msgid "rps.death.9"
-msgstr "Pas comme ça…"
+msgstr "Pas comme ça… le lag…"
 
 msgid "rps.death.10"
-msgstr "Je reviendrai…"
+msgstr "Je réapparais… c'est sûr…"
 
 msgid "rps.death.11"
-msgstr "Mon… mon trésor…"
+msgstr "Mon butin… était loué…"
 
 msgid "rps.death.12"
-msgstr "Maman avait raison…"
+msgstr "Maman disait… un boulot de bureau…"
 
 msgid "rps.death.13"
-msgstr "J'aurais dû fuir…"
+msgstr "J'aurais dû… esquiver…"
 
 msgid "rps.death.14"
-msgstr "On m'a triché…"
+msgstr "Des triches… c'est clair…"
 
 msgid "rps.death.15"
-msgstr "Si froid…"
+msgstr "Je quitte… la partie… et la vie…"
 
 msgid "rps.death.16"
-msgstr "Souviens-toi de moi…"
+msgstr "Note-moi… cinq étoiles…"
 
 msgid "rps.death.17"
-msgstr "C'était… amusant…"
+msgstr "C'était… en classé…?"
 
 msgid "rps.death.18"
-msgstr "C'est pas juste…"
+msgstr "Désabonne-toi…"
 
 msgid "rps.death.19"
-msgstr "Vaincu… par toi…"
+msgstr "Vaincu… par TOI…?"
 
 msgid "rps.death.20"
-msgstr "La fin… déjà ?"
+msgstr "Manque de skill… le mien…"
 
 msgid "rps.death.21"
-msgstr "Je me rends…"
+msgstr "GG, pas de revanche…"
 
 msgid "rps.death.22"
-msgstr "Sois maudit…"
+msgstr "Un avis… une étoile…"
 
 msgid "rps.death.23"
-msgstr "Ténèbres…"
+msgstr "Chargement… de l'au-delà…"
 
 msgid "rps.death.24"
-msgstr "Bien joué…"
+msgstr "Quel… mème…"
 
 msgid "rps.death.25"
-msgstr "Argh… enfin…"
+msgstr "Enfin… une sieste…"
 
 msgid "rps.death.26"
-msgstr "Raconte mon histoire…"
+msgstr "Poste… ce clip…"
 
 msgid "rps.death.27"
-msgstr "Enfin… le repos…"
+msgstr "AFK… pour toujours…"
 
 msgid "snake.title"
 msgstr "Serpent"
