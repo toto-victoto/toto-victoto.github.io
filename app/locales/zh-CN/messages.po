@@ -229,6 +229,9 @@ msgstr "精英"
 msgid "rps.tier.boss"
 msgstr "首领"
 
+msgid "rps.tier.hidden"
+msgstr "宿敌"
+
 msgid "rps.foe.wanderer.name"
 msgstr "流浪者"
 

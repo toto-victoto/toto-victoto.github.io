@@ -9,10 +9,13 @@ import type { ReactNode } from "react";
 // playfield should be marked `flex-1 min-h-0` so it absorbs whatever
 // vertical space the other rows leave behind; everything else (header,
 // scores, status bar, footer controls) is sized by content.
-export function GameLayout({ children }: { children: ReactNode }) {
+// `tint` is an optional gradient-overlay class (e.g. a boss arena wash) painted
+// over the base background but behind the content.
+export function GameLayout({ children, tint }: { children: ReactNode; tint?: string }) {
   return (
-    <main className="flex h-dvh flex-col overflow-hidden bg-neutral-950 px-3 pt-14 pb-2 text-neutral-100">
-      <div className="mx-auto flex w-full min-h-0 max-w-md flex-1 flex-col gap-2">
+    <main className="relative flex h-dvh flex-col overflow-hidden bg-neutral-950 px-3 pt-14 pb-2 text-neutral-100">
+      {tint && <div className={`pointer-events-none absolute inset-0 ${tint}`} aria-hidden="true" />}
+      <div className="relative z-10 mx-auto flex w-full min-h-0 max-w-md flex-1 flex-col gap-2">
         {children}
       </div>
     </main>

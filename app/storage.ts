@@ -38,7 +38,7 @@ export type Persisted = {
         cry: string;
         wordsId: string;
         lastWords: string;
-        tier?: "semiboss" | "boss";
+        tier?: "semiboss" | "boss" | "hidden";
         maxHp: number;
         str: number;
         def: number;

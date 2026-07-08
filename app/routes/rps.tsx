@@ -42,8 +42,8 @@ const emojiOf = (m: Move) => MOVES.find((x) => x.id === m)!.emoji;
 const MARKER: Record<Move, string> = { rock: "💥", paper: "👋", scissors: "✂️" };
 
 type Stats = { maxHp: number; str: number; def: number; agi: number; dex: number };
-// Elite tiers get a distinctive look (bigger, glowing) and beefier stats.
-type FoeTier = "semiboss" | "boss";
+// Elite tiers get a distinctive look (bigger, glowing, tinted arena).
+type FoeTier = "semiboss" | "boss" | "hidden";
 // `key` slugs the foe's name id (rps.foe.<key>.name). The battle cry and last
 // words are drawn from shared pools (roster bosses keep their signature lines),
 // so each carries its own i18n id + English fallback.
@@ -129,7 +129,7 @@ const ROSTER: Foe[] = ([
   { key: "magus", emoji: "🧙", name: "Magus Orin", cry: "Feel the arcane!", lastWords: "My magic… was 60% vibes…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
   { key: "valkyrie", emoji: "🦸‍♀️", name: "Valkyra", cry: "The slain are mine.", lastWords: "A worthy… fall…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
   { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Kneel before me!", lastWords: "Heavy is… the head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
-  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "boss" },
+  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Your story ends.", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
 ] as Array<Omit<Foe, "cryId" | "wordsId">>).map((f) => ({
   ...f,
   cryId: `rps.foe.${f.key}.cry`,
@@ -267,32 +267,51 @@ const pointsForLevel = (level: number) => 3 + Math.floor(level / 3);
 const statValue = (s: Stats, k: StatKey) => (k === "hp" ? s.maxHp : s[k]);
 
 const ROSTER_SIZE = ROSTER.length;
-// Infinite mode: skip past the whole roster with a round war-chest of points to
-// spend up front, then measure progress as depth (levels past the roster).
-const INFINITE_START_LEVEL = ROSTER_SIZE + 1;
+// Infinite mode: fight post-roster foes (foeIndex starts at ROSTER_SIZE) but
+// count levels from 1, with a round war-chest of points to spend up front.
 const INFINITE_POINTS = 50;
 
-// Distinctive look for elites: a bigger, glowing emoji, a colored name, and a
-// tag. Normal foes render at text-7xl with no tag.
+// Distinctive look for elites: a bigger, glowing emoji, a colored name + tag,
+// a matching glow on the HP bar, and a subtly tinted arena. Normal foes render
+// at text-7xl with none of this.
 const TIER_STYLE: Record<
   FoeTier,
-  { emoji: string; glow: string; name: string; chip: string; chipId: string; chipMsg: string }
+  {
+    emoji: string;
+    glow: string;
+    name: string;
+    chip: string;
+    chipId: string;
+    chipMsg: string;
+    bg: string;
+  }
 > = {
   semiboss: {
     emoji: "text-8xl",
-    glow: "drop-shadow(0 0 14px rgba(251,191,36,0.5))",
+    glow: "drop-shadow(0 0 14px rgba(251,191,36,0.55))",
     name: "text-amber-200",
-    chip: "bg-amber-500/15 text-amber-300 ring-amber-500/40",
+    chip: "bg-amber-500/25 text-amber-200 ring-amber-400/50",
     chipId: "rps.tier.semiboss",
     chipMsg: "Elite",
+    bg: "bg-gradient-to-b from-amber-950/50 via-transparent to-transparent",
   },
   boss: {
-    emoji: "text-9xl",
-    glow: "drop-shadow(0 0 22px rgba(244,63,94,0.6))",
+    emoji: "text-8xl",
+    glow: "drop-shadow(0 0 20px rgba(244,63,94,0.6))",
     name: "text-rose-300",
-    chip: "bg-rose-500/20 text-rose-200 ring-rose-500/50",
+    chip: "bg-rose-500/25 text-rose-200 ring-rose-400/50",
     chipId: "rps.tier.boss",
     chipMsg: "Boss",
+    bg: "bg-gradient-to-b from-rose-950/55 via-transparent to-transparent",
+  },
+  hidden: {
+    emoji: "text-8xl",
+    glow: "drop-shadow(0 0 24px rgba(167,139,250,0.7))",
+    name: "text-violet-300",
+    chip: "bg-violet-500/25 text-violet-200 ring-violet-400/50",
+    chipId: "rps.tier.hidden",
+    chipMsg: "Nemesis",
+    bg: "bg-gradient-to-b from-violet-950/60 via-transparent to-transparent",
   },
 };
 
@@ -495,11 +514,12 @@ function gameReducer(state: GameState, action: Action): GameState {
     case "restart":
       return { ...initialState, mode: "story", foe: action.foe, foeHp: action.foe.maxHp, phase: "intro" };
     case "startInfinite":
-      // Jump past the roster with a war-chest of points to spend up front.
+      // Fight post-roster foes (foeIndex past the roster) but count levels from
+      // 1 like a fresh run, with a war-chest of points to spend up front.
       return {
         ...initialState,
         mode: "infinite",
-        level: INFINITE_START_LEVEL,
+        level: 1,
         foeIndex: ROSTER_SIZE,
         foe: action.foe,
         foeHp: action.foe.maxHp,
@@ -634,9 +654,11 @@ export default function RPS() {
   useEffect(() => {
     if (phase === "death") {
       sfx.win();
+      // Record foes DEFEATED (level - 1): on a kill `level` is already the next
+      // level, so `level - 1` is the one just cleared. Dying with no win → 0.
       if (mode === "infinite")
-        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level - INFINITE_START_LEVEL) }));
-      else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level) }));
+        setStored((s) => ({ ...s, infiniteBest: Math.max(s.infiniteBest ?? 0, level - 1) }));
+      else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level - 1) }));
     } else if (phase === "gameover") {
       sfx.lose();
       setStored((s) => ({ ...s, save: undefined }));
@@ -813,13 +835,14 @@ export default function RPS() {
   return (
     <>
       <BackButton />
-      <GameLayout>
+      <GameLayout tint={ts?.bg}>
         <header className="flex items-baseline justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">
             <Trans id="rps.title" message="RPS Saga" />
           </h1>
           <span className="text-sm font-bold tabular-nums text-amber-300">
-            {infinite ? `♾️ ${level - INFINITE_START_LEVEL}` : `Lv ${level}`}
+            {infinite && "♾️ "}
+            Lv {level}
           </span>
         </header>
 
@@ -846,7 +869,7 @@ export default function RPS() {
           )}
           {ts && (
             <div
-              className={`mx-auto w-fit rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ${ts.chip}`}
+              className={`relative z-10 mx-auto mt-1.5 w-fit rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ${ts.chip}`}
             >
               <Trans id={ts.chipId} message={ts.chipMsg} />
             </div>
@@ -868,7 +891,7 @@ export default function RPS() {
                 <div className="text-right text-[11px] tabular-nums text-neutral-600">???</div>
               </div>
             ) : (
-              <HpBar hp={foeHp} max={foe.maxHp} className="bg-rose-500" />
+              <HpBar hp={foeHp} max={foe.maxHp} className="bg-rose-500" glow={ts?.glow} />
             )}
           </div>
           {hideFoe ? (
@@ -1014,19 +1037,11 @@ export default function RPS() {
                 <Trans id="rps.rpg.defeated" message="You were defeated" />
               </p>
               <p className="text-sm text-neutral-400">
-                {infinite ? (
-                  <Trans
-                    id="rps.infinite.reached"
-                    message="Reached depth {n}"
-                    values={{ n: level - INFINITE_START_LEVEL }}
-                  />
-                ) : (
-                  <Trans id="rps.rpg.reached" message="Reached level {level}" values={{ level }} />
-                )}
+                {infinite && "♾️ "}
+                <Trans id="rps.rpg.reached" message="Reached level {level}" values={{ level }} />
               </p>
               <p className="text-sm font-semibold text-amber-300">
-                <Trans id="common.best" message="Best" /> · {infinite ? null : "Lv "}
-                <span className="tabular-nums">{record}</span>
+                <Trans id="common.best" message="Best" /> · Lv <span className="tabular-nums">{record}</span>
               </p>
               <button
                 onClick={infinite ? startInfinite : restart}
@@ -1244,11 +1259,21 @@ function StrikeBanner({ round, foeName }: { round: Round; foeName: string }) {
   );
 }
 
-function HpBar({ hp, max, className }: { hp: number; max: number; className: string }) {
+function HpBar({
+  hp,
+  max,
+  className,
+  glow,
+}: {
+  hp: number;
+  max: number;
+  className: string;
+  glow?: string;
+}) {
   const pct = Math.max(0, Math.min(100, (hp / max) * 100));
   return (
     <div className="space-y-0.5">
-      <div className="h-2 overflow-hidden rounded-full bg-neutral-800">
+      <div className="h-2 overflow-hidden rounded-full bg-neutral-800" style={{ filter: glow }}>
         <div
           className={`h-full rounded-full transition-[width] duration-300 ${className}`}
           style={{ width: `${pct}%` }}

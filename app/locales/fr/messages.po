@@ -229,6 +229,9 @@ msgstr "Élite"
 msgid "rps.tier.boss"
 msgstr "Boss"
 
+msgid "rps.tier.hidden"
+msgstr "Némésis"
+
 msgid "rps.foe.wanderer.name"
 msgstr "Vagabond"
 
