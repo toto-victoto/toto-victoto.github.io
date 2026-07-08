@@ -63,6 +63,7 @@ const STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi", "dex"];
 // Foes have no DEX (it's the player's multiplier-speed stat) — their stat line
 // and placeholders show these four only.
 const FOE_STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi"];
+// English fallbacks; localized via `rps.stat.label.<k>` (e.g. HP → PV in FR).
 const STAT_LABEL: Record<StatKey, string> = {
   hp: "HP",
   str: "STR",
@@ -492,8 +493,13 @@ function resolveRound(state: GameState, move: Move, foeMove: Move): Round {
     newAnchor = anchor;
     newMults = applyFactors(mults, anchor, player.dex);
     if (outcome === "draw") {
+      // A draw reapplies the factors — but it only "deepens the stance" if
+      // something can still move: offence below its cap, or defence not yet at
+      // full-heal. When both are maxed, it's just a stalemate.
+      const off = newMults[anchor];
+      const def = newMults[BEATS[anchor]];
       newMults = applyFactors(newMults, anchor, player.dex);
-      doubled = true;
+      doubled = off < STAKE_MAX || def > -(100 / HEAL_RATE);
     }
   } else {
     // Switch: the exchange already cashed the current factors; re-anchor on
@@ -629,6 +635,8 @@ export default function RPS() {
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
   const { i18n } = useLingui();
+  const tLabel = (k: StatKey) =>
+    i18n._(`rps.stat.label.${k}`, undefined, { message: STAT_LABEL[k] });
   // Guards the save-snapshot effect until the splash has read any prior run,
   // so we never overwrite a save before offering to continue it.
   const [resumed, setResumed] = useState(false);
@@ -839,55 +847,57 @@ export default function RPS() {
                 <Trans id="rps.splash.tagline" message="An RPG on rock-paper-scissors" />
               </p>
             </div>
-            <div className="flex w-full max-w-xs flex-col gap-3">
-              {storySave && (
-                <button
-                  onClick={() => continueRun(storySave)}
-                  className="w-full rounded-full bg-emerald-500 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
-                >
-                  <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
-                  <span className="tabular-nums">Lv {storySave.level}</span>
-                </button>
-              )}
-              {infiniteUnlocked && infiniteSave && (
-                <button
-                  onClick={() => continueRun(infiniteSave)}
-                  className="w-full rounded-full bg-fuchsia-500 py-3 font-semibold text-neutral-950 transition hover:bg-fuchsia-400 active:scale-95"
-                >
-                  ♾️ <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
-                  <span className="tabular-nums">Lv {infiniteSave.level}</span>
-                </button>
-              )}
-              <button
-                onClick={restart}
-                className={`w-full rounded-full py-3 font-semibold transition active:scale-95 ${
-                  storySave
-                    ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-                    : "bg-sky-500 text-neutral-950 hover:bg-sky-400"
-                }`}
-              >
-                {storySave ? (
-                  <Trans id="rps.splash.restart" message="Restart" />
-                ) : (
-                  <Trans id="rps.splash.start" message="Start" />
-                )}
-              </button>
-              {infiniteUnlocked ? (
-                <button
-                  onClick={startInfinite}
-                  className="w-full rounded-full bg-neutral-800 py-3 font-semibold text-fuchsia-300 ring-1 ring-fuchsia-500/40 transition hover:bg-neutral-700 active:scale-95"
-                >
-                  ♾️ <Trans id="rps.splash.infinite" message="Infinite" />
-                  {(stored.infiniteBest ?? 0) > 0 && (
-                    <span className="ml-1 text-fuchsia-400/70 tabular-nums">
-                      · 🏆 {stored.infiniteBest}
-                    </span>
+            {/* Hold the buttons until localStorage is read, so the correct
+                Continue/Start set appears at once instead of flashing Start. */}
+            <div className="flex min-h-[3.25rem] w-full max-w-xs flex-col gap-3">
+              {resumed && (
+                <>
+                  {storySave && (
+                    <button
+                      onClick={() => continueRun(storySave)}
+                      className="w-full rounded-full bg-emerald-500 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
+                    >
+                      <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
+                      <span className="tabular-nums">Lv {storySave.level}</span>
+                    </button>
                   )}
-                </button>
-              ) : (
-                <div className="w-full rounded-full bg-neutral-900 py-3 text-center text-sm font-medium text-neutral-500 ring-1 ring-neutral-800">
-                  🔒 ♾️ <Trans id="rps.splash.infinite_locked" message="Reach Adventure Lv 9" />
-                </div>
+                  {infiniteUnlocked && infiniteSave && (
+                    <button
+                      onClick={() => continueRun(infiniteSave)}
+                      className="w-full rounded-full bg-fuchsia-500 py-3 font-semibold text-neutral-950 transition hover:bg-fuchsia-400 active:scale-95"
+                    >
+                      ♾️ <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
+                      <span className="tabular-nums">Lv {infiniteSave.level}</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={restart}
+                    className={`w-full rounded-full py-3 font-semibold transition active:scale-95 ${
+                      storySave
+                        ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                        : "bg-sky-500 text-neutral-950 hover:bg-sky-400"
+                    }`}
+                  >
+                    {storySave ? (
+                      <Trans id="rps.splash.restart" message="Restart" />
+                    ) : (
+                      <Trans id="rps.splash.start" message="Start" />
+                    )}
+                  </button>
+                  {infiniteUnlocked && (
+                    <button
+                      onClick={startInfinite}
+                      className="w-full rounded-full bg-neutral-800 py-3 font-semibold text-fuchsia-300 ring-1 ring-fuchsia-500/40 transition hover:bg-neutral-700 active:scale-95"
+                    >
+                      ♾️ <Trans id="rps.splash.infinite" message="Infinite" />
+                      {(stored.infiniteBest ?? 0) > 0 && (
+                        <span className="ml-1 text-fuchsia-400/70 tabular-nums">
+                          · 🏆 {stored.infiniteBest}
+                        </span>
+                      )}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -962,7 +972,7 @@ export default function RPS() {
             <div className="flex justify-center gap-3 text-[11px] tabular-nums text-neutral-600">
               {FOE_STAT_KEYS.map((k) => (
                 <span key={k}>
-                  <span>{STAT_LABEL[k]}</span> ?
+                  <span>{tLabel(k)}</span> ?
                 </span>
               ))}
             </div>
@@ -1064,7 +1074,7 @@ export default function RPS() {
               <div className="space-y-1.5">
                 {STAT_KEYS.map((k) => (
                   <div key={k} className="flex items-center gap-3">
-                    <span className="w-10 text-neutral-400">{STAT_LABEL[k]}</span>
+                    <span className="w-10 text-neutral-400">{tLabel(k)}</span>
                     <span className="flex-1 tabular-nums text-neutral-200">
                       {statValue(player, k)}
                       {alloc[k] > 0 && (
@@ -1216,7 +1226,7 @@ export default function RPS() {
               <dl className="space-y-2 text-sm">
                 {STAT_KEYS.map((k) => (
                   <div key={k} className="flex gap-3">
-                    <dt className="w-9 shrink-0 font-bold text-neutral-300">{STAT_LABEL[k]}</dt>
+                    <dt className="w-9 shrink-0 font-bold text-neutral-300">{tLabel(k)}</dt>
                     <dd className="text-neutral-400">
                       <Trans id={STAT_HELP_ID[k]} message={STAT_HELP[k]} />
                     </dd>
@@ -1359,6 +1369,7 @@ function StatLine({
   highlight?: boolean;
   omitDex?: boolean;
 }) {
+  const { i18n } = useLingui();
   const keys = omitDex ? FOE_STAT_KEYS : STAT_KEYS;
   return (
     <div
@@ -1368,7 +1379,10 @@ function StatLine({
     >
       {keys.map((k) => (
         <span key={k}>
-          <span className="text-neutral-500">{STAT_LABEL[k]}</span> {statValue(stats, k)}
+          <span className="text-neutral-500">
+            {i18n._(`rps.stat.label.${k}`, undefined, { message: STAT_LABEL[k] })}
+          </span>{" "}
+          {statValue(stats, k)}
         </span>
       ))}
     </div>

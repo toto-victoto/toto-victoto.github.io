@@ -91,6 +91,21 @@ msgstr "Stats"
 msgid "rps.stats.gotit"
 msgstr "Got it"
 
+msgid "rps.stat.label.hp"
+msgstr "HP"
+
+msgid "rps.stat.label.str"
+msgstr "STR"
+
+msgid "rps.stat.label.def"
+msgstr "DEF"
+
+msgid "rps.stat.label.agi"
+msgstr "AGI"
+
+msgid "rps.stat.label.dex"
+msgstr "DEX"
+
 msgid "rps.stat.hp"
 msgstr "Health. Hit 0 and you're defeated."
 

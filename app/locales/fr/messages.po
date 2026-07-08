@@ -91,6 +91,21 @@ msgstr "Stats"
 msgid "rps.stats.gotit"
 msgstr "Compris"
 
+msgid "rps.stat.label.hp"
+msgstr "PV"
+
+msgid "rps.stat.label.str"
+msgstr "FOR"
+
+msgid "rps.stat.label.def"
+msgstr "DEF"
+
+msgid "rps.stat.label.agi"
+msgstr "AGI"
+
+msgid "rps.stat.label.dex"
+msgstr "DEX"
+
 msgid "rps.stat.hp"
 msgstr "Points de vie. À 0, tu es vaincu."
 

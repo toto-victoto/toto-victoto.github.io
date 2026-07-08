@@ -91,6 +91,21 @@ msgstr "属性"
 msgid "rps.stats.gotit"
 msgstr "知道了"
 
+msgid "rps.stat.label.hp"
+msgstr "生命"
+
+msgid "rps.stat.label.str"
+msgstr "力量"
+
+msgid "rps.stat.label.def"
+msgstr "防御"
+
+msgid "rps.stat.label.agi"
+msgstr "敏捷"
+
+msgid "rps.stat.label.dex"
+msgstr "灵巧"
+
 msgid "rps.stat.hp"
 msgstr "生命值。归零即被击败。"
 
