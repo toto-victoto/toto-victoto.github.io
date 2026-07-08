@@ -60,6 +60,9 @@ type Foe = Stats & {
 type StatKey = "hp" | "str" | "def" | "agi" | "dex";
 
 const STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi", "dex"];
+// Foes have no DEX (it's the player's multiplier-speed stat) — their stat line
+// and placeholders show these four only.
+const FOE_STAT_KEYS: StatKey[] = ["hp", "str", "def", "agi"];
 const STAT_LABEL: Record<StatKey, string> = {
   hp: "HP",
   str: "STR",
@@ -184,20 +187,21 @@ const ARCHETYPES: { key: string; emoji: string; name: string; profile: Profile }
   { key: "kraken", emoji: "🐙", name: "Kraken", profile: "wall" },
 ];
 
-// Each profile is an HP multiplier + how the combat budget (STR/DEF/AGI/DEX)
-// splits (weights sum to 1). HP and the combat budget are scaled separately
-// from the player so the ~10× HP scale never swamps the small combat stats.
-const PROFILES: Record<Profile, { hp: number; w: Record<Exclude<StatKey, "hp">, number> }> = {
-  strong: { hp: 1.0, w: { str: 0.55, def: 0.2, agi: 0.2, dex: 0.05 } }, // heavy hitter
-  wall: { hp: 1.35, w: { str: 0.2, def: 0.55, agi: 0.15, dex: 0.1 } }, // defensive
-  swift: { hp: 0.85, w: { str: 0.32, def: 0.13, agi: 0.5, dex: 0.05 } }, // fast, double-strikes
-  balanced: { hp: 1.05, w: { str: 0.3, def: 0.3, agi: 0.25, dex: 0.15 } }, // all-rounder
-  trickster: { hp: 0.9, w: { str: 0.28, def: 0.2, agi: 0.22, dex: 0.3 } }, // dexterous
-  glass: { hp: 0.6, w: { str: 0.62, def: 0.08, agi: 0.25, dex: 0.05 } }, // glass cannon
-  juggernaut: { hp: 1.7, w: { str: 0.22, def: 0.55, agi: 0.13, dex: 0.1 } }, // super tank
-  berserker: { hp: 0.95, w: { str: 0.48, def: 0.1, agi: 0.37, dex: 0.05 } }, // reckless offense
-  skirmisher: { hp: 0.8, w: { str: 0.35, def: 0.12, agi: 0.48, dex: 0.05 } }, // hit-and-run
-  warlock: { hp: 0.85, w: { str: 0.42, def: 0.18, agi: 0.15, dex: 0.25 } }, // caster
+// Each profile is an HP multiplier + how the combat budget splits across the
+// stats that actually matter in a fight (STR/DEF/AGI — weights sum to 1). DEX is
+// a player-only stat (multiplier speed), so foes don't get one. HP and the
+// combat budget scale separately so the ~10× HP scale never swamps the rest.
+const PROFILES: Record<Profile, { hp: number; w: Record<"str" | "def" | "agi", number> }> = {
+  strong: { hp: 1.0, w: { str: 0.57, def: 0.22, agi: 0.21 } }, // heavy hitter
+  wall: { hp: 1.35, w: { str: 0.22, def: 0.6, agi: 0.18 } }, // defensive
+  swift: { hp: 0.85, w: { str: 0.32, def: 0.13, agi: 0.55 } }, // fast, double-strikes
+  balanced: { hp: 1.05, w: { str: 0.34, def: 0.33, agi: 0.33 } }, // all-rounder
+  trickster: { hp: 0.9, w: { str: 0.4, def: 0.22, agi: 0.38 } }, // evasive duelist
+  glass: { hp: 0.6, w: { str: 0.66, def: 0.09, agi: 0.25 } }, // glass cannon
+  juggernaut: { hp: 1.7, w: { str: 0.24, def: 0.6, agi: 0.16 } }, // super tank
+  berserker: { hp: 0.95, w: { str: 0.52, def: 0.1, agi: 0.38 } }, // reckless offense
+  skirmisher: { hp: 0.8, w: { str: 0.46, def: 0.12, agi: 0.42 } }, // fast bruiser
+  warlock: { hp: 0.75, w: { str: 0.62, def: 0.26, agi: 0.12 } }, // fragile nuker
 };
 
 const CRIES = [
@@ -255,7 +259,7 @@ function makeFoe(index: number, player: Stats = START): Foe {
     str: vary(combat * w.str, swing, 1),
     def: vary(combat * w.def, swing, 0),
     agi: vary(combat * w.agi, swing, 1),
-    dex: vary(combat * w.dex, swing, 0),
+    dex: 0, // DEX is a player-only stat — foes don't use or show it
   };
 }
 
@@ -869,14 +873,14 @@ export default function RPS() {
           </div>
           {hideFoe ? (
             <div className="flex justify-center gap-3 text-[11px] tabular-nums text-neutral-600">
-              {STAT_KEYS.map((k) => (
+              {FOE_STAT_KEYS.map((k) => (
                 <span key={k}>
                   <span>{STAT_LABEL[k]}</span> ?
                 </span>
               ))}
             </div>
           ) : (
-            <StatLine stats={foe} />
+            <StatLine stats={foe} omitDex />
           )}
         </section>
 
@@ -1257,14 +1261,23 @@ function HpBar({ hp, max, className }: { hp: number; max: number; className: str
   );
 }
 
-function StatLine({ stats, highlight }: { stats: Stats; highlight?: boolean }) {
+function StatLine({
+  stats,
+  highlight,
+  omitDex,
+}: {
+  stats: Stats;
+  highlight?: boolean;
+  omitDex?: boolean;
+}) {
+  const keys = omitDex ? FOE_STAT_KEYS : STAT_KEYS;
   return (
     <div
       className={`flex justify-center gap-3 text-[11px] tabular-nums ${
         highlight ? "text-neutral-300" : "text-neutral-500"
       }`}
     >
-      {STAT_KEYS.map((k) => (
+      {keys.map((k) => (
         <span key={k}>
           <span className="text-neutral-500">{STAT_LABEL[k]}</span> {statValue(stats, k)}
         </span>
