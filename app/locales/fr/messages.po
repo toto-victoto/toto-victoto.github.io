@@ -307,6 +307,9 @@ msgstr "Glorieux…"
 msgid "rps.splash.infinite"
 msgstr "Infini"
 
+msgid "rps.splash.infinite_locked"
+msgstr "Atteins Lv 9 en Aventure"
+
 msgid "rps.setup.title"
 msgstr "Prépare-toi"
 

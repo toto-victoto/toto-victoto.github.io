@@ -307,6 +307,9 @@ msgstr "Glorious…"
 msgid "rps.splash.infinite"
 msgstr "Infinite"
 
+msgid "rps.splash.infinite_locked"
+msgstr "Reach Adventure Lv 9"
+
 msgid "rps.setup.title"
 msgstr "Gear up"
 

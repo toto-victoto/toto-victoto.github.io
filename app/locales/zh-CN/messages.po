@@ -307,6 +307,9 @@ msgstr "壮哉……"
 msgid "rps.splash.infinite"
 msgstr "无限"
 
+msgid "rps.splash.infinite_locked"
+msgstr "在冒险模式达到 Lv 9"
+
 msgid "rps.setup.title"
 msgstr "备战"
 

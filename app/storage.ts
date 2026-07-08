@@ -13,6 +13,36 @@ const SCHEMA_VERSION = 1;
 
 type Player = "X" | "O";
 
+// An in-progress RPS run, snapshotted at the move-choice screen so a refresh
+// mid-fight resumes instead of restarting. The foe is stored whole (its
+// stats/flavor are randomized, so it can't be regenerated).
+export type RpsSave = {
+  mode: "story" | "infinite";
+  player: { maxHp: number; str: number; def: number; agi: number; dex: number };
+  hp: number;
+  level: number;
+  foeIndex: number;
+  foe: {
+    key: string;
+    emoji: string;
+    name: string;
+    cryId: string;
+    cry: string;
+    wordsId: string;
+    lastWords: string;
+    tier?: "semiboss" | "boss" | "hidden";
+    maxHp: number;
+    str: number;
+    def: number;
+    agi: number;
+    dex: number;
+  };
+  foeHp: number;
+  mults: { rock: number; paper: number; scissors: number };
+  anchor: "rock" | "paper" | "scissors" | null;
+  seed?: number;
+};
+
 export type Persisted = {
   snake: { best: number };
   flappy: { best: number };
@@ -21,35 +51,9 @@ export type Persisted = {
     bestLevel: number;
     // Best "infinite" run, measured as levels reached past the roster.
     infiniteBest?: number;
-    // In-progress run, snapshotted whenever the player is at the move-choice
-    // screen, so a refresh mid-fight resumes instead of restarting. The foe is
-    // stored whole (its stats/flavor are randomized, so it can't be regenerated).
-    save?: {
-      mode: "story" | "infinite";
-      player: { maxHp: number; str: number; def: number; agi: number; dex: number };
-      hp: number;
-      level: number;
-      foeIndex: number;
-      foe: {
-        key: string;
-        emoji: string;
-        name: string;
-        cryId: string;
-        cry: string;
-        wordsId: string;
-        lastWords: string;
-        tier?: "semiboss" | "boss" | "hidden";
-        maxHp: number;
-        str: number;
-        def: number;
-        agi: number;
-        dex: number;
-      };
-      foeHp: number;
-      mults: { rock: number; paper: number; scissors: number };
-      anchor: "rock" | "paper" | "scissors" | null;
-      seed?: number;
-    };
+    // Separate resumable snapshots per mode.
+    save?: RpsSave; // adventure
+    infiniteSave?: RpsSave; // infinite
   };
   roulette: { best: number; balance: number; history: number[] };
   ultimate: {

@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
-import { peekGame, useStoredGame, type Persisted } from "../storage";
+import { peekGame, useStoredGame, type RpsSave } from "../storage";
 import { sfx, startTitleTheme, stopTitleTheme } from "../sound";
 
 // An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
@@ -354,8 +354,6 @@ type Phase =
   | "levelup"
   | "gameover";
 type Mode = "story" | "infinite";
-// The snapshot persisted at the move-choice screen (see storage's Persisted.rps).
-type SavedRun = NonNullable<Persisted["rps"]["save"]>;
 type Round = {
   player: Move;
   foe: Move;
@@ -433,7 +431,7 @@ const applyAlloc = (p: Stats, a: Record<StatKey, number>): Stats => ({
 });
 
 type Action =
-  | { type: "continue"; save: SavedRun; seed: number }
+  | { type: "continue"; save: RpsSave; seed: number }
   | { type: "restart"; foe: Foe; seed: number }
   | { type: "startInfinite"; foe: Foe; seed: number }
   | { type: "introDone" }
@@ -634,13 +632,16 @@ export default function RPS() {
   // Guards the save-snapshot effect until the splash has read any prior run,
   // so we never overwrite a save before offering to continue it.
   const [resumed, setResumed] = useState(false);
-  // An interrupted run found on mount (snapshotted at the move-choice screen),
-  // offered as "Continue" on the splash. null → no run to resume.
-  const [savedRun, setSavedRun] = useState<SavedRun | null>(null);
+  // Interrupted runs found on mount — one per mode, each offered as its own
+  // "Continue" on the splash. null → no run to resume in that mode.
+  const [storySave, setStorySave] = useState<RpsSave | null>(null);
+  const [infiniteSave, setInfiniteSave] = useState<RpsSave | null>(null);
 
-  // On mount, surface any interrupted run for the splash's Continue button.
+  // On mount, surface any interrupted runs for the splash's Continue buttons.
   useEffect(() => {
-    setSavedRun(peekGame("rps")?.save ?? null);
+    const s = peekGame("rps");
+    setStorySave(s?.save ?? null);
+    setInfiniteSave(s?.infiniteSave ?? null);
     setResumed(true);
   }, []);
 
@@ -653,30 +654,30 @@ export default function RPS() {
 
   const rollSeed = () => Math.floor(Math.random() * 0x7fffffff);
 
-  const continueRun = () => {
-    if (savedRun) dispatch({ type: "continue", save: savedRun, seed: savedRun.seed ?? rollSeed() });
+  const continueRun = (save: RpsSave) => {
+    dispatch({ type: "continue", save, seed: save.seed ?? rollSeed() });
   };
 
-  // Start a fresh story run; drop the resume snapshot, keep the records.
+  // Start a fresh story run; drop only the adventure snapshot (records survive).
   const restart = () => {
     dispatch({ type: "restart", foe: makeFoe(0), seed: rollSeed() });
     setStored((s) => ({ ...s, save: undefined }));
   };
 
-  // Jump into infinite mode; drop any story snapshot (records survive).
+  // Jump into a fresh infinite run; drop only the infinite snapshot.
   const startInfinite = () => {
     dispatch({ type: "startInfinite", foe: makeFoe(ROSTER_SIZE), seed: rollSeed() });
-    setStored((s) => ({ ...s, save: undefined }));
+    setStored((s) => ({ ...s, infiniteSave: undefined }));
   };
 
   // Snapshot the run every time we land on the move-choice screen — the one
-  // stable, resumable moment (never mid-animation).
+  // stable, resumable moment (never mid-animation). Each mode has its own slot.
   useEffect(() => {
     if (!resumed || phase !== "choose") return;
-    setStored((s) => ({
-      ...s,
-      save: { mode, player, hp, level, foeIndex, foe, foeHp, mults, anchor, seed },
-    }));
+    const snap: RpsSave = { mode, player, hp, level, foeIndex, foe, foeHp, mults, anchor, seed };
+    setStored((s) =>
+      mode === "infinite" ? { ...s, infiniteSave: snap } : { ...s, save: snap },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumed, phase]);
 
@@ -692,7 +693,10 @@ export default function RPS() {
       else setStored((s) => ({ ...s, bestLevel: Math.max(s.bestLevel, level - 1) }));
     } else if (phase === "gameover") {
       sfx.lose();
-      setStored((s) => ({ ...s, save: undefined }));
+      // Run's over — clear only this mode's snapshot, keep records + the other mode.
+      setStored((s) =>
+        mode === "infinite" ? { ...s, infiniteSave: undefined } : { ...s, save: undefined },
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -795,8 +799,11 @@ export default function RPS() {
   // During the infinite pre-fight, the foe is a mystery until points are spent.
   const hideFoe = phase === "setup";
   const foeEmoji = showingTomb ? "🪦" : hideFoe ? "❔" : foe.emoji;
-  // Elite styling — suppressed while a gravestone or hidden.
-  const ts = !showingTomb && !hideFoe && foe.tier ? TIER_STYLE[foe.tier] : null;
+  const tierStyle = foe.tier ? TIER_STYLE[foe.tier] : null;
+  // Full elite treatment (badge/name/glow/tint) only during the live fight…
+  const ts = !showingTomb && !hideFoe ? tierStyle : null;
+  // …but keep the emoji SIZE through the gravestone so the layout doesn't jump.
+  const foeSize = !hideFoe && tierStyle ? tierStyle.emoji : "text-7xl";
   // Localized foe flavor — the stored English literals are the fallbacks.
   const foeName = i18n._(`rps.foe.${foe.key}.name`, undefined, { message: foe.name });
   const foeCry = i18n._(foe.cryId, undefined, { message: foe.cry });
@@ -805,6 +812,8 @@ export default function RPS() {
   // Infinite runs measure progress as levels past the roster.
   const infinite = mode === "infinite";
   const record = infinite ? stored.infiniteBest ?? 0 : stored.bestLevel;
+  // Infinite unlocks once the adventure record hits 9 (beat the King).
+  const infiniteUnlocked = stored.bestLevel >= 9;
 
   // Title screen — shown on load, before any fight. Offers Continue (when a
   // run was interrupted) and Start / Restart.
@@ -831,41 +840,55 @@ export default function RPS() {
               </p>
             </div>
             <div className="flex w-full max-w-xs flex-col gap-3">
-              {savedRun && (
+              {storySave && (
                 <button
-                  onClick={continueRun}
+                  onClick={() => continueRun(storySave)}
                   className="w-full rounded-full bg-emerald-500 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
                 >
-                  {savedRun.mode === "infinite" && "♾️ "}
                   <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
-                  <span className="tabular-nums">Lv {savedRun.level}</span>
+                  <span className="tabular-nums">Lv {storySave.level}</span>
+                </button>
+              )}
+              {infiniteUnlocked && infiniteSave && (
+                <button
+                  onClick={() => continueRun(infiniteSave)}
+                  className="w-full rounded-full bg-fuchsia-500 py-3 font-semibold text-neutral-950 transition hover:bg-fuchsia-400 active:scale-95"
+                >
+                  ♾️ <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
+                  <span className="tabular-nums">Lv {infiniteSave.level}</span>
                 </button>
               )}
               <button
                 onClick={restart}
                 className={`w-full rounded-full py-3 font-semibold transition active:scale-95 ${
-                  savedRun
+                  storySave
                     ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
                     : "bg-sky-500 text-neutral-950 hover:bg-sky-400"
                 }`}
               >
-                {savedRun ? (
+                {storySave ? (
                   <Trans id="rps.splash.restart" message="Restart" />
                 ) : (
                   <Trans id="rps.splash.start" message="Start" />
                 )}
               </button>
-              <button
-                onClick={startInfinite}
-                className="w-full rounded-full bg-neutral-800 py-3 font-semibold text-fuchsia-300 ring-1 ring-fuchsia-500/40 transition hover:bg-neutral-700 active:scale-95"
-              >
-                ♾️ <Trans id="rps.splash.infinite" message="Infinite" />
-                {(stored.infiniteBest ?? 0) > 0 && (
-                  <span className="ml-1 text-fuchsia-400/70 tabular-nums">
-                    · 🏆 {stored.infiniteBest}
-                  </span>
-                )}
-              </button>
+              {infiniteUnlocked ? (
+                <button
+                  onClick={startInfinite}
+                  className="w-full rounded-full bg-neutral-800 py-3 font-semibold text-fuchsia-300 ring-1 ring-fuchsia-500/40 transition hover:bg-neutral-700 active:scale-95"
+                >
+                  ♾️ <Trans id="rps.splash.infinite" message="Infinite" />
+                  {(stored.infiniteBest ?? 0) > 0 && (
+                    <span className="ml-1 text-fuchsia-400/70 tabular-nums">
+                      · 🏆 {stored.infiniteBest}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <div className="w-full rounded-full bg-neutral-900 py-3 text-center text-sm font-medium text-neutral-500 ring-1 ring-neutral-800">
+                  🔒 ♾️ <Trans id="rps.splash.infinite_locked" message="Reach Adventure Lv 9" />
+                </div>
+              )}
             </div>
           </div>
         </GameLayout>
@@ -891,7 +914,7 @@ export default function RPS() {
         <section className="relative space-y-1 text-center">
           <div
             key={foeHitting ? `foe-${hit.key}` : "foe-static"}
-            className={`inline-block leading-none will-change-transform ${ts ? ts.emoji : "text-7xl"}`}
+            className={`inline-block leading-none will-change-transform ${foeSize}`}
             style={{ animation: foeAnim, filter: ts?.glow }}
             aria-hidden="true"
           >
