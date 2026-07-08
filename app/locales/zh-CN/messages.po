@@ -67,6 +67,15 @@ msgstr "你被击败了"
 msgid "rps.rpg.reached"
 msgstr "达到第 {level} 级"
 
+msgid "rps.splash.tagline"
+msgstr "石头剪刀布 RPG"
+
+msgid "rps.splash.start"
+msgstr "开始"
+
+msgid "rps.splash.restart"
+msgstr "重新开始"
+
 msgid "rps.round.win"
 msgstr "你赢下这一回合！"
 

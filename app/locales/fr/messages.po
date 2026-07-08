@@ -67,6 +67,15 @@ msgstr "Tu as été vaincu"
 msgid "rps.rpg.reached"
 msgstr "Niveau {level} atteint"
 
+msgid "rps.splash.tagline"
+msgstr "Un RPG au pierre-feuille-ciseaux"
+
+msgid "rps.splash.start"
+msgstr "Commencer"
+
+msgid "rps.splash.restart"
+msgstr "Recommencer"
+
 msgid "rps.round.win"
 msgstr "Tu gagnes la manche !"
 

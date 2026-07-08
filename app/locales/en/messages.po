@@ -67,6 +67,15 @@ msgstr "You were defeated"
 msgid "rps.rpg.reached"
 msgstr "Reached level {level}"
 
+msgid "rps.splash.tagline"
+msgstr "An RPG on rock-paper-scissors"
+
+msgid "rps.splash.start"
+msgstr "Start"
+
+msgid "rps.splash.restart"
+msgstr "Restart"
+
 msgid "rps.round.win"
 msgstr "You win the round!"
 

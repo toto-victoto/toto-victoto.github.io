@@ -3,17 +3,18 @@ import { Trans, useLingui } from "@lingui/react";
 import type { Route } from "./+types/rps";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
-import { peekGame, useStoredGame } from "../storage";
+import { peekGame, useStoredGame, type Persisted } from "../storage";
 import { sfx } from "../sound";
 
 // An RPG on rock-paper-scissors. The RPS itself stays pure & random — the
 // strategy is PER-MOVE stakes: each move carries its own multiplier that scales
 // the exchange you commit it to (damage dealt on a win, taken on a loss).
-// Around an ANCHOR move: the anchor is OFFENSIVE and climbs ×1.2 each time you
-// repeat it; the move it beats is DEFENSIVE and sheds 0.1 toward a floor; the
-// third holds at 1. Repeat to push your lean (a draw pushes it once more);
-// switch to a new move to cash the current factors, then reset all three to 1
-// and re-anchor. First POC — numbers to tune.
+// Around an ANCHOR move: the anchor is OFFENSIVE and climbs by CLIMB each time
+// you repeat it; the move it beats is DEFENSIVE and sheds DROP per repeat with
+// NO floor — once it crosses below zero that move HEALS instead of dealing
+// damage. The third move holds at 1. Repeat to push your lean (a draw pushes it
+// once more); switch to a new move to cash the current factors, then reset all
+// three to 1 and re-anchor.
 
 type Move = "rock" | "paper" | "scissors";
 type Outcome = "win" | "lose" | "draw";
@@ -166,6 +167,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 type Phase =
+  | "splash"
   | "intro"
   | "choose"
   | "count"
@@ -174,6 +176,8 @@ type Phase =
   | "death"
   | "levelup"
   | "gameover";
+// The snapshot persisted at the move-choice screen (see storage's Persisted.rps).
+type SavedRun = NonNullable<Persisted["rps"]["save"]>;
 type Round = {
   player: Move;
   foe: Move;
@@ -199,7 +203,7 @@ export default function RPS() {
   const [foeIndex, setFoeIndex] = useState(0);
   const [foe, setFoe] = useState<Foe>(() => makeFoe(0));
   const [foeHp, setFoeHp] = useState(() => makeFoe(0).maxHp);
-  const [phase, setPhase] = useState<Phase>("intro");
+  const [phase, setPhase] = useState<Phase>("splash");
   const [count, setCount] = useState(0);
   const [round, setRound] = useState<Round | null>(null);
   const [hit, setHit] = useState<Hit | null>(null);
@@ -218,27 +222,33 @@ export default function RPS() {
   const [stored, setStored] = useStoredGame("rps", { bestLevel: 0 });
   const [showStats, setShowStats] = useState(false);
   const { i18n } = useLingui();
-  // Guards the save-snapshot effect until we've had a chance to restore any
-  // in-progress run, so we never overwrite a save before reading it.
+  // Guards the save-snapshot effect until the splash has read any prior run,
+  // so we never overwrite a save before offering to continue it.
   const [resumed, setResumed] = useState(false);
+  // An interrupted run found on mount (snapshotted at the move-choice screen),
+  // offered as "Continue" on the splash. null → no run to resume.
+  const [savedRun, setSavedRun] = useState<SavedRun | null>(null);
 
-  // On mount, restore an interrupted run (snapshotted at the move-choice
-  // screen) so a page refresh mid-fight continues instead of starting over.
+  // On mount, surface any interrupted run for the splash's Continue button.
   useEffect(() => {
-    const sv = peekGame("rps")?.save;
-    if (sv) {
-      setPlayer(sv.player);
-      setHp(sv.hp);
-      setLevel(sv.level);
-      setFoeIndex(sv.foeIndex);
-      setFoe(makeFoe(sv.foeIndex));
-      setFoeHp(sv.foeHp);
-      setMults(sv.mults);
-      setAnchor(sv.anchor);
-      setPhase("choose");
-    }
+    setSavedRun(peekGame("rps")?.save ?? null);
     setResumed(true);
   }, []);
+
+  // Resume the snapshotted run and drop straight into the move-choice screen.
+  const continueRun = () => {
+    if (!savedRun) return;
+    setPlayer(savedRun.player);
+    setHp(savedRun.hp);
+    setLevel(savedRun.level);
+    setFoeIndex(savedRun.foeIndex);
+    setFoe(makeFoe(savedRun.foeIndex));
+    setFoeHp(savedRun.foeHp);
+    setMults(savedRun.mults);
+    setAnchor(savedRun.anchor);
+    setRound(null);
+    setPhase("choose");
+  };
 
   // Snapshot the run every time we land on the move-choice screen — the one
   // stable, resumable moment (never mid-animation).
@@ -464,6 +474,58 @@ export default function RPS() {
   const foeName = i18n._(`rps.foe.${foe.key}.name`, undefined, { message: foe.name });
   const foeCry = i18n._(`rps.foe.${foe.key}.cry`, undefined, { message: foe.cry });
   const foeWords = i18n._(`rps.foe.${foe.key}.words`, undefined, { message: foe.lastWords });
+
+  // Title screen — shown on load, before any fight. Offers Continue (when a
+  // run was interrupted) and Start / Restart.
+  if (phase === "splash") {
+    return (
+      <>
+        <BackButton />
+        <GameLayout>
+          <div className="flex flex-1 flex-col items-center justify-center gap-12 text-center">
+            <div className="space-y-4 motion-safe:animate-rps-tick">
+              <div className="flex items-center justify-center gap-3 text-5xl">
+                <span aria-hidden="true">✊</span>
+                <span aria-hidden="true">✋</span>
+                <span aria-hidden="true">✌️</span>
+              </div>
+              <h1 className="bg-gradient-to-br from-amber-200 via-orange-400 to-rose-500 bg-clip-text text-6xl font-black tracking-tighter text-transparent drop-shadow-[0_2px_12px_rgba(251,146,60,0.35)]">
+                RPS Saga
+              </h1>
+              <p className="text-sm text-neutral-500">
+                <Trans id="rps.splash.tagline" message="An RPG on rock-paper-scissors" />
+              </p>
+            </div>
+            <div className="flex w-full max-w-xs flex-col gap-3">
+              {savedRun && (
+                <button
+                  onClick={continueRun}
+                  className="w-full rounded-full bg-emerald-500 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
+                >
+                  <Trans id="rps.rpg.continue" message="Continue" /> ·{" "}
+                  <span className="tabular-nums">Lv {savedRun.level}</span>
+                </button>
+              )}
+              <button
+                onClick={restart}
+                className={`w-full rounded-full py-3 font-semibold transition active:scale-95 ${
+                  savedRun
+                    ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                    : "bg-sky-500 text-neutral-950 hover:bg-sky-400"
+                }`}
+              >
+                {savedRun ? (
+                  <Trans id="rps.splash.restart" message="Restart" />
+                ) : (
+                  <Trans id="rps.splash.start" message="Start" />
+                )}
+              </button>
+            </div>
+          </div>
+        </GameLayout>
+      </>
+    );
+  }
 
   return (
     <>
