@@ -328,11 +328,17 @@ msgstr "在冒险模式达到 Lv 9"
 msgid "rps.setup.title"
 msgstr "备战"
 
+msgid "rps.prologue.title"
+msgstr "RPS 王国"
+
+msgid "rps.prologue.body"
+msgstr "善良的奥德温国王曾以仁治国——直到一个恶魔白住进来，把他和他的勇士们都变坏了。拿起你的拳头、手掌和剪刀吧，冒险者：总得有人把它赶出去。"
+
 msgid "rps.victory.title"
 msgstr "胜利！"
 
 msgid "rps.victory.body"
-msgstr "你击败了黑暗领主！"
+msgstr "王座背后的恶魔恐惧沃尔克被驱逐了！奥德温国王醒来，喃喃自语着一个奇怪的梦。RPS 王国重获自由，而你如今基本上算得上皇室成员了。"
 
 msgid "rps.victory.unlocked"
 msgstr "♾️ 无限模式已解锁！"

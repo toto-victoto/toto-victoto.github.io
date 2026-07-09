@@ -328,11 +328,17 @@ msgstr "Reach Adventure Lv 9"
 msgid "rps.setup.title"
 msgstr "Gear up"
 
+msgid "rps.prologue.title"
+msgstr "The RPS Kingdom"
+
+msgid "rps.prologue.body"
+msgstr "Kind King Aldwin ruled with a fair hand — until a demon moved in, rent-free, and turned him rotten, his champions with him. Grab your fists, palms and scissors, adventurer: someone has to evict it."
+
 msgid "rps.victory.title"
 msgstr "Victory!"
 
 msgid "rps.victory.body"
-msgstr "You vanquished the Dark Lord!"
+msgstr "Dread Volk — the demon behind the throne — is banished! King Aldwin wakes, mumbling about a strange dream. The RPS Kingdom is free, and you're basically royalty now."
 
 msgid "rps.victory.unlocked"
 msgstr "♾️ Infinite mode unlocked!"

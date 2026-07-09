@@ -88,11 +88,17 @@ const STAT_HELP_ID: Record<StatKey, string> = {
 };
 // Applied gain per allocated point — shown on the level-up screen AND used to
 // apply the allocation, so the two can't drift apart.
-const STAT_GAIN: Record<StatKey, number> = { hp: 18, str: 1, def: 1, agi: 1, dex: 1 };
+const STAT_GAIN: Record<StatKey, number> = { hp: 10, str: 1, def: 1, agi: 1, dex: 1 };
 
-// Numbers run on a ~10× scale: a level-1 hero has 100 HP and lands ~10 base
-// damage, so a turtled ×0.1 hit chips 1 and an escalated one bites deep.
-const START: Stats = { maxHp: 100, str: 10, def: 5, agi: 3, dex: 0 };
+// Global HP dial. Damage is HP-independent, so lowering this shortens every
+// fight (roster HP + START scale by it; generated foes/heal follow player.maxHp).
+// Dial 1/2, 1/3, … from here; STAT_GAIN.hp is kept flat at a round 10.
+const HP_SCALE = 0.5;
+const scaleHp = (hp: number) => Math.max(1, Math.round(hp * HP_SCALE));
+
+// A level-1 hero has ~50 HP and lands ~10 base damage, so a turtled ×0.1 hit
+// chips 1 and an escalated one bites deep.
+const START: Stats = { maxHp: scaleHp(100), str: 10, def: 5, agi: 3, dex: 0 };
 
 // Stakes tuning. Each application the offensive (anchor) move MULTIPLIES by the
 // climb factor while the defensive move (the one the anchor beats) SUBTRACTS the
@@ -104,6 +110,7 @@ const DROP = 0.2; // base defensive multiplier decay per application
 const DEX_STEP = 0.1; // each DEX point adds this much to both the climb and the drop
 const STAKE_MAX = 50; // ceiling on the climbing offensive multiplier
 const HEAL_RATE = 10; // a negative move heals |value| × this % of max HP
+const HEAL_CAP = 0.5; // …but never more than this fraction of max HP in one go
 const HEAL_DMG = 0.1; // …and its exchange deals/takes damage at this flat factor
 type Mults = Record<Move, number>;
 const FRESH_MULTS: Mults = { rock: 1, paper: 1, scissors: 1 };
@@ -133,6 +140,7 @@ const ROSTER: Foe[] = ([
   { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Behold my villain arc!", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
 ] as Array<Omit<Foe, "cryId" | "wordsId">>).map((f) => ({
   ...f,
+  maxHp: scaleHp(f.maxHp), // roster HP rides the global HP dial
   cryId: `rps.foe.${f.key}.cry`,
   wordsId: `rps.foe.${f.key}.words`,
 }));
@@ -262,7 +270,7 @@ function makeFoe(index: number, player: Stats = START, tier?: "semiboss" | "boss
     wordsId: `rps.death.${wordIdx}`,
     lastWords: DEATHS[wordIdx],
     tier,
-    maxHp: vary(ratio * player.maxHp * hpMult, swing, 10),
+    maxHp: vary(ratio * player.maxHp * hpMult, swing, 5),
     str: vary(combat * w.str, swing, 1),
     def: vary(combat * w.def, swing, 0),
     agi: vary(combat * w.agi, swing, 1),
@@ -359,6 +367,7 @@ export function meta({}: Route.MetaArgs) {
 
 type Phase =
   | "splash"
+  | "prologue" // new-adventure lore card
   | "setup" // infinite-mode pre-fight point allocation
   | "intro"
   | "choose"
@@ -450,6 +459,7 @@ type Action =
   | { type: "continue"; save: RpsSave; seed: number }
   | { type: "restart"; foe: Foe; seed: number }
   | { type: "startInfinite"; foe: Foe; seed: number }
+  | { type: "prologueDone" }
   | { type: "introDone" }
   | { type: "pick"; move: Move; foeMove: Move }
   | { type: "countTick" }
@@ -471,8 +481,8 @@ function resolveRound(state: GameState, move: Move, foeMove: Move): Round {
   const { player, foe, foeHp, hp, mults, anchor } = state;
   const outcome = judge(move, foeMove);
   const stk = mults[move];
-  // Heal is |mult| × HEAL_RATE % of max HP, capped at a full 100%.
-  const healPct = stk < 0 ? Math.min(1, (Math.abs(stk) * HEAL_RATE) / 100) : 0;
+  // Heal is |mult| × HEAL_RATE % of max HP, capped at HEAL_CAP of max HP.
+  const healPct = stk < 0 ? Math.min(HEAL_CAP, (Math.abs(stk) * HEAL_RATE) / 100) : 0;
   const heal = stk < 0 ? Math.max(1, Math.round(healPct * player.maxHp)) : 0;
   const dmgMult = stk < 0 ? HEAL_DMG : stk;
 
@@ -514,7 +524,7 @@ function resolveRound(state: GameState, move: Move, foeMove: Move): Round {
       const off = newMults[anchor];
       const def = newMults[BEATS[anchor]];
       newMults = applyFactors(newMults, anchor, player.dex);
-      doubled = off < STAKE_MAX || def > -(100 / HEAL_RATE);
+      doubled = off < STAKE_MAX || def > -((HEAL_CAP * 100) / HEAL_RATE);
     }
   } else {
     // Switch: the exchange already cashed the current factors; re-anchor on
@@ -550,7 +560,9 @@ function gameReducer(state: GameState, action: Action): GameState {
       };
     }
     case "restart":
-      return { ...initialState, mode: "story", foe: action.foe, foeHp: action.foe.maxHp, seed: action.seed, phase: "intro" };
+      return { ...initialState, mode: "story", foe: action.foe, foeHp: action.foe.maxHp, seed: action.seed, phase: "prologue" };
+    case "prologueDone":
+      return { ...state, phase: "intro" };
     case "startInfinite":
       // Fight post-roster foes (foeIndex past the roster) but count levels from
       // 1 like a fresh run, with a war-chest of points to spend up front. The
@@ -832,7 +844,7 @@ export default function RPS() {
   const foeHitting = hit?.target === "foe";
   const youHit = hit?.target === "you";
   const foeAnim = foeHitting ? `rps-hit-${hit.move} 480ms ease-out` : undefined;
-  const showingTomb = phase === "death" || phase === "levelup" || phase === "victory";
+  const showingTomb = phase === "death" || phase === "levelup";
   // During the infinite pre-fight, the foe is a mystery until points are spent.
   const hideFoe = phase === "setup";
   const foeEmoji = showingTomb ? "🪦" : hideFoe ? "❔" : foe.emoji;
@@ -935,22 +947,69 @@ export default function RPS() {
     );
   }
 
+  // Full-screen story cards — the new-adventure prologue and the victory splash,
+  // both built from the same StoryCard. Victory adds looping fireworks.
+  if (phase === "prologue" || phase === "victory") {
+    const victory = phase === "victory";
+    return (
+      <>
+        <BackButton />
+        {victory && (
+          <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" aria-hidden="true">
+            {FIREWORKS.map((f, i) => (
+              <span
+                key={i}
+                className="absolute text-4xl"
+                style={{ top: f.top, left: f.left, animation: `rps-firework 1300ms ease-out ${f.d}ms infinite` }}
+              >
+                {f.e}
+              </span>
+            ))}
+          </div>
+        )}
+        <GameLayout>
+          <div className="flex flex-1 flex-col items-center justify-center">
+            {victory ? (
+              <StoryCard
+                emoji="🎉"
+                title={<Trans id="rps.victory.title" message="Victory!" />}
+                body={
+                  <Trans
+                    id="rps.victory.body"
+                    message="Dread Volk — the demon behind the throne — is banished! King Aldwin wakes, mumbling about a strange dream. The RPS Kingdom is free, and you're basically royalty now."
+                  />
+                }
+                extra={
+                  justUnlocked && (
+                    <p className="text-sm font-semibold text-fuchsia-300">
+                      <Trans id="rps.victory.unlocked" message="♾️ Infinite mode unlocked!" />
+                    </p>
+                  )
+                }
+                onContinue={() => dispatch({ type: "deathDone" })}
+              />
+            ) : (
+              <StoryCard
+                emoji="🏰"
+                title={<Trans id="rps.prologue.title" message="The RPS Kingdom" />}
+                body={
+                  <Trans
+                    id="rps.prologue.body"
+                    message="Kind King Aldwin ruled with a fair hand — until a demon moved in, rent-free, and turned him rotten, his champions with him. Grab your fists, palms and scissors, adventurer: someone has to evict it."
+                  />
+                }
+                onContinue={() => dispatch({ type: "prologueDone" })}
+              />
+            )}
+          </div>
+        </GameLayout>
+      </>
+    );
+  }
+
   return (
     <>
       <BackButton />
-      {phase === "victory" && (
-        <div className="pointer-events-none fixed inset-0 z-20 overflow-hidden" aria-hidden="true">
-          {FIREWORKS.map((f, i) => (
-            <span
-              key={i}
-              className="absolute text-4xl"
-              style={{ top: f.top, left: f.left, animation: `rps-firework 1300ms ease-out ${f.d}ms infinite` }}
-            >
-              {f.e}
-            </span>
-          ))}
-        </div>
-      )}
       <GameLayout tint={ts?.bg}>
         <header className="flex items-baseline justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -1039,31 +1098,6 @@ export default function RPS() {
               <p className="mx-auto max-w-xs rounded-2xl bg-neutral-800 px-4 py-2 text-sm italic text-neutral-300 motion-safe:animate-rps-tick">
                 “{foeWords}”
               </p>
-            </div>
-          )}
-
-          {phase === "victory" && (
-            <div className="space-y-3 text-center motion-safe:animate-rps-tick">
-              <p className="text-5xl" aria-hidden="true">
-                🎉
-              </p>
-              <p className="bg-gradient-to-br from-amber-200 via-orange-400 to-rose-400 bg-clip-text text-2xl font-black text-transparent">
-                <Trans id="rps.victory.title" message="Victory!" />
-              </p>
-              <p className="mx-auto max-w-xs text-sm text-neutral-300">
-                <Trans id="rps.victory.body" message="You vanquished the Dark Lord!" />
-              </p>
-              {justUnlocked && (
-                <p className="text-sm font-semibold text-fuchsia-300">
-                  <Trans id="rps.victory.unlocked" message="♾️ Infinite mode unlocked!" />
-                </p>
-              )}
-              <button
-                onClick={() => dispatch({ type: "deathDone" })}
-                className="mt-1 rounded-full bg-emerald-500 px-8 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
-              >
-                <Trans id="rps.rpg.continue" message="Continue" />
-              </button>
             </div>
           )}
 
@@ -1265,7 +1299,7 @@ export default function RPS() {
                       ×{HEAL_DMG}
                     </span>
                     <span className="pt-0.5 text-xs font-bold tabular-nums text-emerald-300">
-                      ♥{Math.min(100, Math.abs(val) * HEAL_RATE).toFixed(0)}%
+                      ♥{Math.min(HEAL_CAP * 100, Math.abs(val) * HEAL_RATE).toFixed(0)}%
                     </span>
                   </span>
                 ) : (
@@ -1312,6 +1346,42 @@ export default function RPS() {
         )}
       </GameLayout>
     </>
+  );
+}
+
+// Reusable lore/celebration card — an emoji, a gradient title, a blurb, an
+// optional extra line, and a Continue button. Powers the new-adventure prologue
+// and the level-10 victory splash.
+function StoryCard({
+  emoji,
+  title,
+  body,
+  extra,
+  onContinue,
+}: {
+  emoji: string;
+  title: React.ReactNode;
+  body: React.ReactNode;
+  extra?: React.ReactNode;
+  onContinue: () => void;
+}) {
+  return (
+    <div className="max-w-xs space-y-4 text-center motion-safe:animate-rps-tick">
+      <p className="text-6xl" aria-hidden="true">
+        {emoji}
+      </p>
+      <p className="bg-gradient-to-br from-amber-200 via-orange-400 to-rose-400 bg-clip-text text-2xl font-black text-transparent">
+        {title}
+      </p>
+      <p className="text-sm leading-relaxed text-neutral-300">{body}</p>
+      {extra}
+      <button
+        onClick={onContinue}
+        className="mt-2 w-full rounded-full bg-emerald-500 px-8 py-3 font-semibold text-neutral-950 transition hover:bg-emerald-400 active:scale-95"
+      >
+        <Trans id="rps.rpg.continue" message="Continue" />
+      </button>
+    </div>
   );
 }
 

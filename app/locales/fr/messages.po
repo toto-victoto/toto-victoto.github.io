@@ -328,11 +328,17 @@ msgstr "Atteins Lv 9 en Aventure"
 msgid "rps.setup.title"
 msgstr "Prépare-toi"
 
+msgid "rps.prologue.title"
+msgstr "Le Royaume de RPS"
+
+msgid "rps.prologue.body"
+msgstr "Le bon roi Aldwin régnait avec justice — jusqu'à ce qu'un démon s'installe, gratuitement, et le corrompe, ses champions avec lui. Prends tes poings, tes paumes et tes ciseaux, aventurier : quelqu'un doit l'expulser."
+
 msgid "rps.victory.title"
 msgstr "Victoire !"
 
 msgid "rps.victory.body"
-msgstr "Tu as vaincu le Seigneur des Ténèbres !"
+msgstr "Dread Volk — le démon derrière le trône — est banni ! Le roi Aldwin s'éveille en marmonnant un rêve étrange. Le Royaume de RPS est libre, et te voilà presque de sang royal."
 
 msgid "rps.victory.unlocked"
 msgstr "♾️ Mode infini débloqué !"
