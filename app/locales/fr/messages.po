@@ -152,91 +152,91 @@ msgid "rps.foe.farmhand.name"
 msgstr "Pip le fermier"
 
 msgid "rps.foe.farmhand.cry"
-msgstr "On récolte ce que l'on sème !"
+msgstr "Intrus ! Le Roi te veut… récolté !"
 
 msgid "rps.foe.farmhand.words"
-msgstr "Les pissenlits… par la racine…"
+msgstr "Le brouillard se dissipe… retour aux navets…"
 
 msgid "rps.foe.chef.name"
 msgstr "Chef Renard"
 
 msgid "rps.foe.chef.cry"
-msgstr "Tu vas déguster !"
+msgstr "La couronne te veut flambé !"
 
 msgid "rps.foe.chef.words"
-msgstr "Mon soufflé… retombe…"
+msgstr "Mon soufflé… et ma malédiction… retombent…"
 
 msgid "rps.foe.sentry.name"
 msgstr "Cole la sentinelle"
 
 msgid "rps.foe.sentry.cry"
-msgstr "Vous ne passerez pas !"
+msgstr "Nul ne passe — décret royal !"
 
 msgid "rps.foe.sentry.words"
-msgstr "J'avais… une seule mission…"
+msgstr "Une seule mission… mais de qui…?"
 
 msgid "rps.foe.inspector.name"
 msgstr "Insp. Mora"
 
 msgid "rps.foe.inspector.cry"
-msgstr "Élémentaire. Tu perds."
+msgstr "Verdict du Roi : coupable. Élémentaire."
 
 msgid "rps.foe.inspector.words"
-msgstr "C'est le majordome… le coupable…"
+msgstr "Le vrai coupable… c'était le démon…"
 
 msgid "rps.foe.ninja.name"
 msgstr "Kaze"
 
 msgid "rps.foe.ninja.cry"
-msgstr "Un battement de cils… et pouf."
+msgstr "Ordre de l'ombre — cligne et tu disparais."
 
 msgid "rps.foe.ninja.words"
-msgstr "Je ne l'ai pas… vu venir…"
+msgstr "J'ai pas vu venir… ma corruption…"
 
 msgid "rps.foe.magus.name"
 msgstr "Van Gore"
 
 msgid "rps.foe.magus.cry"
-msgstr "Je vais te croquer !"
+msgstr "Un portrait royal de toi — en rouge !"
 
 msgid "rps.foe.magus.words"
-msgstr "Pas mon plus beau… coup de pinceau…"
+msgstr "Ma période sombre… s'achève…"
 
 msgid "rps.foe.king.name"
 msgstr "Roi Aldwin"
 
 msgid "rps.foe.king.cry"
-msgstr "À genoux devant la couronne !"
+msgstr "À GENOUX— non, FUIS— À GENOUX !"
 
 msgid "rps.foe.king.words"
-msgstr "Lourde est… la couronne…"
+msgstr "Ça… quitte ma tête…"
 
 msgid "rps.foe.villain.name"
 msgstr "Volk l'Effroi"
 
 msgid "rps.foe.villain.cry"
-msgstr "Place à mon arc de méchant !"
+msgstr "Débarrassé de ce roi coincé — à MOI !"
 
 msgid "rps.foe.villain.words"
-msgstr "J'avais… une trilogie de prévue…"
+msgstr "Expulsé… après tout ce loyer gratuit…"
 
 msgid "rps.foe.enchantress.name"
 msgstr "Morgause"
 
 msgid "rps.foe.enchantress.cry"
-msgstr "Abracada-BOUM !"
+msgstr "Le sort du démon — Abracada-BOUM !"
 
 msgid "rps.foe.enchantress.words"
-msgstr "Le sortilège… se défait…"
+msgstr "Le sortilège noir… se rompt…"
 
 msgid "rps.foe.valkyrie.name"
 msgstr "Valkyra"
 
 msgid "rps.foe.valkyrie.cry"
-msgstr "J'improvise à tire-d'aile !"
+msgstr "La couronne corrompue m'envoie — à l'arrache !"
 
 msgid "rps.foe.valkyrie.words"
-msgstr "On m'a rogné… les ailes…"
+msgstr "Le vent noir… me rogne les ailes…"
 
 msgid "rps.tier.semiboss"
 msgstr "Élite"

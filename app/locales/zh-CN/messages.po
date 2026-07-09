@@ -152,91 +152,91 @@ msgid "rps.foe.farmhand.name"
 msgstr "农夫皮普"
 
 msgid "rps.foe.farmhand.cry"
-msgstr "自食其果吧！"
+msgstr "入侵者！国王要你……被收割！"
 
 msgid "rps.foe.farmhand.words"
-msgstr "唉……回老家……种地了……"
+msgstr "迷雾散了……回去种萝卜吧……"
 
 msgid "rps.foe.chef.name"
 msgstr "雷纳尔大厨"
 
 msgid "rps.foe.chef.cry"
-msgstr "把你烤了！"
+msgstr "王冠要把你……做成佳肴！"
 
 msgid "rps.foe.chef.words"
-msgstr "我的舒芙蕾……塌了……"
+msgstr "我的舒芙蕾……和诅咒……一起塌了……"
 
 msgid "rps.foe.sentry.name"
 msgstr "哨兵科尔"
 
 msgid "rps.foe.sentry.cry"
-msgstr "谁也别想过去！"
+msgstr "谁也别想过去——王命！"
 
 msgid "rps.foe.sentry.words"
-msgstr "我就……一个任务……"
+msgstr "就一个任务……可这是谁下的令……？"
 
 msgid "rps.foe.inspector.name"
 msgstr "莫拉探长"
 
 msgid "rps.foe.inspector.cry"
-msgstr "小事一桩，你输了。"
+msgstr "国王的判决：有罪。小事一桩。"
 
 msgid "rps.foe.inspector.words"
-msgstr "是管家……干的……"
+msgstr "真凶……是那个恶魔……"
 
 msgid "rps.foe.ninja.name"
 msgstr "疾风"
 
 msgid "rps.foe.ninja.cry"
-msgstr "一眨眼你就没了。"
+msgstr "暗影之命——眨眼你就没了。"
 
 msgid "rps.foe.ninja.words"
-msgstr "没看清……那一招……"
+msgstr "没料到……自己也被腐蚀了……"
 
 msgid "rps.foe.magus.name"
 msgstr "梵血"
 
 msgid "rps.foe.magus.cry"
-msgstr "我给你上点……红色！"
+msgstr "给你画一幅御用肖像——用红色！"
 
 msgid "rps.foe.magus.words"
-msgstr "唉……败笔……"
+msgstr "我的黑暗时期……结束了……"
 
 msgid "rps.foe.king.name"
 msgstr "奥德温国王"
 
 msgid "rps.foe.king.cry"
-msgstr "向王冠下跪！"
+msgstr "下跪——不，快逃——下跪！"
 
 msgid "rps.foe.king.words"
-msgstr "欲戴王冠……必承其重……"
+msgstr "它……正在离开我的脑子……"
 
 msgid "rps.foe.villain.name"
 msgstr "恐惧沃尔克"
 
 msgid "rps.foe.villain.cry"
-msgstr "看我的反派……名场面！"
+msgstr "摆脱了那个古板国王——冲我来吧！"
 
 msgid "rps.foe.villain.words"
-msgstr "可我……还计划了三部曲……"
+msgstr "被赶走了……白住了这么久……"
 
 msgid "rps.foe.enchantress.name"
 msgstr "摩高斯"
 
 msgid "rps.foe.enchantress.cry"
-msgstr "阿布拉卡——完蛋吧！"
+msgstr "恶魔的咒语——阿布拉卡·完蛋吧！"
 
 msgid "rps.foe.enchantress.words"
-msgstr "咒语……散了……"
+msgstr "黑暗咒语……解开了……"
 
 msgid "rps.foe.valkyrie.name"
 msgstr "瓦尔基娅"
 
 msgid "rps.foe.valkyrie.cry"
-msgstr "老规矩，随性而战！"
+msgstr "腐化的王冠派我来——随性开打！"
 
 msgid "rps.foe.valkyrie.words"
-msgstr "翅膀……被剪了……"
+msgstr "黑风……剪断了我的翅膀……"
 
 msgid "rps.tier.semiboss"
 msgstr "精英"

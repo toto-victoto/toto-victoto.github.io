@@ -152,91 +152,91 @@ msgid "rps.foe.farmhand.name"
 msgstr "Pip the Farmhand"
 
 msgid "rps.foe.farmhand.cry"
-msgstr "Time to reap what you sow!"
+msgstr "Trespasser! The King wants you harvested!"
 
 msgid "rps.foe.farmhand.words"
-msgstr "Well… I bought the farm…"
+msgstr "The fog lifts… back to my turnips…"
 
 msgid "rps.foe.chef.name"
 msgstr "Chef Renard"
 
 msgid "rps.foe.chef.cry"
-msgstr "You're getting roasted!"
+msgstr "The crown wants you flambéed!"
 
 msgid "rps.foe.chef.words"
-msgstr "My soufflé… collapses…"
+msgstr "My soufflé… and my curse… fall…"
 
 msgid "rps.foe.sentry.name"
 msgstr "Sentry Cole"
 
 msgid "rps.foe.sentry.cry"
-msgstr "None shall pass!"
+msgstr "None shall pass — royal decree!"
 
 msgid "rps.foe.sentry.words"
-msgstr "I had… one job…"
+msgstr "One job… but whose orders…?"
 
 msgid "rps.foe.inspector.name"
 msgstr "Insp. Mora"
 
 msgid "rps.foe.inspector.cry"
-msgstr "Elementary. You lose."
+msgstr "The King's verdict: guilty. Elementary."
 
 msgid "rps.foe.inspector.words"
-msgstr "The butler… did it…"
+msgstr "The real culprit… was the demon…"
 
 msgid "rps.foe.ninja.name"
 msgstr "Kaze"
 
 msgid "rps.foe.ninja.cry"
-msgstr "Blink and you're gone."
+msgstr "Shadow's orders — blink and you're gone."
 
 msgid "rps.foe.ninja.words"
-msgstr "Didn't see… that one…"
+msgstr "Didn't see… my own corruption…"
 
 msgid "rps.foe.magus.name"
 msgstr "Van Gore"
 
 msgid "rps.foe.magus.cry"
-msgstr "I'll paint the town red."
+msgstr "A royal portrait of you — in red!"
 
 msgid "rps.foe.magus.words"
-msgstr "Not my finest… stroke…"
+msgstr "My dark period… ends…"
 
 msgid "rps.foe.king.name"
 msgstr "King Aldwin"
 
 msgid "rps.foe.king.cry"
-msgstr "Bow to the crown!"
+msgstr "KNEEL— no, RUN— KNEEL!"
 
 msgid "rps.foe.king.words"
-msgstr "Heavy is… the head…"
+msgstr "It's… leaving my head…"
 
 msgid "rps.foe.villain.name"
 msgstr "Dread Volk"
 
 msgid "rps.foe.villain.cry"
-msgstr "Behold my villain arc!"
+msgstr "Free of that stuffy king — face ME!"
 
 msgid "rps.foe.villain.words"
-msgstr "But I had… a trilogy planned…"
+msgstr "Evicted… after all that free rent…"
 
 msgid "rps.foe.enchantress.name"
 msgstr "Morgause"
 
 msgid "rps.foe.enchantress.cry"
-msgstr "Abraca-DIE-bra!"
+msgstr "The demon's hex — Abraca-DIE-bra!"
 
 msgid "rps.foe.enchantress.words"
-msgstr "The threads… unravel…"
+msgstr "The dark spell… breaks…"
 
 msgid "rps.foe.valkyrie.name"
 msgstr "Valkyra"
 
 msgid "rps.foe.valkyrie.cry"
-msgstr "Winging it, as usual!"
+msgstr "The tainted crown sent me — winging it!"
 
 msgid "rps.foe.valkyrie.words"
-msgstr "Clipped my… wings…"
+msgstr "Dark wind… clips my wings…"
 
 msgid "rps.tier.semiboss"
 msgstr "Elite"

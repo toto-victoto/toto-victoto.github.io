@@ -128,16 +128,16 @@ const applyFactors = (m: Mults, anchor: Move, dex: number): Mults => {
 // Two elites (semi-bosses) at levels 5 & 8, King Aldwin the boss (9), and Dread
 // Volk the hidden boss (10). cryId/wordsId point at each one's catalog entry.
 const ROSTER: Foe[] = ([
-  { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Time to reap what you sow!", lastWords: "Well… I bought the farm…", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
-  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "You're getting roasted!", lastWords: "My soufflé… collapses…", maxHp: 30, str: 5, def: 2, agi: 2, dex: 1 },
-  { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass!", lastWords: "I had… one job…", maxHp: 46, str: 7, def: 3, agi: 2, dex: 1 },
-  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "Elementary. You lose.", lastWords: "The butler… did it…", maxHp: 66, str: 9, def: 6, agi: 4, dex: 2 },
-  { key: "enchantress", emoji: "🧙‍♀️", name: "Morgause", cry: "Abraca-DIE-bra!", lastWords: "The threads… unravel…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
-  { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Blink and you're gone.", lastWords: "Didn't see… that one…", maxHp: 108, str: 14, def: 8, agi: 8, dex: 3 },
-  { key: "magus", emoji: "🧑‍🎨", name: "Van Gore", cry: "I'll paint the town red.", lastWords: "Not my finest… stroke…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
-  { key: "valkyrie", emoji: "🧝‍♀️", name: "Valkyra", cry: "Winging it, as usual!", lastWords: "Clipped my… wings…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
-  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "Bow to the crown!", lastWords: "Heavy is… the head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
-  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Behold my villain arc!", lastWords: "But I had… a trilogy planned…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
+  { key: "farmhand", emoji: "🧑‍🌾", name: "Pip the Farmhand", cry: "Trespasser! The King wants you harvested!", lastWords: "The fog lifts… back to my turnips…", maxHp: 18, str: 3, def: 0, agi: 1, dex: 0 },
+  { key: "chef", emoji: "🧑‍🍳", name: "Chef Renard", cry: "The crown wants you flambéed!", lastWords: "My soufflé… and my curse… fall…", maxHp: 30, str: 5, def: 2, agi: 2, dex: 1 },
+  { key: "sentry", emoji: "💂", name: "Sentry Cole", cry: "None shall pass — royal decree!", lastWords: "One job… but whose orders…?", maxHp: 46, str: 7, def: 3, agi: 2, dex: 1 },
+  { key: "inspector", emoji: "🕵️", name: "Insp. Mora", cry: "The King's verdict: guilty. Elementary.", lastWords: "The real culprit… was the demon…", maxHp: 66, str: 9, def: 6, agi: 4, dex: 2 },
+  { key: "enchantress", emoji: "🧙‍♀️", name: "Morgause", cry: "The demon's hex — Abraca-DIE-bra!", lastWords: "The dark spell… breaks…", maxHp: 92, str: 13, def: 7, agi: 6, dex: 3, tier: "semiboss" },
+  { key: "ninja", emoji: "🥷", name: "Kaze", cry: "Shadow's orders — blink and you're gone.", lastWords: "Didn't see… my own corruption…", maxHp: 108, str: 14, def: 8, agi: 8, dex: 3 },
+  { key: "magus", emoji: "🧑‍🎨", name: "Van Gore", cry: "A royal portrait of you — in red!", lastWords: "My dark period… ends…", maxHp: 130, str: 17, def: 11, agi: 6, dex: 3 },
+  { key: "valkyrie", emoji: "🧝‍♀️", name: "Valkyra", cry: "The tainted crown sent me — winging it!", lastWords: "Dark wind… clips my wings…", maxHp: 158, str: 21, def: 13, agi: 7, dex: 4, tier: "semiboss" },
+  { key: "king", emoji: "🤴", name: "King Aldwin", cry: "KNEEL— no, RUN— KNEEL!", lastWords: "It's… leaving my head…", maxHp: 205, str: 26, def: 17, agi: 8, dex: 4, tier: "boss" },
+  { key: "villain", emoji: "🦹", name: "Dread Volk", cry: "Free of that stuffy king — face ME!", lastWords: "Evicted… after all that free rent…", maxHp: 275, str: 34, def: 22, agi: 11, dex: 5, tier: "hidden" },
 ] as Array<Omit<Foe, "cryId" | "wordsId">>).map((f) => ({
   ...f,
   maxHp: scaleHp(f.maxHp), // roster HP rides the global HP dial
