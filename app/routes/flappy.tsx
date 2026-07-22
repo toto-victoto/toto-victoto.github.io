@@ -9,7 +9,11 @@ import { sfx } from "../sound";
 // All positions are expressed in % of the playfield, so the game is
 // resolution-independent and scales with the responsive container.
 const BIRD_X = 28; // % from the left edge
-const BIRD_HALF = 4; // % half-size of the bird's hitbox
+// The field is 3:4 (aspect-[3/4]), so a % of width ≠ a % of height in pixels.
+// These two half-extents make a SQUARE hitbox (in px) that sits inside the
+// visible bird: BIRD_HALF_Y = BIRD_HALF_X × (3/4).
+const BIRD_HALF_X = 4; // % of field WIDTH
+const BIRD_HALF_Y = 3; // % of field HEIGHT
 const GROUND_Y = 86; // % from the top — bird rests here
 const START_Y = 35; // % from the top — where the bird begins
 
@@ -157,11 +161,11 @@ export default function Flappy() {
     const hitGround = birdY >= GROUND_Y;
     const hitPipe = pipes.some((p) => {
       const overlapX =
-        p.x < BIRD_X + BIRD_HALF && p.x + PIPE_WIDTH > BIRD_X - BIRD_HALF;
+        p.x < BIRD_X + BIRD_HALF_X && p.x + PIPE_WIDTH > BIRD_X - BIRD_HALF_X;
       if (!overlapX) return false;
       const gapTop = p.gapY - p.gap / 2;
       const gapBottom = p.gapY + p.gap / 2;
-      return birdY - BIRD_HALF < gapTop || birdY + BIRD_HALF > gapBottom;
+      return birdY - BIRD_HALF_Y < gapTop || birdY + BIRD_HALF_Y > gapBottom;
     });
     if (hitGround || hitPipe) {
       setPhase("gameover");
@@ -190,6 +194,7 @@ export default function Flappy() {
           <div className="flex min-h-0 flex-1 items-center justify-center">
             <div
               onPointerDown={flap}
+              style={{ containerType: "inline-size" }}
               className="relative aspect-[3/4] h-full max-h-full w-auto max-w-full overflow-hidden rounded-2xl bg-gradient-to-b from-sky-400 to-sky-200 select-none touch-none cursor-pointer"
             >
             {pipes.map((p) => {
@@ -219,11 +224,14 @@ export default function Flappy() {
               );
             })}
 
+            {/* Bird sized in cqw (% of the field width) so it scales with the
+                playfield and stays matched to the %-based hitbox at any size. */}
             <div
-              className="absolute text-4xl"
+              className="absolute leading-none"
               style={{
                 left: `${BIRD_X}%`,
                 top: `${birdY}%`,
+                fontSize: "13cqw",
                 transform: `translate(-50%, -50%) rotate(${rotation}deg) scaleX(-1)`,
               }}
               aria-hidden="true"
