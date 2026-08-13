@@ -40,6 +40,13 @@ export const GAMES: GameMeta[] = [
     icon: "🎰",
   },
   {
+    slug: "slots",
+    titleId: "slots.title",
+    title: "1-UP Slots",
+    tone: "bg-gradient-to-br from-red-600 to-amber-500",
+    icon: "🍄",
+  },
+  {
     slug: "rps",
     titleId: "rps.title",
     title: "RPS Saga",

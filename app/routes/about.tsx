@@ -24,6 +24,7 @@ function readRecords(): Record<string, string> {
     threader: String(peekGame("threader")?.best ?? 0),
     trias: String(peekGame("trias")?.best ?? 0),
     roulette: String(peekGame("roulette")?.best ?? 0),
+    slots: String(peekGame("slots")?.best ?? 0),
     rps: rps?.infiniteBest
       ? `Lv ${rps.bestLevel ?? 0} · ♾️${rps.infiniteBest}`
       : `Lv ${rps?.bestLevel ?? 0}`,

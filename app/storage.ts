@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 // Single localStorage key holding per-game state in one JSON dict. Bumping
 // the schema version invalidates any older saved blob so we never feed an
@@ -56,6 +51,7 @@ export type Persisted = {
     infiniteSave?: RpsSave; // infinite
   };
   roulette: { best: number; balance: number; history: number[] };
+  slots: { best: number };
   ultimate: {
     mode: "2p" | "ai";
     scores: { X: number; O: number; draws: number };
@@ -81,6 +77,7 @@ const GAME_KEYS = [
   "threader",
   "rps",
   "roulette",
+  "slots",
   "ultimate",
   "trias",
 ] as const satisfies readonly GameKey[];

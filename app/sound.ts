@@ -154,14 +154,18 @@ const THEME_BASS: [number, number][] = [
 
 let themeStops: Array<() => void> = [];
 
-function runTrack(track: [number, number][], opts: ToneOpts): () => void {
+function runTrack(
+  track: [number, number][],
+  opts: ToneOpts,
+  unit = STEP,
+): () => void {
   let i = 0;
   let timer: ReturnType<typeof setTimeout>;
   const step = () => {
     const [freq, len] = track[i];
-    if (freq) tone(freq, STEP * len * 0.9, opts);
+    if (freq) tone(freq, unit * len * 0.9, opts);
     i = (i + 1) % track.length;
-    timer = setTimeout(step, STEP * len * 1000);
+    timer = setTimeout(step, unit * len * 1000);
   };
   step();
   return () => clearTimeout(timer);
@@ -178,4 +182,34 @@ export function startTitleTheme(): void {
 export function stopTitleTheme(): void {
   themeStops.forEach((stop) => stop());
   themeStops = [];
+}
+
+// ---- Slot spin loop --------------------------------------------------------
+// A fast, bouncy bonus-room riff for the 1-UP Slots reels. It runs while the
+// reels spin and stops the moment they rest, so the payline jingle lands clean.
+const SLOT_STEP = 0.11; // seconds per note — quick and lively
+const SLOT_MELODY: [number, number][] = [
+  [523.25, 1], [659.25, 1], [783.99, 1], [1046.5, 1], // C5 E5 G5 C6
+  [783.99, 1], [659.25, 1], [880.0, 1], [659.25, 1], //  G5 E5 A5 E5
+  [587.33, 1], [698.46, 1], [880.0, 1], [1174.66, 1], // D5 F5 A5 D6
+  [880.0, 1], [698.46, 1], [587.33, 1], [523.25, 1], //  A5 F5 D5 C5
+];
+const SLOT_BASS: [number, number][] = [
+  [130.81, 2], [130.81, 2], [196.0, 2], [196.0, 2], // C3 C3 G3 G3
+  [146.83, 2], [146.83, 2], [130.81, 2], [130.81, 2], // D3 D3 C3 C3
+];
+
+let slotStops: Array<() => void> = [];
+
+export function startSlotSpin(): void {
+  if (typeof window === "undefined" || slotStops.length) return;
+  slotStops = [
+    runTrack(SLOT_MELODY, { type: "square", gain: 0.06 }, SLOT_STEP),
+    runTrack(SLOT_BASS, { type: "triangle", gain: 0.05 }, SLOT_STEP),
+  ];
+}
+
+export function stopSlotSpin(): void {
+  slotStops.forEach((stop) => stop());
+  slotStops = [];
 }

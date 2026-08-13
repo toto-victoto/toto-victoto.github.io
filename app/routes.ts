@@ -7,6 +7,7 @@ export default [
   route("snake", "routes/snake.tsx"),
   route("flappy", "routes/flappy.tsx"),
   route("roulette", "routes/roulette.tsx"),
+  route("slots", "routes/slots.tsx"),
   route("ultimate", "routes/ultimate.tsx"),
   route("trias", "routes/trias.tsx"),
   route("threader", "routes/threader.tsx"),

@@ -6,804 +6,955 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: zh-CN\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
-msgid "common.best"
-msgstr "最高"
+#~ msgid "rps.win"
+#~ msgstr "你赢了！"
 
-msgid "common.play_again"
-msgstr "再玩一次"
+#~ msgid "rps.lose"
+#~ msgstr "你输了。"
 
-msgid "common.reset"
-msgstr "重置"
+#~ msgid "rps.score.you"
+#~ msgstr "你"
 
-msgid "home.title"
-msgstr "toto-victoto"
+#~ msgid "rps.score.cpu"
+#~ msgstr "电脑"
 
-msgid "home.subtitle"
-msgstr "点击应用开始游戏。"
+#~ msgid "rps.stat.label.hp"
+#~ msgstr "生命"
 
-msgid "home.app.about"
-msgstr "关于"
+#~ msgid "rps.stat.label.str"
+#~ msgstr "力量"
 
-msgid "rps.title"
-msgstr "RPS Saga"
+#~ msgid "rps.stat.label.def"
+#~ msgstr "防御"
 
-msgid "rps.choose"
-msgstr "选择你的出招"
+#~ msgid "rps.stat.label.agi"
+#~ msgstr "敏捷"
 
-msgid "rps.win"
-msgstr "你赢了！"
+#~ msgid "rps.stat.label.dex"
+#~ msgstr "灵巧"
 
-msgid "rps.lose"
-msgstr "你输了。"
+#~ msgid "rps.stat.hp"
+#~ msgstr "生命值。归零即被击败。"
 
-msgid "rps.draw"
-msgstr "平局"
+#~ msgid "rps.stat.str"
+#~ msgstr "攻击力 —— 你的基础伤害。"
 
-msgid "rps.score.you"
-msgstr "你"
+#~ msgid "rps.stat.def"
+#~ msgstr "减少你受到的伤害。"
 
-msgid "rps.score.cpu"
-msgstr "电脑"
+#~ msgid "rps.stat.agi"
+#~ msgstr "速度压制对手，攻击两次。"
 
-msgid "rps.rpg.fight"
-msgstr "战斗！"
+#~ msgid "rps.stat.dex"
+#~ msgstr "你的出招倍率上升和下降的速度。"
 
-msgid "rps.rpg.continue"
-msgstr "继续"
+#~ msgid "rps.foe.farmhand.name"
+#~ msgstr "农夫皮普"
 
-msgid "rps.rpg.tryagain"
-msgstr "再试一次"
+#~ msgid "rps.foe.farmhand.cry"
+#~ msgstr "入侵者！国王要你……被收割！"
 
-msgid "rps.rpg.levelup"
-msgstr "升级！"
+#~ msgid "rps.foe.farmhand.words"
+#~ msgstr "迷雾散了……回去种萝卜吧……"
 
-msgid "rps.rpg.spend"
-msgstr "分配点数"
+#~ msgid "rps.foe.chef.name"
+#~ msgstr "雷纳尔大厨"
 
-msgid "rps.rpg.defeated"
-msgstr "你被击败了"
+#~ msgid "rps.foe.chef.cry"
+#~ msgstr "王冠要把你……做成佳肴！"
 
-msgid "rps.rpg.reached"
-msgstr "达到第 {level} 级"
+#~ msgid "rps.foe.chef.words"
+#~ msgstr "我的舒芙蕾……和诅咒……一起塌了……"
 
-msgid "rps.splash.tagline"
-msgstr "石头剪刀布 RPG"
+#~ msgid "rps.foe.sentry.name"
+#~ msgstr "哨兵科尔"
 
-msgid "rps.splash.start"
-msgstr "开始"
+#~ msgid "rps.foe.sentry.cry"
+#~ msgstr "谁也别想过去——王命！"
 
-msgid "rps.splash.restart"
-msgstr "重新开始"
+#~ msgid "rps.foe.sentry.words"
+#~ msgstr "就一个任务……可这是谁下的令……？"
 
-msgid "rps.round.win"
-msgstr "你赢下这一回合！"
+#~ msgid "rps.foe.inspector.name"
+#~ msgstr "莫拉探长"
 
-msgid "rps.round.lose"
-msgstr "{name} 赢下这一回合"
+#~ msgid "rps.foe.inspector.cry"
+#~ msgstr "国王的判决：有罪。小事一桩。"
 
-msgid "rps.rip"
-msgstr "安息 {name}"
+#~ msgid "rps.foe.inspector.words"
+#~ msgstr "真凶……是那个恶魔……"
 
-msgid "rps.stats.title"
-msgstr "属性"
+#~ msgid "rps.foe.ninja.name"
+#~ msgstr "疾风"
 
-msgid "rps.stats.gotit"
-msgstr "知道了"
+#~ msgid "rps.foe.ninja.cry"
+#~ msgstr "暗影之命——眨眼你就没了。"
 
-msgid "rps.stat.label.hp"
-msgstr "生命"
+#~ msgid "rps.foe.ninja.words"
+#~ msgstr "没料到……自己也被腐蚀了……"
 
-msgid "rps.stat.label.str"
-msgstr "力量"
+#~ msgid "rps.foe.magus.name"
+#~ msgstr "梵血"
 
-msgid "rps.stat.label.def"
-msgstr "防御"
+#~ msgid "rps.foe.magus.cry"
+#~ msgstr "给你画一幅御用肖像——用红色！"
 
-msgid "rps.stat.label.agi"
-msgstr "敏捷"
+#~ msgid "rps.foe.magus.words"
+#~ msgstr "我的黑暗时期……结束了……"
 
-msgid "rps.stat.label.dex"
-msgstr "灵巧"
+#~ msgid "rps.foe.king.name"
+#~ msgstr "奥德温国王"
 
-msgid "rps.stat.hp"
-msgstr "生命值。归零即被击败。"
+#~ msgid "rps.foe.king.cry"
+#~ msgstr "下跪——不，快逃——下跪！"
 
-msgid "rps.stat.str"
-msgstr "攻击力 —— 你的基础伤害。"
+#~ msgid "rps.foe.king.words"
+#~ msgstr "它……正在离开我的脑子……"
 
-msgid "rps.stat.def"
-msgstr "减少你受到的伤害。"
+#~ msgid "rps.foe.villain.name"
+#~ msgstr "恐惧沃尔克"
 
-msgid "rps.stat.agi"
-msgstr "速度压制对手，攻击两次。"
+#~ msgid "rps.foe.villain.cry"
+#~ msgstr "摆脱了那个古板国王——冲我来吧！"
 
-msgid "rps.stat.dex"
-msgstr "你的出招倍率上升和下降的速度。"
+#~ msgid "rps.foe.villain.words"
+#~ msgstr "被赶走了……白住了这么久……"
 
-msgid "rps.banner.healed"
-msgstr "回复 {amount}"
+#~ msgid "rps.foe.enchantress.name"
+#~ msgstr "摩高斯"
 
-msgid "rps.banner.stalemate_deep"
-msgstr "僵持 —— 蓄势更深！"
+#~ msgid "rps.foe.enchantress.cry"
+#~ msgstr "恶魔的咒语——阿布拉卡·完蛋吧！"
 
-msgid "rps.banner.stalemate"
-msgstr "僵持！"
+#~ msgid "rps.foe.enchantress.words"
+#~ msgstr "黑暗咒语……解开了……"
 
-msgid "rps.banner.stakes"
-msgstr "赌注 ×{mult}！"
+#~ msgid "rps.foe.valkyrie.name"
+#~ msgstr "瓦尔基娅"
 
-msgid "rps.banner.softened"
-msgstr "减弱 ×{mult}"
+#~ msgid "rps.foe.valkyrie.cry"
+#~ msgstr "腐化的王冠派我来——随性开打！"
 
-msgid "rps.banner.faster_you"
-msgstr "你更快！"
+#~ msgid "rps.foe.valkyrie.words"
+#~ msgstr "黑风……剪断了我的翅膀……"
 
+#~ msgid "rps.tier.semiboss"
+#~ msgstr "精英"
+
+#~ msgid "rps.tier.boss"
+#~ msgstr "首领"
+
+#~ msgid "rps.tier.hidden"
+#~ msgstr "宿敌"
+
+#~ msgid "rps.foe.wanderer.name"
+#~ msgstr "流浪者"
+
+#~ msgid "rps.foe.wanderer.cry"
+#~ msgstr "你完蛋了！"
+
+#~ msgid "rps.foe.wanderer.words"
+#~ msgstr "哎哟。"
+
+#~ msgid "rps.foe.brute.name"
+#~ msgstr "蛮兵"
+
+#~ msgid "rps.foe.brute.cry"
+#~ msgstr "过来吧。"
+
+#~ msgid "rps.foe.brute.words"
+#~ msgstr "就这？"
+
+#~ msgid "rps.foe.reaver.name"
+#~ msgstr "劫掠者"
+
+#~ msgid "rps.foe.reaver.cry"
+#~ msgstr "现在就结束。"
+
+#~ msgid "rps.foe.reaver.words"
+#~ msgstr "值了。"
+
+#~ msgid "rps.foe.warden.name"
+#~ msgstr "守卫"
+
+#~ msgid "rps.foe.warden.cry"
+#~ msgstr "我见过更糟的。"
+
+#~ msgid "rps.foe.warden.words"
+#~ msgstr "别告诉任何人。"
+
+#~ msgid "rps.foe.fiend.name"
+#~ msgstr "恶魔"
+
+#~ msgid "rps.foe.fiend.cry"
+#~ msgstr "绝不留情。"
+
+#~ msgid "rps.foe.fiend.words"
+#~ msgstr "可恶……"
+
+#~ msgid "rps.foe.marauder.name"
+#~ msgstr "掠夺者"
+
+#~ msgid "rps.foe.marauder.cry"
+#~ msgstr "你敢？"
+
+#~ msgid "rps.foe.marauder.words"
+#~ msgstr "就这样结束了。"
+
+#~ msgid "rps.foe.specter.name"
+#~ msgstr "幽灵"
+
+#~ msgid "rps.foe.specter.cry"
+#~ msgstr "咽下最后一口气吧。"
+
+#~ msgid "rps.foe.specter.words"
+#~ msgstr "我……毫不后悔。"
+
+#~ msgid "rps.foe.troll.name"
+#~ msgstr "巨魔"
+
+#~ msgid "rps.foe.troll.cry"
+#~ msgstr "你够不着。"
+
+#~ msgid "rps.foe.troll.words"
+#~ msgstr "壮哉……"
+
+#~ msgid "rps.splash.infinite_locked"
+#~ msgstr "在冒险模式达到 Lv 9"
+
+#~ msgid "rps.infinite.reached"
+#~ msgstr "到达深度 {n}"
+
+#~ msgid "rps.foe.imp.name"
+#~ msgstr "小恶魔"
+
+#~ msgid "rps.foe.djinn.name"
+#~ msgstr "精灵"
+
+#~ msgid "rps.foe.tideborn.name"
+#~ msgstr "潮生者"
+
+#~ msgid "rps.foe.wyrm.name"
+#~ msgstr "巨龙"
+
+#~ msgid "rps.foe.nightwing.name"
+#~ msgstr "夜翼"
+
+#~ msgid "rps.foe.weaver.name"
+#~ msgstr "织网者"
+
+#~ msgid "rps.foe.stinger.name"
+#~ msgstr "蜇刺"
+
+#~ msgid "rps.foe.tusk.name"
+#~ msgstr "獠牙"
+
+#~ msgid "rps.foe.maw.name"
+#~ msgstr "巨口"
+
+#~ msgid "rps.foe.fang.name"
+#~ msgstr "尖牙"
+
+#~ msgid "rps.foe.kong.name"
+#~ msgstr "金刚"
+
+#~ msgid "rps.foe.charger.name"
+#~ msgstr "冲锋兽"
+
+#~ msgid "rps.foe.snapper.name"
+#~ msgstr "咬颚"
+
+#~ msgid "rps.foe.wisp.name"
+#~ msgstr "鬼火"
+
+#~ msgid "rps.foe.bonelord.name"
+#~ msgstr "骨王"
+
+#~ msgid "rps.foe.sentinel.name"
+#~ msgstr "哨戒机"
+
+#~ msgid "rps.foe.invader.name"
+#~ msgstr "入侵者"
+
+#~ msgid "rps.foe.hollow.name"
+#~ msgstr "空心"
+
+#~ msgid "rps.foe.rex.name"
+#~ msgstr "暴龙"
+
+#~ msgid "rps.foe.kraken.name"
+#~ msgstr "海妖"
+
+#~ msgid "rps.foe.ghoul.name"
+#~ msgstr "食尸鬼"
+
+#~ msgid "rps.foe.countess.name"
+#~ msgstr "伯爵夫人"
+
+#~ msgid "rps.foe.sylph.name"
+#~ msgstr "气精"
+
+#~ msgid "rps.foe.siren.name"
+#~ msgstr "塞壬"
+
+#~ msgid "rps.foe.hexen.name"
+#~ msgstr "女巫"
+
+#~ msgid "rps.foe.jester.name"
+#~ msgstr "弄臣"
+
+#~ msgid "rps.cry.0"
+#~ msgstr "你完蛋了！"
+
+#~ msgid "rps.cry.1"
+#~ msgstr "来抱一个！"
+
+#~ msgid "rps.cry.2"
+#~ msgstr "剧透：你输了。"
+
+#~ msgid "rps.cry.3"
+#~ msgstr "我见过更吓人的喷嚏。"
+
+#~ msgid "rps.cry.4"
+#~ msgstr "概不退款！"
+
+#~ msgid "rps.cry.5"
+#~ msgstr "你还敢来，有胆量。"
+
+#~ msgid "rps.cry.6"
+#~ msgstr "祈祷吧！"
+
+#~ msgid "rps.cry.7"
+#~ msgstr "你不在一个段位，伙计。"
+
+#~ msgid "rps.cry.8"
+#~ msgstr "小心脚下——你已经掉进去了。"
+
+#~ msgid "rps.cry.9"
+#~ msgstr "这会留个印子。"
+
+#~ msgid "rps.cry.10"
+#~ msgstr "那是恐惧，还是你的香水？"
+
+#~ msgid "rps.cry.11"
+#~ msgstr "我的胜率高得离谱。"
+
+#~ msgid "rps.cry.12"
+#~ msgstr "幸运女神休假了。"
+
+#~ msgid "rps.cry.13"
+#~ msgstr "下跪，不然我重组你。"
+
+#~ msgid "rps.cry.14"
+#~ msgstr "我早就想赢了。"
+
+#~ msgid "rps.cry.15"
+#~ msgstr "怕的话就眨眨眼。"
+
+#~ msgid "rps.cry.16"
+#~ msgstr "赢这事，我先占了。"
+
+#~ msgid "rps.cry.17"
+#~ msgstr "你按错门铃了，伙计。"
+
+#~ msgid "rps.cry.18"
+#~ msgstr "惹我，你会哭。"
+
+#~ msgid "rps.cry.19"
+#~ msgstr "我打过更硬的NPC。"
+
+#~ msgid "rps.cry.20"
+#~ msgstr "练心肺也救不了你。"
+
+#~ msgid "rps.cry.21"
+#~ msgstr "感受我小小的不爽！"
+
+#~ msgid "rps.cry.22"
+#~ msgstr "谢谢游玩！"
+
+#~ msgid "rps.cry.23"
+#~ msgstr "你还能愤怒退游。"
+
+#~ msgid "rps.cry.24"
+#~ msgstr "从早饭起就没输过。"
+
+#~ msgid "rps.cry.25"
+#~ msgstr "挥手说拜拜！"
+
+#~ msgid "rps.cry.26"
+#~ msgstr "找错对手了，冠军。"
+
+#~ msgid "rps.cry.27"
+#~ msgstr "该练练技术了。"
+
+#~ msgid "rps.death.0"
+#~ msgstr "哎哟。真没礼貌。"
+
+#~ msgid "rps.death.1"
+#~ msgstr "这……也行？"
+
+#~ msgid "rps.death.2"
+#~ msgstr "值了。大概吧。"
+
+#~ msgid "rps.death.3"
+#~ msgstr "别告诉任何人。尤其是我妈。"
+
+#~ msgid "rps.death.4"
+#~ msgstr "这个得削……"
+
+#~ msgid "rps.death.5"
+#~ msgstr "GG……"
+
+#~ msgid "rps.death.6"
+#~ msgstr "我后悔……一些事……"
+
+#~ msgid "rps.death.7"
+#~ msgstr "把那个……截图……"
+
+#~ msgid "rps.death.8"
+#~ msgstr "教程里……没这招……"
+
+#~ msgid "rps.death.9"
+#~ msgstr "不该这样……卡了……"
+
+#~ msgid "rps.death.10"
+#~ msgstr "总会……复活的吧……"
+
+#~ msgid "rps.death.11"
+#~ msgstr "我的战利品……是租的……"
+
+#~ msgid "rps.death.12"
+#~ msgstr "我妈说……找份坐办公室的工作……"
+
+#~ msgid "rps.death.13"
+#~ msgstr "早该……闪开的……"
+
+#~ msgid "rps.death.14"
+#~ msgstr "肯定……开挂了……"
+
+#~ msgid "rps.death.15"
+#~ msgstr "愤怒退出……现实……"
+
+#~ msgid "rps.death.16"
+#~ msgstr "给我……五星好评……"
+
+#~ msgid "rps.death.17"
+#~ msgstr "这是……排位赛吗……？"
+
+#~ msgid "rps.death.18"
+#~ msgstr "取关了……"
+
+#~ msgid "rps.death.19"
+#~ msgstr "竟然……输给你……？"
+
+#~ msgid "rps.death.20"
+#~ msgstr "技术问题……我的……"
+
+#~ msgid "rps.death.21"
+#~ msgstr "GG，不打了……"
+
+#~ msgid "rps.death.22"
+#~ msgstr "给个……一星差评……"
+
+#~ msgid "rps.death.23"
+#~ msgstr "正在加载……来世……"
+
+#~ msgid "rps.death.24"
+#~ msgstr "这波……成梗了……"
+
+#~ msgid "rps.death.25"
+#~ msgstr "终于……能睡了……"
+
+#~ msgid "rps.death.26"
+#~ msgstr "把这段……发出去……"
+
+#~ msgid "rps.death.27"
+#~ msgstr "永久……挂机了……"
+
+#~ msgid "roulette.spin"
+#~ msgstr "开始"
+
+#: app/routes/rps.tsx:1447
 msgid "rps.banner.faster_foe"
 msgstr "{name} 更快！"
 
-msgid "rps.banner.hit"
-msgstr "命中！"
-
-msgid "rps.banner.youhit"
-msgstr "你被击中！"
-
-msgid "rps.foe.farmhand.name"
-msgstr "农夫皮普"
-
-msgid "rps.foe.farmhand.cry"
-msgstr "入侵者！国王要你……被收割！"
-
-msgid "rps.foe.farmhand.words"
-msgstr "迷雾散了……回去种萝卜吧……"
-
-msgid "rps.foe.chef.name"
-msgstr "雷纳尔大厨"
-
-msgid "rps.foe.chef.cry"
-msgstr "王冠要把你……做成佳肴！"
-
-msgid "rps.foe.chef.words"
-msgstr "我的舒芙蕾……和诅咒……一起塌了……"
-
-msgid "rps.foe.sentry.name"
-msgstr "哨兵科尔"
-
-msgid "rps.foe.sentry.cry"
-msgstr "谁也别想过去——王命！"
-
-msgid "rps.foe.sentry.words"
-msgstr "就一个任务……可这是谁下的令……？"
-
-msgid "rps.foe.inspector.name"
-msgstr "莫拉探长"
-
-msgid "rps.foe.inspector.cry"
-msgstr "国王的判决：有罪。小事一桩。"
-
-msgid "rps.foe.inspector.words"
-msgstr "真凶……是那个恶魔……"
-
-msgid "rps.foe.ninja.name"
-msgstr "疾风"
-
-msgid "rps.foe.ninja.cry"
-msgstr "暗影之命——眨眼你就没了。"
-
-msgid "rps.foe.ninja.words"
-msgstr "没料到……自己也被腐蚀了……"
-
-msgid "rps.foe.magus.name"
-msgstr "梵血"
-
-msgid "rps.foe.magus.cry"
-msgstr "给你画一幅御用肖像——用红色！"
-
-msgid "rps.foe.magus.words"
-msgstr "我的黑暗时期……结束了……"
-
-msgid "rps.foe.king.name"
-msgstr "奥德温国王"
-
-msgid "rps.foe.king.cry"
-msgstr "下跪——不，快逃——下跪！"
-
-msgid "rps.foe.king.words"
-msgstr "它……正在离开我的脑子……"
-
-msgid "rps.foe.villain.name"
-msgstr "恐惧沃尔克"
-
-msgid "rps.foe.villain.cry"
-msgstr "摆脱了那个古板国王——冲我来吧！"
-
-msgid "rps.foe.villain.words"
-msgstr "被赶走了……白住了这么久……"
-
-msgid "rps.foe.enchantress.name"
-msgstr "摩高斯"
-
-msgid "rps.foe.enchantress.cry"
-msgstr "恶魔的咒语——阿布拉卡·完蛋吧！"
-
-msgid "rps.foe.enchantress.words"
-msgstr "黑暗咒语……解开了……"
-
-msgid "rps.foe.valkyrie.name"
-msgstr "瓦尔基娅"
-
-msgid "rps.foe.valkyrie.cry"
-msgstr "腐化的王冠派我来——随性开打！"
-
-msgid "rps.foe.valkyrie.words"
-msgstr "黑风……剪断了我的翅膀……"
-
-msgid "rps.tier.semiboss"
-msgstr "精英"
-
-msgid "rps.tier.boss"
-msgstr "首领"
-
-msgid "rps.tier.hidden"
-msgstr "宿敌"
-
-msgid "rps.foe.wanderer.name"
-msgstr "流浪者"
-
-msgid "rps.foe.wanderer.cry"
-msgstr "你完蛋了！"
-
-msgid "rps.foe.wanderer.words"
-msgstr "哎哟。"
-
-msgid "rps.foe.brute.name"
-msgstr "蛮兵"
-
-msgid "rps.foe.brute.cry"
-msgstr "过来吧。"
-
-msgid "rps.foe.brute.words"
-msgstr "就这？"
-
-msgid "rps.foe.reaver.name"
-msgstr "劫掠者"
-
-msgid "rps.foe.reaver.cry"
-msgstr "现在就结束。"
-
-msgid "rps.foe.reaver.words"
-msgstr "值了。"
-
-msgid "rps.foe.warden.name"
-msgstr "守卫"
-
-msgid "rps.foe.warden.cry"
-msgstr "我见过更糟的。"
-
-msgid "rps.foe.warden.words"
-msgstr "别告诉任何人。"
-
-msgid "rps.foe.fiend.name"
-msgstr "恶魔"
-
-msgid "rps.foe.fiend.cry"
-msgstr "绝不留情。"
-
-msgid "rps.foe.fiend.words"
-msgstr "可恶……"
-
-msgid "rps.foe.marauder.name"
-msgstr "掠夺者"
-
-msgid "rps.foe.marauder.cry"
-msgstr "你敢？"
-
-msgid "rps.foe.marauder.words"
-msgstr "就这样结束了。"
-
-msgid "rps.foe.specter.name"
-msgstr "幽灵"
-
-msgid "rps.foe.specter.cry"
-msgstr "咽下最后一口气吧。"
-
-msgid "rps.foe.specter.words"
-msgstr "我……毫不后悔。"
-
-msgid "rps.foe.troll.name"
-msgstr "巨魔"
-
-msgid "rps.foe.troll.cry"
-msgstr "你够不着。"
-
-msgid "rps.foe.troll.words"
-msgstr "壮哉……"
-
-msgid "rps.splash.infinite"
-msgstr "无限"
-
-msgid "rps.splash.infinite_locked"
-msgstr "在冒险模式达到 Lv 9"
-
-msgid "rps.setup.title"
-msgstr "备战"
-
-msgid "rps.prologue.title"
-msgstr "RPS 王国"
-
-msgid "rps.prologue.body"
-msgstr "善良的奥德温国王曾以仁治国——直到一个恶魔白住进来，把他和他的勇士们都变坏了。拿起你的拳头、手掌和剪刀吧，冒险者：总得有人把它赶出去。"
-
-msgid "rps.victory.title"
-msgstr "胜利！"
-
-msgid "rps.victory.body"
-msgstr "王座背后的恶魔恐惧沃尔克被驱逐了！奥德温国王醒来，喃喃自语着一个奇怪的梦。RPS 王国重获自由，而你如今基本上算得上皇室成员了。"
-
+#: app/routes/rps.tsx:1146
+msgid "rps.round.lose"
+msgstr "{name} 赢下这一回合"
+
+#: app/routes/rps.tsx:985
 msgid "rps.victory.unlocked"
 msgstr "♾️ 无限模式已解锁！"
 
-msgid "rps.infinite.reached"
-msgstr "到达深度 {n}"
-
-msgid "rps.foe.imp.name"
-msgstr "小恶魔"
-
-msgid "rps.foe.djinn.name"
-msgstr "精灵"
-
-msgid "rps.foe.tideborn.name"
-msgstr "潮生者"
-
-msgid "rps.foe.wyrm.name"
-msgstr "巨龙"
-
-msgid "rps.foe.nightwing.name"
-msgstr "夜翼"
-
-msgid "rps.foe.weaver.name"
-msgstr "织网者"
-
-msgid "rps.foe.stinger.name"
-msgstr "蜇刺"
-
-msgid "rps.foe.tusk.name"
-msgstr "獠牙"
-
-msgid "rps.foe.maw.name"
-msgstr "巨口"
-
-msgid "rps.foe.fang.name"
-msgstr "尖牙"
-
-msgid "rps.foe.kong.name"
-msgstr "金刚"
-
-msgid "rps.foe.charger.name"
-msgstr "冲锋兽"
-
-msgid "rps.foe.snapper.name"
-msgstr "咬颚"
-
-msgid "rps.foe.wisp.name"
-msgstr "鬼火"
-
-msgid "rps.foe.bonelord.name"
-msgstr "骨王"
-
-msgid "rps.foe.sentinel.name"
-msgstr "哨戒机"
-
-msgid "rps.foe.invader.name"
-msgstr "入侵者"
-
-msgid "rps.foe.hollow.name"
-msgstr "空心"
-
-msgid "rps.foe.rex.name"
-msgstr "暴龙"
-
-msgid "rps.foe.kraken.name"
-msgstr "海妖"
-
-msgid "rps.foe.ghoul.name"
-msgstr "食尸鬼"
-
-msgid "rps.foe.countess.name"
-msgstr "伯爵夫人"
-
-msgid "rps.foe.sylph.name"
-msgstr "气精"
-
-msgid "rps.foe.siren.name"
-msgstr "塞壬"
-
-msgid "rps.foe.hexen.name"
-msgstr "女巫"
-
-msgid "rps.foe.jester.name"
-msgstr "弄臣"
-
-msgid "rps.cry.0"
-msgstr "你完蛋了！"
-
-msgid "rps.cry.1"
-msgstr "来抱一个！"
-
-msgid "rps.cry.2"
-msgstr "剧透：你输了。"
-
-msgid "rps.cry.3"
-msgstr "我见过更吓人的喷嚏。"
-
-msgid "rps.cry.4"
-msgstr "概不退款！"
-
-msgid "rps.cry.5"
-msgstr "你还敢来，有胆量。"
-
-msgid "rps.cry.6"
-msgstr "祈祷吧！"
-
-msgid "rps.cry.7"
-msgstr "你不在一个段位，伙计。"
-
-msgid "rps.cry.8"
-msgstr "小心脚下——你已经掉进去了。"
-
-msgid "rps.cry.9"
-msgstr "这会留个印子。"
-
-msgid "rps.cry.10"
-msgstr "那是恐惧，还是你的香水？"
-
-msgid "rps.cry.11"
-msgstr "我的胜率高得离谱。"
-
-msgid "rps.cry.12"
-msgstr "幸运女神休假了。"
-
-msgid "rps.cry.13"
-msgstr "下跪，不然我重组你。"
-
-msgid "rps.cry.14"
-msgstr "我早就想赢了。"
-
-msgid "rps.cry.15"
-msgstr "怕的话就眨眨眼。"
-
-msgid "rps.cry.16"
-msgstr "赢这事，我先占了。"
-
-msgid "rps.cry.17"
-msgstr "你按错门铃了，伙计。"
-
-msgid "rps.cry.18"
-msgstr "惹我，你会哭。"
-
-msgid "rps.cry.19"
-msgstr "我打过更硬的NPC。"
-
-msgid "rps.cry.20"
-msgstr "练心肺也救不了你。"
-
-msgid "rps.cry.21"
-msgstr "感受我小小的不爽！"
-
-msgid "rps.cry.22"
-msgstr "谢谢游玩！"
-
-msgid "rps.cry.23"
-msgstr "你还能愤怒退游。"
-
-msgid "rps.cry.24"
-msgstr "从早饭起就没输过。"
-
-msgid "rps.cry.25"
-msgstr "挥手说拜拜！"
-
-msgid "rps.cry.26"
-msgstr "找错对手了，冠军。"
-
-msgid "rps.cry.27"
-msgstr "该练练技术了。"
-
-msgid "rps.death.0"
-msgstr "哎哟。真没礼貌。"
-
-msgid "rps.death.1"
-msgstr "这……也行？"
-
-msgid "rps.death.2"
-msgstr "值了。大概吧。"
-
-msgid "rps.death.3"
-msgstr "别告诉任何人。尤其是我妈。"
-
-msgid "rps.death.4"
-msgstr "这个得削……"
-
-msgid "rps.death.5"
-msgstr "GG……"
-
-msgid "rps.death.6"
-msgstr "我后悔……一些事……"
-
-msgid "rps.death.7"
-msgstr "把那个……截图……"
-
-msgid "rps.death.8"
-msgstr "教程里……没这招……"
-
-msgid "rps.death.9"
-msgstr "不该这样……卡了……"
-
-msgid "rps.death.10"
-msgstr "总会……复活的吧……"
-
-msgid "rps.death.11"
-msgstr "我的战利品……是租的……"
-
-msgid "rps.death.12"
-msgstr "我妈说……找份坐办公室的工作……"
-
-msgid "rps.death.13"
-msgstr "早该……闪开的……"
-
-msgid "rps.death.14"
-msgstr "肯定……开挂了……"
-
-msgid "rps.death.15"
-msgstr "愤怒退出……现实……"
-
-msgid "rps.death.16"
-msgstr "给我……五星好评……"
-
-msgid "rps.death.17"
-msgstr "这是……排位赛吗……？"
-
-msgid "rps.death.18"
-msgstr "取关了……"
-
-msgid "rps.death.19"
-msgstr "竟然……输给你……？"
-
-msgid "rps.death.20"
-msgstr "技术问题……我的……"
-
-msgid "rps.death.21"
-msgstr "GG，不打了……"
-
-msgid "rps.death.22"
-msgstr "给个……一星差评……"
-
-msgid "rps.death.23"
-msgstr "正在加载……来世……"
-
-msgid "rps.death.24"
-msgstr "这波……成梗了……"
-
-msgid "rps.death.25"
-msgstr "终于……能睡了……"
-
-msgid "rps.death.26"
-msgstr "把这段……发出去……"
-
-msgid "rps.death.27"
-msgstr "永久……挂机了……"
-
-msgid "snake.title"
-msgstr "贪吃蛇"
-
-msgid "snake.score"
-msgstr "分数"
-
-msgid "snake.start"
-msgstr "滑动屏幕或使用方向键开始"
-
-msgid "snake.gameover"
-msgstr "游戏结束"
-
-msgid "snake.hint"
-msgstr "在棋盘上滑动 · 电脑端方向键或 WASD"
-
-msgid "flappy.title"
-msgstr "飞翔的小鸟"
-
-msgid "flappy.start"
-msgstr "点击或按空格开始"
-
-msgid "flappy.gameover"
-msgstr "游戏结束"
-
-msgid "roulette.title"
-msgstr "轮盘"
-
-msgid "roulette.balance"
-msgstr "余额"
-
-msgid "roulette.red"
-msgstr "红"
-
-msgid "roulette.black"
-msgstr "黑"
-
-msgid "roulette.even"
-msgstr "双"
-
-msgid "roulette.odd"
-msgstr "单"
-
-msgid "roulette.wagered"
-msgstr "下注中"
-
-msgid "roulette.chip"
-msgstr "筹码"
-
-msgid "roulette.allin"
-msgstr "全押"
-
-msgid "roulette.clear"
-msgstr "清除"
-
-msgid "roulette.spin"
-msgstr "开始"
-
-msgid "roulette.broke"
-msgstr "筹码用尽"
-
-msgid "roulette.place_bets"
-msgstr "请下注"
-
-msgid "roulette.no_more_bets"
-msgstr "买定离手，停止下注"
-
-msgid "roulette.stats_title"
-msgstr "统计"
-
-msgid "roulette.spins"
-msgstr "次数"
-
-msgid "roulette.hot"
-msgstr "热门"
-
-msgid "roulette.cold"
-msgstr "冷门"
-
-msgid "about.title"
-msgstr "关于"
-
-msgid "about.section.built_with"
-msgstr "构建工具"
-
-msgid "about.section.source"
-msgstr "源代码"
-
-msgid "about.built.claude"
-msgstr "与 Claude（Anthropic）共同编写"
-
-msgid "about.section.records"
-msgstr "纪录"
-
-msgid "about.records.reset"
-msgstr "重置"
-
-msgid "about.records.confirm"
-msgstr "确认"
-
-msgid "about.section.legal"
-msgstr "法律声明"
-
-msgid "about.legal.body"
-msgstr "由 toto-victoto 发布的非商业个人网站。由 GitHub, Inc.（88 Colin P Kelly Jr St, San Francisco, CA 94107, 美国）托管。无分析工具、无 Cookie、无第三方跟踪。"
-
-msgid "nav.home"
-msgstr "首页"
-
-msgid "ultimate.title"
-msgstr "终极井字棋"
-
-msgid "ultimate.rules"
-msgstr "你的格子将对手送往对应的子棋盘"
-
-msgid "ultimate.turn"
-msgstr "轮到"
-
-msgid "ultimate.wins"
-msgstr "获胜!"
-
-msgid "ultimate.draw"
-msgstr "平局"
-
-msgid "ultimate.draws"
-msgstr "平局数"
-
+#: app/routes/slots.tsx:207
+msgid "slots.title"
+msgstr "1-UP 老虎机"
+
+#: app/routes/ultimate.tsx:415
 msgid "ultimate.mode.2p"
 msgstr "双人"
 
-msgid "ultimate.mode.ai"
-msgstr "对战电脑"
+#: app/routes/home.tsx:47
+msgid "home.app.about"
+msgstr "关于"
 
-msgid "trias.title"
-msgstr "Trias"
+#: app/routes/about.tsx:75
+msgid "about.title"
+msgstr "关于"
 
-msgid "trias.score"
-msgstr "得分"
+#: app/routes/roulette.tsx:644
+msgid "roulette.allin"
+msgstr "全押"
 
-msgid "trias.hold"
-msgstr "暂存"
+#: app/routes/rps.tsx:888
+msgid "rps.splash.tagline"
+msgstr "石头剪刀布 RPG"
 
-msgid "trias.level"
-msgstr "等级"
+#: app/routes/roulette.tsx:462
+msgid "roulette.balance"
+msgstr "余额"
 
-msgid "trias.next"
-msgstr "下一个"
+#: app/routes/flappy.tsx:269
+#: app/routes/roulette.tsx:473
+#: app/routes/rps.tsx:1219
+#: app/routes/slots.tsx:213
+#: app/routes/snake.tsx:237
+#: app/routes/threader.tsx:888
+#: app/routes/trias.tsx:940
+msgid "common.best"
+msgstr "最高"
 
-msgid "trias.gameover"
-msgstr "堆满了"
+#: app/routes/roulette.tsx:837
+msgid "roulette.black"
+msgstr "黑"
 
-msgid "trias.hint"
-msgstr "左右滑动移动 · 按住下滑加速 · 上滑落子 · 长按暂存 · 电脑用方向键 / 空格 / C"
+#: app/routes/about.tsx:81
+msgid "about.section.built_with"
+msgstr "构建工具"
 
-msgid "trias.time"
-msgstr "时间"
+#: app/routes/roulette.tsx:619
+msgid "roulette.chip"
+msgstr "筹码"
 
-msgid "trias.modes"
-msgstr "模式"
-
+#: app/routes/trias.tsx:1042
 msgid "trias.mode.choose"
 msgstr "选择模式"
 
-msgid "trias.mode.endless"
-msgstr "无尽"
+#: app/routes/rps.tsx:1106
+msgid "rps.choose"
+msgstr "选择你的出招"
 
-msgid "trias.mode.marathon"
-msgstr "马拉松"
+#: app/routes/roulette.tsx:652
+msgid "roulette.clear"
+msgstr "清除"
 
-msgid "trias.mode.timeattack"
-msgstr "计时赛"
-
+#: app/routes/trias.tsx:346
 msgid "trias.goal.endless"
 msgstr "尽可能堆得更高"
 
-msgid "trias.goal.marathon"
-msgstr "达到第 {max} 级"
+#: app/routes/about.tsx:90
+msgid "about.built.claude"
+msgstr "与 Claude（Anthropic）共同编写"
 
-msgid "trias.goal.timeattack"
-msgstr "达到 {target} 分"
+#: app/routes/roulette.tsx:863
+msgid "roulette.cold"
+msgstr "冷门"
 
-msgid "trias.won.marathon"
-msgstr "马拉松完成！"
-
-msgid "trias.won.timeattack"
-msgstr "目标达成！"
-
+#: app/routes/trias.tsx:1032
 msgid "trias.combo"
 msgstr "连击"
 
+#: app/routes/threader.tsx:874
+msgid "threader.legend.shield"
+msgstr "连击可获得护盾 — 每个替你挡下一次失误"
+
+#: app/routes/about.tsx:124
+msgid "about.records.confirm"
+msgstr "确认"
+
+#: app/routes/rps.tsx:901
+#: app/routes/rps.tsx:910
+#: app/routes/rps.tsx:1203
+#: app/routes/rps.tsx:1382
+msgid "rps.rpg.continue"
+msgstr "继续"
+
+#: app/routes/trias.tsx:1026
 msgid "trias.clear.double"
 msgstr "双行"
 
-msgid "trias.clear.triple"
-msgstr "三行"
+#: app/routes/ultimate.tsx:469
+msgid "ultimate.draw"
+msgstr "平局"
 
-msgid "trias.clear.perfect"
-msgstr "完美清屏！"
+#: app/routes/rps.tsx:1152
+msgid "rps.draw"
+msgstr "平局"
 
-msgid "threader.title"
-msgstr "Threader"
+#: app/routes/ultimate.tsx:446
+msgid "ultimate.draws"
+msgstr "平局数"
 
-msgid "threader.start"
-msgstr "点击切换形状 · 拖动对准缺口"
+#: app/routes/rps.tsx:977
+msgid "rps.victory.body"
+msgstr "王座背后的恶魔恐惧沃尔克被驱逐了！奥德温国王醒来，喃喃自语着一个奇怪的梦。RPS 王国重获自由，而你如今基本上算得上皇室成员了。"
 
+#: app/routes/trias.tsx:337
+msgid "trias.mode.endless"
+msgstr "无尽"
+
+#: app/routes/roulette.tsx:843
+msgid "roulette.even"
+msgstr "双"
+
+#: app/routes/rps.tsx:1201
+msgid "rps.rpg.fight"
+msgstr "战斗！"
+
+#: app/routes/flappy.tsx:188
+msgid "flappy.title"
+msgstr "飞翔的小鸟"
+
+#: app/routes/snake.tsx:290
+msgid "snake.gameover"
+msgstr "游戏结束"
+
+#: app/routes/threader.tsx:885
 msgid "threader.gameover"
 msgstr "游戏结束"
 
+#: app/routes/flappy.tsx:266
+msgid "flappy.gameover"
+msgstr "游戏结束"
+
+#: app/routes/rps.tsx:1165
+msgid "rps.setup.title"
+msgstr "备战"
+
+#: app/routes/rps.tsx:1342
+msgid "rps.stats.gotit"
+msgstr "知道了"
+
+#: app/routes/rps.tsx:1395
+msgid "rps.banner.healed"
+msgstr "回复 {amount}"
+
+#: app/routes/rps.tsx:1456
+msgid "rps.banner.hit"
+msgstr "命中！"
+
+#: app/routes/trias.tsx:962
+msgid "trias.hold"
+msgstr "暂存"
+
+#: app/components/BackButton.tsx:29
+#: app/components/HomeButton.tsx:18
+msgid "nav.home"
+msgstr "首页"
+
+#: app/routes/roulette.tsx:853
+msgid "roulette.hot"
+msgstr "热门"
+
+#: app/routes/roulette.tsx:656
+msgid "roulette.wagered"
+msgstr "下注中"
+
+#: app/routes/rps.tsx:933
+msgid "rps.splash.infinite"
+msgstr "无限"
+
+#: app/routes/rps.tsx:996
+msgid "rps.prologue.body"
+msgstr "善良的奥德温国王曾以仁治国——直到一个恶魔白住进来，把他和他的勇士们都变坏了。拿起你的拳头、手掌和剪刀吧，冒险者：总得有人把它赶出去。"
+
+#: app/routes/about.tsx:152
+msgid "about.section.legal"
+msgstr "法律声明"
+
+#: app/routes/trias.tsx:928
+msgid "trias.level"
+msgstr "等级"
+
+#: app/routes/rps.tsx:1167
+msgid "rps.rpg.levelup"
+msgstr "升级！"
+
+#: app/routes/trias.tsx:339
+msgid "trias.mode.marathon"
+msgstr "马拉松"
+
+#: app/routes/trias.tsx:1068
+msgid "trias.won.marathon"
+msgstr "马拉松完成！"
+
+#: app/routes/trias.tsx:1106
+msgid "trias.modes"
+msgstr "模式"
+
+#: app/routes/trias.tsx:1116
+msgid "trias.next"
+msgstr "下一个"
+
+#: app/routes/roulette.tsx:484
+msgid "roulette.no_more_bets"
+msgstr "买定离手，停止下注"
+
+#: app/routes/roulette.tsx:844
+msgid "roulette.odd"
+msgstr "单"
+
+#: app/routes/roulette.tsx:670
+msgid "roulette.broke"
+msgstr "筹码用尽"
+
+#: app/routes/threader.tsx:768
 msgid "threader.perfect"
 msgstr "完美"
 
+#: app/routes/trias.tsx:1018
+msgid "trias.clear.perfect"
+msgstr "完美清屏！"
+
+#: app/routes/about.tsx:155
+msgid "about.legal.body"
+msgstr "由 toto-victoto 发布的非商业个人网站。由 GitHub, Inc.（88 Colin P Kelly Jr St, San Francisco, CA 94107, 美国）托管。无分析工具、无 Cookie、无第三方跟踪。"
+
+#: app/routes/roulette.tsx:489
+msgid "roulette.place_bets"
+msgstr "请下注"
+
+#: app/routes/flappy.tsx:276
+#: app/routes/roulette.tsx:676
+#: app/routes/snake.tsx:296
+#: app/routes/threader.tsx:895
+#: app/routes/trias.tsx:1100
+#: app/routes/ultimate.tsx:557
+msgid "common.play_again"
+msgstr "再玩一次"
+
+#: app/routes/slots.tsx:321
+msgid "slots.again"
+msgstr "再来一次"
+
+#: app/routes/slots.tsx:323
+msgid "slots.pull"
+msgstr "拉动拉杆"
+
+#: app/routes/rps.tsx:1096
+msgid "rps.rip"
+msgstr "安息 {name}"
+
+#: app/routes/trias.tsx:357
+msgid "trias.goal.timeattack"
+msgstr "达到 {target} 分"
+
+#: app/routes/trias.tsx:350
+msgid "trias.goal.marathon"
+msgstr "达到第 {max} 级"
+
+#: app/routes/rps.tsx:1216
+msgid "rps.rpg.reached"
+msgstr "达到第 {level} 级"
+
+#: app/routes/about.tsx:100
+msgid "about.section.records"
+msgstr "纪录"
+
+#: app/routes/roulette.tsx:836
+msgid "roulette.red"
+msgstr "红"
+
+#: app/routes/about.tsx:126
+msgid "about.records.reset"
+msgstr "重置"
+
+#: app/routes/roulette.tsx:687
+#: app/routes/ultimate.tsx:566
+msgid "common.reset"
+msgstr "重置"
+
+#: app/routes/rps.tsx:923
+msgid "rps.splash.restart"
+msgstr "重新开始"
+
+#: app/routes/roulette.tsx:431
+msgid "roulette.title"
+msgstr "轮盘"
+
+#: app/routes/rps.tsx:1016
+msgid "rps.title"
+msgstr "RPS Saga"
+
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "分数"
+
+#: app/routes/trias.tsx:907
+#: app/routes/trias.tsx:1085
+msgid "trias.score"
+msgstr "得分"
+
+#: app/routes/snake.tsx:224
+msgid "snake.title"
+msgstr "贪吃蛇"
+
+#: app/routes/rps.tsx:1434
+msgid "rps.banner.softened"
+msgstr "减弱 ×{mult}"
+
+#: app/routes/about.tsx:138
+msgid "about.section.source"
+msgstr "源代码"
+
+#: app/routes/rps.tsx:1171
+msgid "rps.rpg.spend"
+msgstr "分配点数"
+
+#: app/routes/roulette.tsx:827
+msgid "roulette.spins"
+msgstr "次数"
+
+#: app/routes/trias.tsx:1081
+msgid "trias.gameover"
+msgstr "堆满了"
+
+#: app/routes/rps.tsx:1424
+msgid "rps.banner.stakes"
+msgstr "赌注 ×{mult}！"
+
+#: app/routes/rps.tsx:1403
+msgid "rps.banner.stalemate_deep"
+msgstr "僵持 —— 蓄势更深！"
+
+#: app/routes/rps.tsx:1405
+msgid "rps.banner.stalemate"
+msgstr "僵持！"
+
+#: app/routes/rps.tsx:925
+msgid "rps.splash.start"
+msgstr "开始"
+
+#: app/routes/roulette.tsx:814
+msgid "roulette.stats_title"
+msgstr "统计"
+
+#: app/routes/rps.tsx:1325
+msgid "rps.stats.title"
+msgstr "属性"
+
+#: app/routes/slots.tsx:319
+msgid "slots.stop"
+msgstr "停"
+
+#: app/routes/trias.tsx:1125
+msgid "trias.hint"
+msgstr "左右滑动移动 · 按住下滑加速 · 上滑落子 · 长按暂存 · 电脑用方向键 / 空格 / C"
+
+#: app/routes/snake.tsx:307
+msgid "snake.hint"
+msgstr "在棋盘上滑动 · 电脑端方向键或 WASD"
+
+#: app/routes/snake.tsx:282
+msgid "snake.start"
+msgstr "滑动屏幕或使用方向键开始"
+
+#: app/routes/home.tsx:29
+msgid "home.subtitle"
+msgstr "点击应用开始游戏。"
+
+#: app/routes/flappy.tsx:258
+msgid "flappy.start"
+msgstr "点击或按空格开始"
+
+#: app/routes/threader.tsx:849
+msgid "threader.start"
+msgstr "点击切换形状 · 拖动对准缺口"
+
+#: app/routes/trias.tsx:1073
+msgid "trias.won.timeattack"
+msgstr "目标达成！"
+
+#: app/routes/rps.tsx:994
+msgid "rps.prologue.title"
+msgstr "RPS 王国"
+
+#: app/routes/threader.tsx:863
 msgid "threader.legend.bead"
 msgstr "穿过圆珠可得额外分数"
 
-msgid "threader.legend.shield"
-msgstr "连击可获得护盾 — 每个替你挡下一次失误"
+#: app/routes/threader.tsx:627
+msgid "threader.title"
+msgstr "Threader"
+
+#: app/routes/trias.tsx:919
+#: app/routes/trias.tsx:1090
+msgid "trias.time"
+msgstr "时间"
+
+#: app/routes/trias.tsx:340
+msgid "trias.mode.timeattack"
+msgstr "计时赛"
+
+#: app/routes/home.tsx:26
+msgid "home.title"
+msgstr "toto-victoto"
+
+#: app/routes/trias.tsx:902
+msgid "trias.title"
+msgstr "Trias"
+
+#: app/routes/trias.tsx:1024
+msgid "trias.clear.triple"
+msgstr "三行"
+
+#: app/routes/rps.tsx:1225
+msgid "rps.rpg.tryagain"
+msgstr "再试一次"
+
+#: app/routes/ultimate.tsx:473
+msgid "ultimate.turn"
+msgstr "轮到"
+
+#: app/routes/ultimate.tsx:398
+msgid "ultimate.title"
+msgstr "终极井字棋"
+
+#: app/routes/rps.tsx:975
+msgid "rps.victory.title"
+msgstr "胜利！"
+
+#: app/routes/ultimate.tsx:425
+msgid "ultimate.mode.ai"
+msgstr "对战电脑"
+
+#: app/routes/ultimate.tsx:465
+msgid "ultimate.wins"
+msgstr "获胜!"
+
+#: app/routes/rps.tsx:1212
+msgid "rps.rpg.defeated"
+msgstr "你被击败了"
+
+#: app/routes/rps.tsx:1143
+msgid "rps.round.win"
+msgstr "你赢下这一回合！"
+
+#: app/routes/rps.tsx:1445
+msgid "rps.banner.faster_you"
+msgstr "你更快！"
+
+#: app/routes/rps.tsx:1458
+msgid "rps.banner.youhit"
+msgstr "你被击中！"
+
+#: app/routes/ultimate.tsx:401
+msgid "ultimate.rules"
+msgstr "你的格子将对手送往对应的子棋盘"

@@ -6,804 +6,955 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: fr\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
-msgid "common.best"
-msgstr "Record"
+#~ msgid "rps.win"
+#~ msgstr "Gagné !"
 
-msgid "common.play_again"
-msgstr "Rejouer"
+#~ msgid "rps.lose"
+#~ msgstr "Perdu."
 
-msgid "common.reset"
-msgstr "Réinitialiser"
+#~ msgid "rps.score.you"
+#~ msgstr "Toi"
 
-msgid "home.title"
-msgstr "toto-victoto"
+#~ msgid "rps.score.cpu"
+#~ msgstr "Ordi"
 
-msgid "home.subtitle"
-msgstr "Tape sur une app pour jouer."
+#~ msgid "rps.stat.label.hp"
+#~ msgstr "PV"
 
-msgid "home.app.about"
-msgstr "À propos"
+#~ msgid "rps.stat.label.str"
+#~ msgstr "FOR"
 
-msgid "rps.title"
-msgstr "RPS Saga"
+#~ msgid "rps.stat.label.def"
+#~ msgstr "DEF"
 
-msgid "rps.choose"
-msgstr "Choisis ton coup"
+#~ msgid "rps.stat.label.agi"
+#~ msgstr "AGI"
 
-msgid "rps.win"
-msgstr "Gagné !"
+#~ msgid "rps.stat.label.dex"
+#~ msgstr "DEX"
 
-msgid "rps.lose"
-msgstr "Perdu."
+#~ msgid "rps.stat.hp"
+#~ msgstr "Points de vie. À 0, tu es vaincu."
 
-msgid "rps.draw"
-msgstr "Égalité"
+#~ msgid "rps.stat.str"
+#~ msgstr "Puissance d'attaque — tes dégâts de base."
 
-msgid "rps.score.you"
-msgstr "Toi"
+#~ msgid "rps.stat.def"
+#~ msgstr "Réduit les dégâts que tu subis."
 
-msgid "rps.score.cpu"
-msgstr "Ordi"
+#~ msgid "rps.stat.agi"
+#~ msgstr "Prends l'adversaire de vitesse pour frapper deux fois."
 
-msgid "rps.rpg.fight"
-msgstr "Combattre !"
+#~ msgid "rps.stat.dex"
+#~ msgstr "La vitesse à laquelle tes multiplicateurs montent et descendent."
 
-msgid "rps.rpg.continue"
-msgstr "Continuer"
+#~ msgid "rps.foe.farmhand.name"
+#~ msgstr "Pip le fermier"
 
-msgid "rps.rpg.tryagain"
-msgstr "Réessayer"
+#~ msgid "rps.foe.farmhand.cry"
+#~ msgstr "Intrus ! Le Roi te veut… récolté !"
 
-msgid "rps.rpg.levelup"
-msgstr "Niveau supérieur !"
+#~ msgid "rps.foe.farmhand.words"
+#~ msgstr "Le brouillard se dissipe… retour aux navets…"
 
-msgid "rps.rpg.spend"
-msgstr "Répartis tes points"
+#~ msgid "rps.foe.chef.name"
+#~ msgstr "Chef Renard"
 
-msgid "rps.rpg.defeated"
-msgstr "Tu as été vaincu"
+#~ msgid "rps.foe.chef.cry"
+#~ msgstr "La couronne te veut flambé !"
 
-msgid "rps.rpg.reached"
-msgstr "Niveau {level} atteint"
+#~ msgid "rps.foe.chef.words"
+#~ msgstr "Mon soufflé… et ma malédiction… retombent…"
 
-msgid "rps.splash.tagline"
-msgstr "Un RPG au pierre-feuille-ciseaux"
+#~ msgid "rps.foe.sentry.name"
+#~ msgstr "Cole la sentinelle"
 
-msgid "rps.splash.start"
-msgstr "Commencer"
+#~ msgid "rps.foe.sentry.cry"
+#~ msgstr "Nul ne passe — décret royal !"
 
-msgid "rps.splash.restart"
-msgstr "Recommencer"
+#~ msgid "rps.foe.sentry.words"
+#~ msgstr "Une seule mission… mais de qui…?"
 
-msgid "rps.round.win"
-msgstr "Tu gagnes la manche !"
+#~ msgid "rps.foe.inspector.name"
+#~ msgstr "Insp. Mora"
 
-msgid "rps.round.lose"
-msgstr "{name} gagne la manche"
+#~ msgid "rps.foe.inspector.cry"
+#~ msgstr "Verdict du Roi : coupable. Élémentaire."
 
-msgid "rps.rip"
-msgstr "R.I.P. {name}"
+#~ msgid "rps.foe.inspector.words"
+#~ msgstr "Le vrai coupable… c'était le démon…"
 
-msgid "rps.stats.title"
-msgstr "Stats"
+#~ msgid "rps.foe.ninja.name"
+#~ msgstr "Kaze"
 
-msgid "rps.stats.gotit"
-msgstr "Compris"
+#~ msgid "rps.foe.ninja.cry"
+#~ msgstr "Ordre de l'ombre — cligne et tu disparais."
 
-msgid "rps.stat.label.hp"
-msgstr "PV"
+#~ msgid "rps.foe.ninja.words"
+#~ msgstr "J'ai pas vu venir… ma corruption…"
 
-msgid "rps.stat.label.str"
-msgstr "FOR"
+#~ msgid "rps.foe.magus.name"
+#~ msgstr "Van Gore"
 
-msgid "rps.stat.label.def"
-msgstr "DEF"
+#~ msgid "rps.foe.magus.cry"
+#~ msgstr "Un portrait royal de toi — en rouge !"
 
-msgid "rps.stat.label.agi"
-msgstr "AGI"
+#~ msgid "rps.foe.magus.words"
+#~ msgstr "Ma période sombre… s'achève…"
 
-msgid "rps.stat.label.dex"
-msgstr "DEX"
+#~ msgid "rps.foe.king.name"
+#~ msgstr "Roi Aldwin"
 
-msgid "rps.stat.hp"
-msgstr "Points de vie. À 0, tu es vaincu."
+#~ msgid "rps.foe.king.cry"
+#~ msgstr "À GENOUX— non, FUIS— À GENOUX !"
 
-msgid "rps.stat.str"
-msgstr "Puissance d'attaque — tes dégâts de base."
+#~ msgid "rps.foe.king.words"
+#~ msgstr "Ça… quitte ma tête…"
 
-msgid "rps.stat.def"
-msgstr "Réduit les dégâts que tu subis."
+#~ msgid "rps.foe.villain.name"
+#~ msgstr "Volk l'Effroi"
 
-msgid "rps.stat.agi"
-msgstr "Prends l'adversaire de vitesse pour frapper deux fois."
+#~ msgid "rps.foe.villain.cry"
+#~ msgstr "Débarrassé de ce roi coincé — à MOI !"
 
-msgid "rps.stat.dex"
-msgstr "La vitesse à laquelle tes multiplicateurs montent et descendent."
+#~ msgid "rps.foe.villain.words"
+#~ msgstr "Expulsé… après tout ce loyer gratuit…"
 
-msgid "rps.banner.healed"
-msgstr "Soin +{amount}"
+#~ msgid "rps.foe.enchantress.name"
+#~ msgstr "Morgause"
 
-msgid "rps.banner.stalemate_deep"
-msgstr "Impasse — la posture se creuse !"
+#~ msgid "rps.foe.enchantress.cry"
+#~ msgstr "Le sort du démon — Abracada-BOUM !"
 
-msgid "rps.banner.stalemate"
-msgstr "Impasse !"
+#~ msgid "rps.foe.enchantress.words"
+#~ msgstr "Le sortilège noir… se rompt…"
 
-msgid "rps.banner.stakes"
-msgstr "Enjeu ×{mult} !"
+#~ msgid "rps.foe.valkyrie.name"
+#~ msgstr "Valkyra"
 
-msgid "rps.banner.softened"
-msgstr "Amorti ×{mult}"
+#~ msgid "rps.foe.valkyrie.cry"
+#~ msgstr "La couronne corrompue m'envoie — à l'arrache !"
 
-msgid "rps.banner.faster_you"
-msgstr "Tu es plus rapide !"
+#~ msgid "rps.foe.valkyrie.words"
+#~ msgstr "Le vent noir… me rogne les ailes…"
 
+#~ msgid "rps.tier.semiboss"
+#~ msgstr "Élite"
+
+#~ msgid "rps.tier.boss"
+#~ msgstr "Boss"
+
+#~ msgid "rps.tier.hidden"
+#~ msgstr "Némésis"
+
+#~ msgid "rps.foe.wanderer.name"
+#~ msgstr "Vagabond"
+
+#~ msgid "rps.foe.wanderer.cry"
+#~ msgstr "Tu es fini !"
+
+#~ msgid "rps.foe.wanderer.words"
+#~ msgstr "Aïe."
+
+#~ msgid "rps.foe.brute.name"
+#~ msgstr "Brute"
+
+#~ msgid "rps.foe.brute.cry"
+#~ msgstr "Approche."
+
+#~ msgid "rps.foe.brute.words"
+#~ msgstr "C'est tout ?"
+
+#~ msgid "rps.foe.reaver.name"
+#~ msgstr "Pillard"
+
+#~ msgid "rps.foe.reaver.cry"
+#~ msgstr "Ça se termine maintenant."
+
+#~ msgid "rps.foe.reaver.words"
+#~ msgstr "Ça valait le coup."
+
+#~ msgid "rps.foe.warden.name"
+#~ msgstr "Gardien"
+
+#~ msgid "rps.foe.warden.cry"
+#~ msgstr "J'ai connu pire."
+
+#~ msgid "rps.foe.warden.words"
+#~ msgstr "N'en parle à personne."
+
+#~ msgid "rps.foe.fiend.name"
+#~ msgstr "Démon"
+
+#~ msgid "rps.foe.fiend.cry"
+#~ msgstr "Aucune pitié."
+
+#~ msgid "rps.foe.fiend.words"
+#~ msgstr "Zut…"
+
+#~ msgid "rps.foe.marauder.name"
+#~ msgstr "Maraudeur"
+
+#~ msgid "rps.foe.marauder.cry"
+#~ msgstr "Tu oses ?"
+
+#~ msgid "rps.foe.marauder.words"
+#~ msgstr "Ainsi tout s'achève."
+
+#~ msgid "rps.foe.specter.name"
+#~ msgstr "Spectre"
+
+#~ msgid "rps.foe.specter.cry"
+#~ msgstr "Rends ton dernier souffle."
+
+#~ msgid "rps.foe.specter.words"
+#~ msgstr "Je ne regrette… rien."
+
+#~ msgid "rps.foe.troll.name"
+#~ msgstr "Troll"
+
+#~ msgid "rps.foe.troll.cry"
+#~ msgstr "Hors de ta portée."
+
+#~ msgid "rps.foe.troll.words"
+#~ msgstr "Glorieux…"
+
+#~ msgid "rps.splash.infinite_locked"
+#~ msgstr "Atteins Lv 9 en Aventure"
+
+#~ msgid "rps.infinite.reached"
+#~ msgstr "Profondeur {n} atteinte"
+
+#~ msgid "rps.foe.imp.name"
+#~ msgstr "Diablotin"
+
+#~ msgid "rps.foe.djinn.name"
+#~ msgstr "Djinn"
+
+#~ msgid "rps.foe.tideborn.name"
+#~ msgstr "Né-des-Marées"
+
+#~ msgid "rps.foe.wyrm.name"
+#~ msgstr "Guivre"
+
+#~ msgid "rps.foe.nightwing.name"
+#~ msgstr "Aile-Noire"
+
+#~ msgid "rps.foe.weaver.name"
+#~ msgstr "Tisseur"
+
+#~ msgid "rps.foe.stinger.name"
+#~ msgstr "Dardeur"
+
+#~ msgid "rps.foe.tusk.name"
+#~ msgstr "Défense"
+
+#~ msgid "rps.foe.maw.name"
+#~ msgstr "Gueule"
+
+#~ msgid "rps.foe.fang.name"
+#~ msgstr "Croc"
+
+#~ msgid "rps.foe.kong.name"
+#~ msgstr "Kong"
+
+#~ msgid "rps.foe.charger.name"
+#~ msgstr "Fonceur"
+
+#~ msgid "rps.foe.snapper.name"
+#~ msgstr "Happeur"
+
+#~ msgid "rps.foe.wisp.name"
+#~ msgstr "Feu-Follet"
+
+#~ msgid "rps.foe.bonelord.name"
+#~ msgstr "Seigneur d'Os"
+
+#~ msgid "rps.foe.sentinel.name"
+#~ msgstr "Sentinelle"
+
+#~ msgid "rps.foe.invader.name"
+#~ msgstr "Envahisseur"
+
+#~ msgid "rps.foe.hollow.name"
+#~ msgstr "Le Creux"
+
+#~ msgid "rps.foe.rex.name"
+#~ msgstr "Rex"
+
+#~ msgid "rps.foe.kraken.name"
+#~ msgstr "Kraken"
+
+#~ msgid "rps.foe.ghoul.name"
+#~ msgstr "Goule"
+
+#~ msgid "rps.foe.countess.name"
+#~ msgstr "Comtesse"
+
+#~ msgid "rps.foe.sylph.name"
+#~ msgstr "Sylphe"
+
+#~ msgid "rps.foe.siren.name"
+#~ msgstr "Sirène"
+
+#~ msgid "rps.foe.hexen.name"
+#~ msgstr "Sorcière"
+
+#~ msgid "rps.foe.jester.name"
+#~ msgstr "Bouffon"
+
+#~ msgid "rps.cry.0"
+#~ msgstr "T'es cuit !"
+
+#~ msgid "rps.cry.1"
+#~ msgstr "Viens faire un câlin !"
+
+#~ msgid "rps.cry.2"
+#~ msgstr "Spoiler : tu perds."
+
+#~ msgid "rps.cry.3"
+#~ msgstr "J'ai vu des éternuements plus flippants."
+
+#~ msgid "rps.cry.4"
+#~ msgstr "Pas de remboursement !"
+
+#~ msgid "rps.cry.5"
+#~ msgstr "Culotté d'être venu."
+
+#~ msgid "rps.cry.6"
+#~ msgstr "Fais ta prière !"
+
+#~ msgid "rps.cry.7"
+#~ msgstr "Hors catégorie, mon grand."
+
+#~ msgid "rps.cry.8"
+#~ msgstr "Attention à la marche… tu tombes."
+
+#~ msgid "rps.cry.9"
+#~ msgstr "Ça va laisser des traces."
+
+#~ msgid "rps.cry.10"
+#~ msgstr "C'est la peur ou ton parfum ?"
+
+#~ msgid "rps.cry.11"
+#~ msgstr "Mon taux de victoire est indécent."
+
+#~ msgid "rps.cry.12"
+#~ msgstr "La chance est en pause."
+
+#~ msgid "rps.cry.13"
+#~ msgstr "Incline-toi, ou je te réarrange."
+
+#~ msgid "rps.cry.14"
+#~ msgstr "Je meurs d'envie de gagner."
+
+#~ msgid "rps.cry.15"
+#~ msgstr "Cligne si t'as peur."
+
+#~ msgid "rps.cry.16"
+#~ msgstr "La victoire, c'est chasse gardée."
+
+#~ msgid "rps.cry.17"
+#~ msgstr "T'as sonné à la mauvaise porte."
+
+#~ msgid "rps.cry.18"
+#~ msgstr "Cherche-moi, et pleure."
+
+#~ msgid "rps.cry.19"
+#~ msgstr "J'ai battu des PNJ plus coriaces."
+
+#~ msgid "rps.cry.20"
+#~ msgstr "Le cardio te sauvera pas."
+
+#~ msgid "rps.cry.21"
+#~ msgstr "Ressens mon léger agacement !"
+
+#~ msgid "rps.cry.22"
+#~ msgstr "Merci d'avoir joué !"
+
+#~ msgid "rps.cry.23"
+#~ msgstr "Tu peux encore rage-quit."
+
+#~ msgid "rps.cry.24"
+#~ msgstr "Invaincu depuis le petit-déj."
+
+#~ msgid "rps.cry.25"
+#~ msgstr "Fais coucou, au revoir !"
+
+#~ msgid "rps.cry.26"
+#~ msgstr "Mauvais adversaire, champion."
+
+#~ msgid "rps.cry.27"
+#~ msgstr "Faut t'améliorer, là."
+
+#~ msgid "rps.death.0"
+#~ msgstr "Aïe. Malpoli."
+
+#~ msgid "rps.death.1"
+#~ msgstr "C'est… autorisé, ça ?"
+
+#~ msgid "rps.death.2"
+#~ msgstr "Ça valait le coup. À peu près."
+
+#~ msgid "rps.death.3"
+#~ msgstr "N'en parle à personne. Surtout à maman."
+
+#~ msgid "rps.death.4"
+#~ msgstr "Faut nerf ça…"
+
+#~ msgid "rps.death.5"
+#~ msgstr "GG…"
+
+#~ msgid "rps.death.6"
+#~ msgstr "Je regrette… certaines choses…"
+
+#~ msgid "rps.death.7"
+#~ msgstr "Capture… ça…"
+
+#~ msgid "rps.death.8"
+#~ msgstr "C'était pas… dans le tuto…"
+
+#~ msgid "rps.death.9"
+#~ msgstr "Pas comme ça… le lag…"
+
+#~ msgid "rps.death.10"
+#~ msgstr "Je réapparais… c'est sûr…"
+
+#~ msgid "rps.death.11"
+#~ msgstr "Mon butin… était loué…"
+
+#~ msgid "rps.death.12"
+#~ msgstr "Maman disait… un boulot de bureau…"
+
+#~ msgid "rps.death.13"
+#~ msgstr "J'aurais dû… esquiver…"
+
+#~ msgid "rps.death.14"
+#~ msgstr "Des triches… c'est clair…"
+
+#~ msgid "rps.death.15"
+#~ msgstr "Je quitte… la partie… et la vie…"
+
+#~ msgid "rps.death.16"
+#~ msgstr "Note-moi… cinq étoiles…"
+
+#~ msgid "rps.death.17"
+#~ msgstr "C'était… en classé…?"
+
+#~ msgid "rps.death.18"
+#~ msgstr "Désabonne-toi…"
+
+#~ msgid "rps.death.19"
+#~ msgstr "Vaincu… par TOI…?"
+
+#~ msgid "rps.death.20"
+#~ msgstr "Manque de skill… le mien…"
+
+#~ msgid "rps.death.21"
+#~ msgstr "GG, pas de revanche…"
+
+#~ msgid "rps.death.22"
+#~ msgstr "Un avis… une étoile…"
+
+#~ msgid "rps.death.23"
+#~ msgstr "Chargement… de l'au-delà…"
+
+#~ msgid "rps.death.24"
+#~ msgstr "Quel… mème…"
+
+#~ msgid "rps.death.25"
+#~ msgstr "Enfin… une sieste…"
+
+#~ msgid "rps.death.26"
+#~ msgstr "Poste… ce clip…"
+
+#~ msgid "rps.death.27"
+#~ msgstr "AFK… pour toujours…"
+
+#~ msgid "roulette.spin"
+#~ msgstr "Tirer"
+
+#: app/routes/rps.tsx:1447
 msgid "rps.banner.faster_foe"
 msgstr "{name} est plus rapide !"
 
-msgid "rps.banner.hit"
-msgstr "Touché !"
-
-msgid "rps.banner.youhit"
-msgstr "Tu es touché !"
-
-msgid "rps.foe.farmhand.name"
-msgstr "Pip le fermier"
-
-msgid "rps.foe.farmhand.cry"
-msgstr "Intrus ! Le Roi te veut… récolté !"
-
-msgid "rps.foe.farmhand.words"
-msgstr "Le brouillard se dissipe… retour aux navets…"
-
-msgid "rps.foe.chef.name"
-msgstr "Chef Renard"
-
-msgid "rps.foe.chef.cry"
-msgstr "La couronne te veut flambé !"
-
-msgid "rps.foe.chef.words"
-msgstr "Mon soufflé… et ma malédiction… retombent…"
-
-msgid "rps.foe.sentry.name"
-msgstr "Cole la sentinelle"
-
-msgid "rps.foe.sentry.cry"
-msgstr "Nul ne passe — décret royal !"
-
-msgid "rps.foe.sentry.words"
-msgstr "Une seule mission… mais de qui…?"
-
-msgid "rps.foe.inspector.name"
-msgstr "Insp. Mora"
-
-msgid "rps.foe.inspector.cry"
-msgstr "Verdict du Roi : coupable. Élémentaire."
-
-msgid "rps.foe.inspector.words"
-msgstr "Le vrai coupable… c'était le démon…"
-
-msgid "rps.foe.ninja.name"
-msgstr "Kaze"
-
-msgid "rps.foe.ninja.cry"
-msgstr "Ordre de l'ombre — cligne et tu disparais."
-
-msgid "rps.foe.ninja.words"
-msgstr "J'ai pas vu venir… ma corruption…"
-
-msgid "rps.foe.magus.name"
-msgstr "Van Gore"
-
-msgid "rps.foe.magus.cry"
-msgstr "Un portrait royal de toi — en rouge !"
-
-msgid "rps.foe.magus.words"
-msgstr "Ma période sombre… s'achève…"
-
-msgid "rps.foe.king.name"
-msgstr "Roi Aldwin"
-
-msgid "rps.foe.king.cry"
-msgstr "À GENOUX— non, FUIS— À GENOUX !"
-
-msgid "rps.foe.king.words"
-msgstr "Ça… quitte ma tête…"
-
-msgid "rps.foe.villain.name"
-msgstr "Volk l'Effroi"
-
-msgid "rps.foe.villain.cry"
-msgstr "Débarrassé de ce roi coincé — à MOI !"
-
-msgid "rps.foe.villain.words"
-msgstr "Expulsé… après tout ce loyer gratuit…"
-
-msgid "rps.foe.enchantress.name"
-msgstr "Morgause"
-
-msgid "rps.foe.enchantress.cry"
-msgstr "Le sort du démon — Abracada-BOUM !"
-
-msgid "rps.foe.enchantress.words"
-msgstr "Le sortilège noir… se rompt…"
-
-msgid "rps.foe.valkyrie.name"
-msgstr "Valkyra"
-
-msgid "rps.foe.valkyrie.cry"
-msgstr "La couronne corrompue m'envoie — à l'arrache !"
-
-msgid "rps.foe.valkyrie.words"
-msgstr "Le vent noir… me rogne les ailes…"
-
-msgid "rps.tier.semiboss"
-msgstr "Élite"
-
-msgid "rps.tier.boss"
-msgstr "Boss"
-
-msgid "rps.tier.hidden"
-msgstr "Némésis"
-
-msgid "rps.foe.wanderer.name"
-msgstr "Vagabond"
-
-msgid "rps.foe.wanderer.cry"
-msgstr "Tu es fini !"
-
-msgid "rps.foe.wanderer.words"
-msgstr "Aïe."
-
-msgid "rps.foe.brute.name"
-msgstr "Brute"
-
-msgid "rps.foe.brute.cry"
-msgstr "Approche."
-
-msgid "rps.foe.brute.words"
-msgstr "C'est tout ?"
-
-msgid "rps.foe.reaver.name"
-msgstr "Pillard"
-
-msgid "rps.foe.reaver.cry"
-msgstr "Ça se termine maintenant."
-
-msgid "rps.foe.reaver.words"
-msgstr "Ça valait le coup."
-
-msgid "rps.foe.warden.name"
-msgstr "Gardien"
-
-msgid "rps.foe.warden.cry"
-msgstr "J'ai connu pire."
-
-msgid "rps.foe.warden.words"
-msgstr "N'en parle à personne."
-
-msgid "rps.foe.fiend.name"
-msgstr "Démon"
-
-msgid "rps.foe.fiend.cry"
-msgstr "Aucune pitié."
-
-msgid "rps.foe.fiend.words"
-msgstr "Zut…"
-
-msgid "rps.foe.marauder.name"
-msgstr "Maraudeur"
-
-msgid "rps.foe.marauder.cry"
-msgstr "Tu oses ?"
-
-msgid "rps.foe.marauder.words"
-msgstr "Ainsi tout s'achève."
-
-msgid "rps.foe.specter.name"
-msgstr "Spectre"
-
-msgid "rps.foe.specter.cry"
-msgstr "Rends ton dernier souffle."
-
-msgid "rps.foe.specter.words"
-msgstr "Je ne regrette… rien."
-
-msgid "rps.foe.troll.name"
-msgstr "Troll"
-
-msgid "rps.foe.troll.cry"
-msgstr "Hors de ta portée."
-
-msgid "rps.foe.troll.words"
-msgstr "Glorieux…"
-
-msgid "rps.splash.infinite"
-msgstr "Infini"
-
-msgid "rps.splash.infinite_locked"
-msgstr "Atteins Lv 9 en Aventure"
-
-msgid "rps.setup.title"
-msgstr "Prépare-toi"
-
-msgid "rps.prologue.title"
-msgstr "Le Royaume de RPS"
-
-msgid "rps.prologue.body"
-msgstr "Le bon roi Aldwin régnait avec justice — jusqu'à ce qu'un démon s'installe, gratuitement, et le corrompe, ses champions avec lui. Prends tes poings, tes paumes et tes ciseaux, aventurier : quelqu'un doit l'expulser."
-
-msgid "rps.victory.title"
-msgstr "Victoire !"
-
-msgid "rps.victory.body"
-msgstr "Dread Volk — le démon derrière le trône — est banni ! Le roi Aldwin s'éveille en marmonnant un rêve étrange. Le Royaume de RPS est libre, et te voilà presque de sang royal."
-
+#: app/routes/rps.tsx:1146
+msgid "rps.round.lose"
+msgstr "{name} gagne la manche"
+
+#: app/routes/rps.tsx:985
 msgid "rps.victory.unlocked"
 msgstr "♾️ Mode infini débloqué !"
 
-msgid "rps.infinite.reached"
-msgstr "Profondeur {n} atteinte"
-
-msgid "rps.foe.imp.name"
-msgstr "Diablotin"
-
-msgid "rps.foe.djinn.name"
-msgstr "Djinn"
-
-msgid "rps.foe.tideborn.name"
-msgstr "Né-des-Marées"
-
-msgid "rps.foe.wyrm.name"
-msgstr "Guivre"
-
-msgid "rps.foe.nightwing.name"
-msgstr "Aile-Noire"
-
-msgid "rps.foe.weaver.name"
-msgstr "Tisseur"
-
-msgid "rps.foe.stinger.name"
-msgstr "Dardeur"
-
-msgid "rps.foe.tusk.name"
-msgstr "Défense"
-
-msgid "rps.foe.maw.name"
-msgstr "Gueule"
-
-msgid "rps.foe.fang.name"
-msgstr "Croc"
-
-msgid "rps.foe.kong.name"
-msgstr "Kong"
-
-msgid "rps.foe.charger.name"
-msgstr "Fonceur"
-
-msgid "rps.foe.snapper.name"
-msgstr "Happeur"
-
-msgid "rps.foe.wisp.name"
-msgstr "Feu-Follet"
-
-msgid "rps.foe.bonelord.name"
-msgstr "Seigneur d'Os"
-
-msgid "rps.foe.sentinel.name"
-msgstr "Sentinelle"
-
-msgid "rps.foe.invader.name"
-msgstr "Envahisseur"
-
-msgid "rps.foe.hollow.name"
-msgstr "Le Creux"
-
-msgid "rps.foe.rex.name"
-msgstr "Rex"
-
-msgid "rps.foe.kraken.name"
-msgstr "Kraken"
-
-msgid "rps.foe.ghoul.name"
-msgstr "Goule"
-
-msgid "rps.foe.countess.name"
-msgstr "Comtesse"
-
-msgid "rps.foe.sylph.name"
-msgstr "Sylphe"
-
-msgid "rps.foe.siren.name"
-msgstr "Sirène"
-
-msgid "rps.foe.hexen.name"
-msgstr "Sorcière"
-
-msgid "rps.foe.jester.name"
-msgstr "Bouffon"
-
-msgid "rps.cry.0"
-msgstr "T'es cuit !"
-
-msgid "rps.cry.1"
-msgstr "Viens faire un câlin !"
-
-msgid "rps.cry.2"
-msgstr "Spoiler : tu perds."
-
-msgid "rps.cry.3"
-msgstr "J'ai vu des éternuements plus flippants."
-
-msgid "rps.cry.4"
-msgstr "Pas de remboursement !"
-
-msgid "rps.cry.5"
-msgstr "Culotté d'être venu."
-
-msgid "rps.cry.6"
-msgstr "Fais ta prière !"
-
-msgid "rps.cry.7"
-msgstr "Hors catégorie, mon grand."
-
-msgid "rps.cry.8"
-msgstr "Attention à la marche… tu tombes."
-
-msgid "rps.cry.9"
-msgstr "Ça va laisser des traces."
-
-msgid "rps.cry.10"
-msgstr "C'est la peur ou ton parfum ?"
-
-msgid "rps.cry.11"
-msgstr "Mon taux de victoire est indécent."
-
-msgid "rps.cry.12"
-msgstr "La chance est en pause."
-
-msgid "rps.cry.13"
-msgstr "Incline-toi, ou je te réarrange."
-
-msgid "rps.cry.14"
-msgstr "Je meurs d'envie de gagner."
-
-msgid "rps.cry.15"
-msgstr "Cligne si t'as peur."
-
-msgid "rps.cry.16"
-msgstr "La victoire, c'est chasse gardée."
-
-msgid "rps.cry.17"
-msgstr "T'as sonné à la mauvaise porte."
-
-msgid "rps.cry.18"
-msgstr "Cherche-moi, et pleure."
-
-msgid "rps.cry.19"
-msgstr "J'ai battu des PNJ plus coriaces."
-
-msgid "rps.cry.20"
-msgstr "Le cardio te sauvera pas."
-
-msgid "rps.cry.21"
-msgstr "Ressens mon léger agacement !"
-
-msgid "rps.cry.22"
-msgstr "Merci d'avoir joué !"
-
-msgid "rps.cry.23"
-msgstr "Tu peux encore rage-quit."
-
-msgid "rps.cry.24"
-msgstr "Invaincu depuis le petit-déj."
-
-msgid "rps.cry.25"
-msgstr "Fais coucou, au revoir !"
-
-msgid "rps.cry.26"
-msgstr "Mauvais adversaire, champion."
-
-msgid "rps.cry.27"
-msgstr "Faut t'améliorer, là."
-
-msgid "rps.death.0"
-msgstr "Aïe. Malpoli."
-
-msgid "rps.death.1"
-msgstr "C'est… autorisé, ça ?"
-
-msgid "rps.death.2"
-msgstr "Ça valait le coup. À peu près."
-
-msgid "rps.death.3"
-msgstr "N'en parle à personne. Surtout à maman."
-
-msgid "rps.death.4"
-msgstr "Faut nerf ça…"
-
-msgid "rps.death.5"
-msgstr "GG…"
-
-msgid "rps.death.6"
-msgstr "Je regrette… certaines choses…"
-
-msgid "rps.death.7"
-msgstr "Capture… ça…"
-
-msgid "rps.death.8"
-msgstr "C'était pas… dans le tuto…"
-
-msgid "rps.death.9"
-msgstr "Pas comme ça… le lag…"
-
-msgid "rps.death.10"
-msgstr "Je réapparais… c'est sûr…"
-
-msgid "rps.death.11"
-msgstr "Mon butin… était loué…"
-
-msgid "rps.death.12"
-msgstr "Maman disait… un boulot de bureau…"
-
-msgid "rps.death.13"
-msgstr "J'aurais dû… esquiver…"
-
-msgid "rps.death.14"
-msgstr "Des triches… c'est clair…"
-
-msgid "rps.death.15"
-msgstr "Je quitte… la partie… et la vie…"
-
-msgid "rps.death.16"
-msgstr "Note-moi… cinq étoiles…"
-
-msgid "rps.death.17"
-msgstr "C'était… en classé…?"
-
-msgid "rps.death.18"
-msgstr "Désabonne-toi…"
-
-msgid "rps.death.19"
-msgstr "Vaincu… par TOI…?"
-
-msgid "rps.death.20"
-msgstr "Manque de skill… le mien…"
-
-msgid "rps.death.21"
-msgstr "GG, pas de revanche…"
-
-msgid "rps.death.22"
-msgstr "Un avis… une étoile…"
-
-msgid "rps.death.23"
-msgstr "Chargement… de l'au-delà…"
-
-msgid "rps.death.24"
-msgstr "Quel… mème…"
-
-msgid "rps.death.25"
-msgstr "Enfin… une sieste…"
-
-msgid "rps.death.26"
-msgstr "Poste… ce clip…"
-
-msgid "rps.death.27"
-msgstr "AFK… pour toujours…"
-
-msgid "snake.title"
-msgstr "Serpent"
-
-msgid "snake.score"
-msgstr "Score"
-
-msgid "snake.start"
-msgstr "Glisse ou utilise les flèches pour démarrer"
-
-msgid "snake.gameover"
-msgstr "Perdu !"
-
-msgid "snake.hint"
-msgstr "Glisse sur le plateau · flèches ou ZQSD sur ordi"
-
-msgid "flappy.title"
-msgstr "Flappy"
-
-msgid "flappy.start"
-msgstr "Tape ou appuie sur Espace pour démarrer"
-
-msgid "flappy.gameover"
-msgstr "Perdu !"
-
-msgid "roulette.title"
-msgstr "Roulette"
-
-msgid "roulette.balance"
-msgstr "Solde"
-
-msgid "roulette.red"
-msgstr "Rouge"
-
-msgid "roulette.black"
-msgstr "Noir"
-
-msgid "roulette.even"
-msgstr "Pair"
-
-msgid "roulette.odd"
-msgstr "Impair"
-
-msgid "roulette.wagered"
-msgstr "En jeu"
-
-msgid "roulette.chip"
-msgstr "Jeton"
-
-msgid "roulette.allin"
-msgstr "Tapis"
-
-msgid "roulette.clear"
-msgstr "Annuler les mises"
-
-msgid "roulette.spin"
-msgstr "Tirer"
-
-msgid "roulette.broke"
-msgstr "Plus de jetons"
-
-msgid "roulette.place_bets"
-msgstr "Faites vos jeux"
-
-msgid "roulette.no_more_bets"
-msgstr "Les jeux sont faits, rien ne va plus"
-
-msgid "roulette.stats_title"
-msgstr "Statistiques"
-
-msgid "roulette.spins"
-msgstr "Tirages"
-
-msgid "roulette.hot"
-msgstr "Chauds"
-
-msgid "roulette.cold"
-msgstr "Froids"
-
-msgid "about.title"
-msgstr "À propos"
-
-msgid "about.section.built_with"
-msgstr "Réalisé avec"
-
-msgid "about.section.source"
-msgstr "Code source"
-
-msgid "about.built.claude"
-msgstr "Co-écrit avec Claude (Anthropic)"
-
-msgid "about.section.records"
-msgstr "Records"
-
-msgid "about.records.reset"
-msgstr "Effacer"
-
-msgid "about.records.confirm"
-msgstr "Confirmer"
-
-msgid "about.section.legal"
-msgstr "Mentions légales"
-
-msgid "about.legal.body"
-msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis). Aucune collecte de données, aucun cookie, aucun tracker tiers."
-
-msgid "nav.home"
-msgstr "Accueil"
-
-msgid "ultimate.title"
-msgstr "Morpion Ultime"
-
-msgid "ultimate.rules"
-msgstr "Ta case envoie l'adversaire dans ce sous-plateau"
-
-msgid "ultimate.turn"
-msgstr "Au tour de"
-
-msgid "ultimate.wins"
-msgstr "gagne !"
-
-msgid "ultimate.draw"
-msgstr "Match nul"
-
-msgid "ultimate.draws"
-msgstr "Nuls"
-
+#: app/routes/slots.tsx:207
+msgid "slots.title"
+msgstr "1-UP Slots"
+
+#: app/routes/ultimate.tsx:415
 msgid "ultimate.mode.2p"
 msgstr "2 joueurs"
 
-msgid "ultimate.mode.ai"
-msgstr "vs Ordi"
+#: app/routes/home.tsx:47
+msgid "home.app.about"
+msgstr "À propos"
 
-msgid "trias.title"
-msgstr "Trias"
+#: app/routes/about.tsx:75
+msgid "about.title"
+msgstr "À propos"
 
-msgid "trias.score"
-msgstr "Score"
+#: app/routes/roulette.tsx:644
+msgid "roulette.allin"
+msgstr "Tapis"
 
-msgid "trias.hold"
-msgstr "Hold"
+#: app/routes/rps.tsx:888
+msgid "rps.splash.tagline"
+msgstr "Un RPG au pierre-feuille-ciseaux"
 
-msgid "trias.level"
-msgstr "Niveau"
+#: app/routes/roulette.tsx:462
+msgid "roulette.balance"
+msgstr "Solde"
 
-msgid "trias.next"
-msgstr "Suite"
+#: app/routes/flappy.tsx:269
+#: app/routes/roulette.tsx:473
+#: app/routes/rps.tsx:1219
+#: app/routes/slots.tsx:213
+#: app/routes/snake.tsx:237
+#: app/routes/threader.tsx:888
+#: app/routes/trias.tsx:940
+msgid "common.best"
+msgstr "Record"
 
-msgid "trias.gameover"
-msgstr "Pile pleine"
+#: app/routes/roulette.tsx:837
+msgid "roulette.black"
+msgstr "Noir"
 
-msgid "trias.hint"
-msgstr "Glisse ← → pour bouger · maintiens ↓ pour accélérer · ↑ pour lâcher · appui long = réserve · flèches / espace / C au clavier"
+#: app/routes/about.tsx:81
+msgid "about.section.built_with"
+msgstr "Réalisé avec"
 
-msgid "trias.time"
-msgstr "Temps"
+#: app/routes/roulette.tsx:619
+msgid "roulette.chip"
+msgstr "Jeton"
 
-msgid "trias.modes"
-msgstr "Modes"
-
+#: app/routes/trias.tsx:1042
 msgid "trias.mode.choose"
 msgstr "Choisis un mode"
 
-msgid "trias.mode.endless"
-msgstr "Sans fin"
+#: app/routes/rps.tsx:1106
+msgid "rps.choose"
+msgstr "Choisis ton coup"
 
-msgid "trias.mode.marathon"
-msgstr "Marathon"
+#: app/routes/roulette.tsx:652
+msgid "roulette.clear"
+msgstr "Annuler les mises"
 
-msgid "trias.mode.timeattack"
-msgstr "Contre-la-montre"
-
+#: app/routes/trias.tsx:346
 msgid "trias.goal.endless"
 msgstr "Monte le plus haut possible"
 
-msgid "trias.goal.marathon"
-msgstr "Atteins le niveau {max}"
+#: app/routes/about.tsx:90
+msgid "about.built.claude"
+msgstr "Co-écrit avec Claude (Anthropic)"
 
-msgid "trias.goal.timeattack"
-msgstr "Atteins {target} points"
+#: app/routes/roulette.tsx:863
+msgid "roulette.cold"
+msgstr "Froids"
 
-msgid "trias.won.marathon"
-msgstr "Marathon terminé !"
-
-msgid "trias.won.timeattack"
-msgstr "Objectif explosé !"
-
+#: app/routes/trias.tsx:1032
 msgid "trias.combo"
 msgstr "Combo"
 
+#: app/routes/threader.tsx:874
+msgid "threader.legend.shield"
+msgstr "Les combos donnent des boucliers — chacun encaisse une faute"
+
+#: app/routes/about.tsx:124
+msgid "about.records.confirm"
+msgstr "Confirmer"
+
+#: app/routes/rps.tsx:901
+#: app/routes/rps.tsx:910
+#: app/routes/rps.tsx:1203
+#: app/routes/rps.tsx:1382
+msgid "rps.rpg.continue"
+msgstr "Continuer"
+
+#: app/routes/trias.tsx:1026
 msgid "trias.clear.double"
 msgstr "Double"
 
-msgid "trias.clear.triple"
-msgstr "Triplé"
+#: app/routes/ultimate.tsx:469
+msgid "ultimate.draw"
+msgstr "Match nul"
 
-msgid "trias.clear.perfect"
-msgstr "Grille vidée !"
+#: app/routes/rps.tsx:1152
+msgid "rps.draw"
+msgstr "Égalité"
 
-msgid "threader.title"
-msgstr "Threader"
+#: app/routes/ultimate.tsx:446
+msgid "ultimate.draws"
+msgstr "Nuls"
 
-msgid "threader.start"
-msgstr "Tape pour changer de forme · glisse pour l'aligner"
+#: app/routes/rps.tsx:977
+msgid "rps.victory.body"
+msgstr "Dread Volk — le démon derrière le trône — est banni ! Le roi Aldwin s'éveille en marmonnant un rêve étrange. Le Royaume de RPS est libre, et te voilà presque de sang royal."
 
+#: app/routes/trias.tsx:337
+msgid "trias.mode.endless"
+msgstr "Sans fin"
+
+#: app/routes/roulette.tsx:843
+msgid "roulette.even"
+msgstr "Pair"
+
+#: app/routes/rps.tsx:1201
+msgid "rps.rpg.fight"
+msgstr "Combattre !"
+
+#: app/routes/flappy.tsx:188
+msgid "flappy.title"
+msgstr "Flappy"
+
+#: app/routes/snake.tsx:290
+msgid "snake.gameover"
+msgstr "Perdu !"
+
+#: app/routes/threader.tsx:885
 msgid "threader.gameover"
 msgstr "Perdu !"
 
+#: app/routes/flappy.tsx:266
+msgid "flappy.gameover"
+msgstr "Perdu !"
+
+#: app/routes/rps.tsx:1165
+msgid "rps.setup.title"
+msgstr "Prépare-toi"
+
+#: app/routes/rps.tsx:1342
+msgid "rps.stats.gotit"
+msgstr "Compris"
+
+#: app/routes/rps.tsx:1395
+msgid "rps.banner.healed"
+msgstr "Soin +{amount}"
+
+#: app/routes/rps.tsx:1456
+msgid "rps.banner.hit"
+msgstr "Touché !"
+
+#: app/routes/trias.tsx:962
+msgid "trias.hold"
+msgstr "Hold"
+
+#: app/components/BackButton.tsx:29
+#: app/components/HomeButton.tsx:18
+msgid "nav.home"
+msgstr "Accueil"
+
+#: app/routes/roulette.tsx:853
+msgid "roulette.hot"
+msgstr "Chauds"
+
+#: app/routes/roulette.tsx:656
+msgid "roulette.wagered"
+msgstr "En jeu"
+
+#: app/routes/rps.tsx:933
+msgid "rps.splash.infinite"
+msgstr "Infini"
+
+#: app/routes/rps.tsx:996
+msgid "rps.prologue.body"
+msgstr "Le bon roi Aldwin régnait avec justice — jusqu'à ce qu'un démon s'installe, gratuitement, et le corrompe, ses champions avec lui. Prends tes poings, tes paumes et tes ciseaux, aventurier : quelqu'un doit l'expulser."
+
+#: app/routes/about.tsx:152
+msgid "about.section.legal"
+msgstr "Mentions légales"
+
+#: app/routes/trias.tsx:928
+msgid "trias.level"
+msgstr "Niveau"
+
+#: app/routes/rps.tsx:1167
+msgid "rps.rpg.levelup"
+msgstr "Niveau supérieur !"
+
+#: app/routes/trias.tsx:339
+msgid "trias.mode.marathon"
+msgstr "Marathon"
+
+#: app/routes/trias.tsx:1068
+msgid "trias.won.marathon"
+msgstr "Marathon terminé !"
+
+#: app/routes/trias.tsx:1106
+msgid "trias.modes"
+msgstr "Modes"
+
+#: app/routes/trias.tsx:1116
+msgid "trias.next"
+msgstr "Suite"
+
+#: app/routes/roulette.tsx:484
+msgid "roulette.no_more_bets"
+msgstr "Les jeux sont faits, rien ne va plus"
+
+#: app/routes/roulette.tsx:844
+msgid "roulette.odd"
+msgstr "Impair"
+
+#: app/routes/roulette.tsx:670
+msgid "roulette.broke"
+msgstr "Plus de jetons"
+
+#: app/routes/threader.tsx:768
 msgid "threader.perfect"
 msgstr "Parfait"
 
+#: app/routes/trias.tsx:1018
+msgid "trias.clear.perfect"
+msgstr "Grille vidée !"
+
+#: app/routes/about.tsx:155
+msgid "about.legal.body"
+msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis). Aucune collecte de données, aucun cookie, aucun tracker tiers."
+
+#: app/routes/roulette.tsx:489
+msgid "roulette.place_bets"
+msgstr "Faites vos jeux"
+
+#: app/routes/flappy.tsx:276
+#: app/routes/roulette.tsx:676
+#: app/routes/snake.tsx:296
+#: app/routes/threader.tsx:895
+#: app/routes/trias.tsx:1100
+#: app/routes/ultimate.tsx:557
+msgid "common.play_again"
+msgstr "Rejouer"
+
+#: app/routes/slots.tsx:321
+msgid "slots.again"
+msgstr "Rejouer"
+
+#: app/routes/slots.tsx:323
+msgid "slots.pull"
+msgstr "Tirez le levier"
+
+#: app/routes/rps.tsx:1096
+msgid "rps.rip"
+msgstr "R.I.P. {name}"
+
+#: app/routes/trias.tsx:357
+msgid "trias.goal.timeattack"
+msgstr "Atteins {target} points"
+
+#: app/routes/trias.tsx:350
+msgid "trias.goal.marathon"
+msgstr "Atteins le niveau {max}"
+
+#: app/routes/rps.tsx:1216
+msgid "rps.rpg.reached"
+msgstr "Niveau {level} atteint"
+
+#: app/routes/about.tsx:100
+msgid "about.section.records"
+msgstr "Records"
+
+#: app/routes/roulette.tsx:836
+msgid "roulette.red"
+msgstr "Rouge"
+
+#: app/routes/about.tsx:126
+msgid "about.records.reset"
+msgstr "Effacer"
+
+#: app/routes/roulette.tsx:687
+#: app/routes/ultimate.tsx:566
+msgid "common.reset"
+msgstr "Réinitialiser"
+
+#: app/routes/rps.tsx:923
+msgid "rps.splash.restart"
+msgstr "Recommencer"
+
+#: app/routes/roulette.tsx:431
+msgid "roulette.title"
+msgstr "Roulette"
+
+#: app/routes/rps.tsx:1016
+msgid "rps.title"
+msgstr "RPS Saga"
+
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "Score"
+
+#: app/routes/trias.tsx:907
+#: app/routes/trias.tsx:1085
+msgid "trias.score"
+msgstr "Score"
+
+#: app/routes/snake.tsx:224
+msgid "snake.title"
+msgstr "Serpent"
+
+#: app/routes/rps.tsx:1434
+msgid "rps.banner.softened"
+msgstr "Amorti ×{mult}"
+
+#: app/routes/about.tsx:138
+msgid "about.section.source"
+msgstr "Code source"
+
+#: app/routes/rps.tsx:1171
+msgid "rps.rpg.spend"
+msgstr "Répartis tes points"
+
+#: app/routes/roulette.tsx:827
+msgid "roulette.spins"
+msgstr "Tirages"
+
+#: app/routes/trias.tsx:1081
+msgid "trias.gameover"
+msgstr "Pile pleine"
+
+#: app/routes/rps.tsx:1424
+msgid "rps.banner.stakes"
+msgstr "Enjeu ×{mult} !"
+
+#: app/routes/rps.tsx:1403
+msgid "rps.banner.stalemate_deep"
+msgstr "Impasse — la posture se creuse !"
+
+#: app/routes/rps.tsx:1405
+msgid "rps.banner.stalemate"
+msgstr "Impasse !"
+
+#: app/routes/rps.tsx:925
+msgid "rps.splash.start"
+msgstr "Commencer"
+
+#: app/routes/roulette.tsx:814
+msgid "roulette.stats_title"
+msgstr "Statistiques"
+
+#: app/routes/rps.tsx:1325
+msgid "rps.stats.title"
+msgstr "Stats"
+
+#: app/routes/slots.tsx:319
+msgid "slots.stop"
+msgstr "Arrêter"
+
+#: app/routes/trias.tsx:1125
+msgid "trias.hint"
+msgstr "Glisse ← → pour bouger · maintiens ↓ pour accélérer · ↑ pour lâcher · appui long = réserve · flèches / espace / C au clavier"
+
+#: app/routes/snake.tsx:307
+msgid "snake.hint"
+msgstr "Glisse sur le plateau · flèches ou ZQSD sur ordi"
+
+#: app/routes/snake.tsx:282
+msgid "snake.start"
+msgstr "Glisse ou utilise les flèches pour démarrer"
+
+#: app/routes/home.tsx:29
+msgid "home.subtitle"
+msgstr "Tape sur une app pour jouer."
+
+#: app/routes/flappy.tsx:258
+msgid "flappy.start"
+msgstr "Tape ou appuie sur Espace pour démarrer"
+
+#: app/routes/threader.tsx:849
+msgid "threader.start"
+msgstr "Tape pour changer de forme · glisse pour l'aligner"
+
+#: app/routes/trias.tsx:1073
+msgid "trias.won.timeattack"
+msgstr "Objectif explosé !"
+
+#: app/routes/rps.tsx:994
+msgid "rps.prologue.title"
+msgstr "Le Royaume de RPS"
+
+#: app/routes/threader.tsx:863
 msgid "threader.legend.bead"
 msgstr "Enfile une boule pour des points bonus"
 
-msgid "threader.legend.shield"
-msgstr "Les combos donnent des boucliers — chacun encaisse une faute"
+#: app/routes/threader.tsx:627
+msgid "threader.title"
+msgstr "Threader"
+
+#: app/routes/trias.tsx:919
+#: app/routes/trias.tsx:1090
+msgid "trias.time"
+msgstr "Temps"
+
+#: app/routes/trias.tsx:340
+msgid "trias.mode.timeattack"
+msgstr "Contre-la-montre"
+
+#: app/routes/home.tsx:26
+msgid "home.title"
+msgstr "toto-victoto"
+
+#: app/routes/trias.tsx:902
+msgid "trias.title"
+msgstr "Trias"
+
+#: app/routes/trias.tsx:1024
+msgid "trias.clear.triple"
+msgstr "Triplé"
+
+#: app/routes/rps.tsx:1225
+msgid "rps.rpg.tryagain"
+msgstr "Réessayer"
+
+#: app/routes/ultimate.tsx:473
+msgid "ultimate.turn"
+msgstr "Au tour de"
+
+#: app/routes/ultimate.tsx:398
+msgid "ultimate.title"
+msgstr "Morpion Ultime"
+
+#: app/routes/rps.tsx:975
+msgid "rps.victory.title"
+msgstr "Victoire !"
+
+#: app/routes/ultimate.tsx:425
+msgid "ultimate.mode.ai"
+msgstr "vs Ordi"
+
+#: app/routes/ultimate.tsx:465
+msgid "ultimate.wins"
+msgstr "gagne !"
+
+#: app/routes/rps.tsx:1212
+msgid "rps.rpg.defeated"
+msgstr "Tu as été vaincu"
+
+#: app/routes/rps.tsx:1143
+msgid "rps.round.win"
+msgstr "Tu gagnes la manche !"
+
+#: app/routes/rps.tsx:1445
+msgid "rps.banner.faster_you"
+msgstr "Tu es plus rapide !"
+
+#: app/routes/rps.tsx:1458
+msgid "rps.banner.youhit"
+msgstr "Tu es touché !"
+
+#: app/routes/ultimate.tsx:401
+msgid "ultimate.rules"
+msgstr "Ta case envoie l'adversaire dans ce sous-plateau"
