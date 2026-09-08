@@ -42,6 +42,7 @@ export type Persisted = {
   snake: { best: number };
   flappy: { best: number };
   threader: { best: number };
+  cross: { best: number };
   rps: {
     bestLevel: number;
     // Best "infinite" run, measured as levels reached past the roster.
@@ -75,6 +76,7 @@ const GAME_KEYS = [
   "snake",
   "flappy",
   "threader",
+  "cross",
   "rps",
   "roulette",
   "slots",
