@@ -33,6 +33,13 @@ export const GAMES: GameMeta[] = [
     icon: "🪡",
   },
   {
+    slug: "cross",
+    titleId: "cross.title",
+    title: "Cross",
+    tone: "bg-gradient-to-br from-lime-400 to-teal-600",
+    icon: "🕹️",
+  },
+  {
     slug: "roulette",
     titleId: "roulette.title",
     title: "Roulette",

@@ -11,6 +11,11 @@
   --animate-trias-confetti: trias-confetti 900ms ease-out forwards;
   --animate-thread-ring: thread-ring 520ms ease-out forwards;
   --animate-thread-spark: thread-spark 600ms ease-out forwards;
+  --animate-cross-warn: cross-warn 260ms ease-in-out infinite alternate;
+  --animate-cross-bonus: cross-bonus 700ms ease-in-out infinite alternate;
+  --animate-cross-blink: cross-blink 180ms steps(2, end) infinite;
+  --animate-cross-pop: cross-pop 700ms ease-out forwards;
+  --animate-cross-shake: cross-shake 260ms ease-out;
 
   @keyframes fade-in {
     from {
@@ -81,6 +86,73 @@
     100% {
       transform: scale(2.6);
       opacity: 0;
+    }
+  }
+
+  /* Cross: edge telegraph pulsing before a projectile enters. */
+  @keyframes cross-warn {
+    from {
+      opacity: 0.35;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.15);
+    }
+  }
+
+  /* Cross: goodies bob gently so they read as "catch me", not "avoid me". */
+  @keyframes cross-bonus {
+    from {
+      filter: drop-shadow(0 0 2px rgba(252, 211, 77, 0.4));
+    }
+    to {
+      filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.95));
+    }
+  }
+
+  /* Cross: post-hit mercy window — the avatar flickers. */
+  @keyframes cross-blink {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.25;
+    }
+  }
+
+  /* Cross: floating marker over the avatar ("+60", "💥"). */
+  @keyframes cross-pop {
+    0% {
+      transform: translate(-50%, -50%) scale(0.6);
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -150%) scale(1.1);
+      opacity: 0;
+    }
+  }
+
+  /* Cross: the whole field jolts on a hit. */
+  @keyframes cross-shake {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    20% {
+      transform: translate(-1.5%, 1%);
+    }
+    40% {
+      transform: translate(1.5%, -1%);
+    }
+    60% {
+      transform: translate(-1%, -0.5%);
+    }
+    80% {
+      transform: translate(0.75%, 0.5%);
     }
   }
 

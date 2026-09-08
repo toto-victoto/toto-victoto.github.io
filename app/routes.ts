@@ -11,4 +11,5 @@ export default [
   route("ultimate", "routes/ultimate.tsx"),
   route("trias", "routes/trias.tsx"),
   route("threader", "routes/threader.tsx"),
+  route("cross", "routes/cross.tsx"),
 ] satisfies RouteConfig;

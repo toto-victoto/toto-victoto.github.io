@@ -22,6 +22,7 @@ function readRecords(): Record<string, string> {
     snake: String(peekGame("snake")?.best ?? 0),
     flappy: String(peekGame("flappy")?.best ?? 0),
     threader: String(peekGame("threader")?.best ?? 0),
+    cross: String(peekGame("cross")?.best ?? 0),
     trias: String(peekGame("trias")?.best ?? 0),
     roulette: String(peekGame("roulette")?.best ?? 0),
     slots: String(peekGame("slots")?.best ?? 0),
