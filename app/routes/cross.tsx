@@ -17,23 +17,42 @@ import { sfx, tone } from "../sound";
 
 // The three lane coordinates: the pads sit at the intersections that exist on a
 // cross (never at the corners), so a lane at 50 sweeps three pads while a lane
-// at 20 / 80 only clips one arm pad. Every pad is covered by exactly four lane
+// at 30 / 70 only clips one arm pad. Every pad is covered by exactly four lane
 // directions, so no pad is a safe camp.
-const LANES = [20, 50, 80] as const;
+//
+// The cross is deliberately tucked into the middle of the field rather than
+// spread to its edges: that leaves ~30% of runway on every side, so a
+// projectile is on screen and readable for half again as long as it would be
+// with the arms pushed out to 20 / 80.
+const LANES = [30, 50, 70] as const;
 type LaneCoord = (typeof LANES)[number];
-const PAD_SIZE = 22; // % — visual pad side
-const HIT_R = 8.5; // % — projectile-vs-avatar hit radius (a bit under a pad half)
-const CATCH_R = 10; // % — bonuses are a touch easier to grab than to dodge
+const LANE_MIN = LANES[0];
+const LANE_MAX = LANES[LANES.length - 1];
+const PAD_SIZE = 16; // % — visual pad side
+const HIT_R = 6; // % — projectile-vs-avatar hit radius (a bit under a pad half)
+const CATCH_R = 7.5; // % — bonuses are a touch easier to grab than to dodge
 const MAX_DT = 0.05; // clamp dt so a backgrounded tab can't teleport things
+
+// Emoji font sizes, in cqw of the field. Kept a little under the pad so a piece
+// never spills past the pad it is standing on.
+const AVATAR_EM = 9; // cqw
+const PROJ_EM = 8;
+const BONUS_EM = 7.5;
+const POP_EM = 5.5;
 
 type PadId = "center" | "up" | "down" | "left" | "right";
 const PADS: Record<PadId, { x: number; y: number }> = {
   center: { x: 50, y: 50 },
-  up: { x: 50, y: 20 },
-  down: { x: 50, y: 80 },
-  left: { x: 20, y: 50 },
-  right: { x: 80, y: 50 },
+  up: { x: 50, y: LANE_MIN },
+  down: { x: 50, y: LANE_MAX },
+  left: { x: LANE_MIN, y: 50 },
+  right: { x: LANE_MAX, y: 50 },
 };
+
+// Swipe control: press anywhere, push in a direction to shift onto that arm,
+// release to spring back to centre. Inside this radius of the press point you
+// are in neutral — like the gate of a gear stick.
+const SWIPE_DEADZONE = 8; // % of the field
 
 // Difficulty ramps with elapsed time: quicker spawns, faster flight, and later
 // on a chance to fire two things at once. Values interpolate linearly from
@@ -163,6 +182,12 @@ export default function Cross() {
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
+  // Active swipe: the pointer id we captured and where it first landed.
+  const dragRef = useRef<{ id: number; x: number; y: number } | null>(null);
+  // Direction keys currently held, most recent last — so rolling from one key
+  // to another follows the newest, and releasing falls back to the one still
+  // down rather than snapping home.
+  const heldRef = useRef<PadId[]>([]);
 
   // Pick the avatar on the client only so the prerendered HTML is stable.
   useEffect(() => {
@@ -186,6 +211,8 @@ export default function Cross() {
     dodgedRef.current = 0;
     bonusScoreRef.current = 0;
     lastTimeRef.current = null;
+    dragRef.current = null;
+    heldRef.current = [];
     setEntities([]);
     setPops([]);
     setScore(0);
@@ -199,61 +226,105 @@ export default function Cross() {
     sfx.ui();
   };
 
-  // Move to a pad. From the keyboard, pressing the arm you're already on hops
-  // back to the centre, which makes "tap-tap" a quick dodge-and-return.
-  const go = (target: PadId, toggle = false) => {
+  // Move to a pad. Every input is "hold to stay out, release to come home", so
+  // this is just a setter with a click.
+  const go = (target: PadId) => {
     if (phaseRef.current !== "playing") return;
-    const next = toggle && padRef.current === target ? "center" : target;
-    if (next === padRef.current) return;
-    padRef.current = next;
-    setPad(next);
-    tone(next === "center" ? 300 : 380, 0.04, { type: "square", gain: 0.04 });
+    if (target === padRef.current) return;
+    padRef.current = target;
+    setPad(target);
+    tone(target === "center" ? 300 : 380, 0.04, { type: "square", gain: 0.04 });
   };
 
+  // Which arm a push of (dx, dy) — in % of the field, measured from wherever
+  // the finger landed — selects. Inside the dead zone you're back in neutral,
+  // so you can slide through the middle from one arm to the opposite one.
+  const padFromPush = (dx: number, dy: number): PadId => {
+    if (Math.hypot(dx, dy) < SWIPE_DEADZONE) return "center";
+    return Math.abs(dx) > Math.abs(dy)
+      ? dx > 0
+        ? "right"
+        : "left"
+      : dy > 0
+        ? "down"
+        : "up";
+  };
+
+  // Keyboard mirrors the swipe: hold a direction to sit on that arm, let go to
+  // come back to the centre.
   useEffect(() => {
+    const map: Record<string, PadId> = {
+      arrowup: "up",
+      w: "up",
+      z: "up",
+      arrowdown: "down",
+      s: "down",
+      arrowleft: "left",
+      a: "left",
+      q: "left",
+      arrowright: "right",
+      d: "right",
+    };
     const onKey = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
-      const map: Record<string, PadId> = {
-        arrowup: "up",
-        w: "up",
-        z: "up",
-        arrowdown: "down",
-        s: "down",
-        arrowleft: "left",
-        a: "left",
-        q: "left",
-        arrowright: "right",
-        d: "right",
-      };
       if (k === " " || k === "enter") {
         e.preventDefault();
         if (phaseRef.current !== "playing") start();
-        else go("center");
         return;
       }
       const target = map[k];
       if (!target) return;
       e.preventDefault();
+      if (e.repeat) return;
       if (phaseRef.current === "idle") start();
-      go(target, true);
+      heldRef.current = [...heldRef.current.filter((p) => p !== target), target];
+      go(target);
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      const target = map[e.key.toLowerCase()];
+      if (!target) return;
+      const held = heldRef.current.filter((p) => p !== target);
+      heldRef.current = held;
+      go(held.length ? held[held.length - 1] : "center");
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keyup", onKeyUp);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Tap anywhere on the field: the centre disc selects the centre pad, anything
-  // further out picks the arm by dominant axis. Big forgiving targets on phones.
-  const onFieldPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+  // Swipe anywhere on the field. The press point becomes neutral, so the stick
+  // is wherever your thumb already is rather than a fixed spot on screen; you
+  // can then rake the finger around to shift between arms without lifting, and
+  // letting go always drops you back to the centre.
+  const onFieldDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (phaseRef.current !== "playing") return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragRef.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    go("center");
+  };
+
+  const onFieldMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (!drag || drag.id !== e.pointerId) return;
     const el = fieldRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const dx = ((e.clientX - r.left) / r.width) * 100 - 50;
-    const dy = ((e.clientY - r.top) / r.height) * 100 - 50;
-    if (Math.hypot(dx, dy) < PAD_SIZE * 0.6) return go("center");
-    if (Math.abs(dx) > Math.abs(dy)) go(dx > 0 ? "right" : "left");
-    else go(dy > 0 ? "down" : "up");
+    go(
+      padFromPush(
+        ((e.clientX - drag.x) / r.width) * 100,
+        ((e.clientY - drag.y) / r.height) * 100,
+      ),
+    );
+  };
+
+  const onFieldUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragRef.current?.id !== e.pointerId) return;
+    dragRef.current = null;
+    go("center");
   };
 
   const spawn = (t: number) => {
@@ -375,7 +446,7 @@ export default function Cross() {
           // Count a dodge once the projectile has cleared the last pad on its
           // lane, then drop it once it's fully off-screen.
           if (!e.passed && e.kind === "proj") {
-            const far = e.dir === 1 ? 80 + HIT_R : 20 - HIT_R;
+            const far = e.dir === 1 ? LANE_MAX + HIT_R : LANE_MIN - HIT_R;
             if ((e.dir === 1 && e.pos > far) || (e.dir === -1 && e.pos < far)) {
               e.passed = true;
               dodgedRef.current += 1;
@@ -458,7 +529,10 @@ export default function Cross() {
         >
           <div
             ref={fieldRef}
-            onPointerDown={onFieldPointer}
+            onPointerDown={onFieldDown}
+            onPointerMove={onFieldMove}
+            onPointerUp={onFieldUp}
+            onPointerCancel={onFieldUp}
             onAnimationEnd={(e) => {
               if (e.animationName === "cross-shake") setShake(false);
             }}
@@ -544,7 +618,7 @@ export default function Cross() {
                     style={{
                       left: `${p.x}%`,
                       top: `${p.y}%`,
-                      fontSize: e.kind === "bonus" ? "10cqw" : "11cqw",
+                      fontSize: `${e.kind === "bonus" ? BONUS_EM : PROJ_EM}cqw`,
                       transform: `translate(-50%, -50%) rotate(${e.rot}deg)`,
                     }}
                   >
@@ -562,7 +636,7 @@ export default function Cross() {
               style={{
                 left: `${me.x}%`,
                 top: `${me.y}%`,
-                fontSize: "13cqw",
+                fontSize: `${AVATAR_EM}cqw`,
                 transform: "translate(-50%, -50%)",
                 filter: shield ? "drop-shadow(0 0 6px rgba(56,189,248,0.9))" : undefined,
               }}
@@ -578,7 +652,7 @@ export default function Cross() {
                 style={{
                   left: `${p.x}%`,
                   top: `${p.y - 10}%`,
-                  fontSize: "7cqw",
+                  fontSize: `${POP_EM}cqw`,
                   transform: "translate(-50%, -50%)",
                 }}
               >
@@ -604,7 +678,7 @@ export default function Cross() {
                         />
                       </p>
                       <p className="text-xs text-neutral-300 leading-relaxed">
-                        <Trans id="cross.legend.controls" message="Tap a pad, or use arrows / WASD / ZQSD." />
+                        <Trans id="cross.legend.controls" message="Swipe to move — let go to snap back to centre. Or hold arrows / WASD / ZQSD." />
                         <br />
                         ⭐ <Trans id="cross.legend.star" message="points" /> · 🛡️{" "}
                         <Trans id="cross.legend.shield" message="blocks one hit" /> · ⏳{" "}

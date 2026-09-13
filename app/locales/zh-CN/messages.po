@@ -903,7 +903,7 @@ msgstr "滑动屏幕或使用方向键开始"
 
 #: app/routes/cross.tsx:602
 msgid "cross.legend.controls"
-msgstr "点击方格，或使用方向键 / WASD / ZQSD。"
+msgstr "滑动移动 — 松手回到中心。或按住方向键 / WASD / ZQSD。"
 
 #: app/routes/home.tsx:29
 msgid "home.subtitle"

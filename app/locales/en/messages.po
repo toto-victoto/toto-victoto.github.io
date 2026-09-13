@@ -903,7 +903,7 @@ msgstr "Swipe or use arrow keys to start"
 
 #: app/routes/cross.tsx:602
 msgid "cross.legend.controls"
-msgstr "Tap a pad, or use arrows / WASD / ZQSD."
+msgstr "Swipe to move — let go to snap back to centre. Or hold arrows / WASD / ZQSD."
 
 #: app/routes/home.tsx:29
 msgid "home.subtitle"

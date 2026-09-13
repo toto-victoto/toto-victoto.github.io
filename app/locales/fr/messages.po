@@ -903,7 +903,7 @@ msgstr "Glisse ou utilise les flèches pour démarrer"
 
 #: app/routes/cross.tsx:602
 msgid "cross.legend.controls"
-msgstr "Tape une case, ou utilise les flèches / ZQSD / WASD."
+msgstr "Glisse pour bouger — relâche pour revenir au centre. Ou maintiens les flèches / ZQSD / WASD."
 
 #: app/routes/home.tsx:29
 msgid "home.subtitle"
