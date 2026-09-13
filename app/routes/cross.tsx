@@ -56,8 +56,10 @@ const SWIPE_DEADZONE = 8; // % of the field
 
 // Difficulty ramps with elapsed time: quicker spawns, faster flight, and later
 // on a chance to fire two things at once. Values interpolate linearly from
-// START to MAX over RAMP_SECONDS.
-const RAMP_SECONDS = 90;
+// START to MAX over RAMP_SECONDS — every knob below rides that one factor, so
+// this constant alone sets how fast the game tightens. The ceiling is
+// unchanged; it just arrives sooner.
+const RAMP_SECONDS = 55;
 const SPAWN_GAP_START = 1.15; // s between spawns
 const SPAWN_GAP_MIN = 0.36;
 const SPEED_START = 55; // %/s
