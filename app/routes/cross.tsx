@@ -296,18 +296,20 @@ export default function Cross() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Swipe anywhere on the field. The press point becomes neutral, so the stick
-  // is wherever your thumb already is rather than a fixed spot on screen; you
-  // can then rake the finger around to shift between arms without lifting, and
-  // letting go always drops you back to the centre.
-  const onFieldDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  // Swipe anywhere in the play area — the square itself or the letterboxed
+  // space around it. The press point becomes neutral, so the stick is wherever
+  // your thumb already is rather than a fixed spot on screen; you can then rake
+  // the finger around to shift between arms without lifting, and letting go
+  // always drops you back to the centre. Distances are normalised against the
+  // square's size so the throw needed is the same wherever you started.
+  const onFieldDown = (e: React.PointerEvent<HTMLElement>) => {
     if (phaseRef.current !== "playing") return;
     e.currentTarget.setPointerCapture(e.pointerId);
     dragRef.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
     go("center");
   };
 
-  const onFieldMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const onFieldMove = (e: React.PointerEvent<HTMLElement>) => {
     const drag = dragRef.current;
     if (!drag || drag.id !== e.pointerId) return;
     const el = fieldRef.current;
@@ -321,7 +323,7 @@ export default function Cross() {
     );
   };
 
-  const onFieldUp = (e: React.PointerEvent<HTMLDivElement>) => {
+  const onFieldUp = (e: React.PointerEvent<HTMLElement>) => {
     if (dragRef.current?.id !== e.pointerId) return;
     dragRef.current = null;
     go("center");
@@ -522,17 +524,21 @@ export default function Cross() {
         </section>
 
         {/* The field is the largest square that fits the leftover area: width
-            is capped by both the column width and the section height (cqh). */}
+            is capped by both the column width and the section height (cqh).
+            The pointer handlers sit on the section rather than the square so
+            the whole leftover area counts — on a tall phone the square is
+            letterboxed and the dead space below it is exactly where a thumb
+            rests, so a swipe has to be allowed to start there. */}
         <section
-          className="flex min-h-0 flex-1 items-center justify-center"
+          onPointerDown={onFieldDown}
+          onPointerMove={onFieldMove}
+          onPointerUp={onFieldUp}
+          onPointerCancel={onFieldUp}
+          className="flex min-h-0 flex-1 touch-none items-center justify-center select-none"
           style={{ containerType: "size" } as CSSProperties}
         >
           <div
             ref={fieldRef}
-            onPointerDown={onFieldDown}
-            onPointerMove={onFieldMove}
-            onPointerUp={onFieldUp}
-            onPointerCancel={onFieldUp}
             onAnimationEnd={(e) => {
               if (e.animationName === "cross-shake") setShake(false);
             }}
