@@ -11,22 +11,34 @@ import { sfx, tone, startSlotSpin, stopSlotSpin } from "../sound";
 // 2 the bottom. Stop all three so one column shows the SAME prize top-to-bottom
 // and its bands reassemble into a whole picture — that wins the lives.
 //
-// A reel is ONE number — its `offset`, how many cells its band-strip has
-// rolled. Everything drawn is DERIVED from that offset by arithmetic; the `% N`
-// (modulo) wraps the tiny 3-symbol strip into an endless ribbon.
-const SYMBOLS = ["🍄", "🌸", "⭐"] as const;
-const N = SYMBOLS.length;
+// A reel is ONE number — its `offset`, how many cells its strip has rolled.
+// Everything drawn is DERIVED from that offset by arithmetic; the modulo wraps
+// the short strip into an endless ribbon.
+//
+// The timings and the strip below are lifted from the original 6502 code
+// (`Roulette_*` in bank 22 of the Southbird SMB3 disassembly) and converted
+// from NES frames/subpixels into seconds/cells — see NES_* further down.
 const REELS = 3;
 
-// Spade Panel payout, indexed like SYMBOLS: three 🍄 award 2 lives, three 🌸
-// award 3, three ⭐ award 5. Any mismatch pays nothing.
-const PAYOUTS = [2, 3, 5];
+// The real reel is FOUR cells, not three: the mushroom appears twice, which is
+// why mushrooms come up half the time. Rendered left to right the window reads
+// ⭐(right half) 🍄 🌸 🍄 ⭐(left half) — one wrap of this strip.
+const STRIP = ["🍄", "🌸", "🍄", "⭐"] as const;
+const CELLS = STRIP.length;
+
+// Lives paid per cell, in strip order — 🍄 2, 🌸 3, 🍄 2, ⭐ 5.
+const PAYOUTS = [2, 3, 2, 5];
+
+// Both mushroom cells are the same prize, so the original accepts either one on
+// reels 2 and 3 when reel 1 stopped on a mushroom. Folding cell 2 onto cell 0
+// reproduces that leniency exactly.
+const prizeOf = (cell: number): number => (cell === 2 ? 0 : cell);
 
 // You buy in with five lives and every pull costs one, so the panel is a wager
-// rather than a free toy. Stopped at random the three reels only agree 1 in 9
-// times, which averages 1/9 × mean(2,3,5) ≈ 0.37 lives back per 1 spent — a
-// losing game. Reading the bands and timing the stops is what turns it
-// positive, which is the whole point of the original cabinet.
+// rather than a free toy. (The cabinet gave you exactly one free pull —
+// `Roulette_Turns` is hard-wired to 0 — so the economy is ours.) Stopped at
+// random the reels agree about 1 spin in 6, worth ≈ 0.38 lives per 1 staked:
+// still a losing game until you learn to read the bands.
 const LIVES_START = 5;
 const PULL_COST = 1;
 
@@ -39,37 +51,71 @@ const GLYPH = 80;
 const CELL = 24; // % of the reel's width taken by one cell
 const HALF_WINDOW = 3; // cells drawn on each side of center
 
-// One speed for every reel, like the original. The middle reel scrolls RIGHT
-// while the outer two scroll left. +1 = left (offset grows), −1 = right.
-const SPIN_SPEED = 7; // cells per second
-const DIRECTIONS = [1, -1, 1];
+// ── The original's numbers ────────────────────────────────────────────────
+// `Roulette_Pos` counts 128 units per cell; `Roulette_Speed` is a signed 8.4
+// fixed-point value, so raw/16 units advance per 60 Hz frame. This converts a
+// raw speed straight into our unit, cells per second.
+const FPS = 60;
+const FRAME = 1 / FPS;
+const cps = (raw: number): number => (raw * FPS) / (16 * 128);
+
+// `Roulette_Init`: $70, $90, $7F. $90 is negative as a signed byte, which is
+// the whole reason the middle reel scrolls the other way — and reel 3 is set a
+// hair faster than the outer two.
+const SPEEDS = [cps(0x70), cps(-0x70), cps(0x7f)]; // ≈ +3.28, −3.28, +3.72
+
+// `RouletteRow_Slow` bleeds 2 raw off the speed every frame, and hands over as
+// soon as the magnitude drops under $40 — about 0.42 s and 1.1 cells of coast.
+const DECEL = cps(2) * FPS; // ≈ 3.52 cells/s²
+const CRAWL = cps(0x40); // ≈ 1.875 cells/s
+
+// `Roulette_Run` arms a countdown on the press and the reel keeps running at
+// FULL speed until it expires — so no tap ever stops a reel where you saw it.
+// The windows are the giveaway: reels 1 and 2 slip under half a cell either
+// way, while reel 3 is handed a range four cells wide and is pure chance.
+const STOP_DELAY: [number, number][] = [
+  [0x20 * FRAME, 0x2f * FRAME], // reel 1: 32–47 frames, 0.53–0.78 s
+  [0x20 * FRAME, 0x3f * FRAME], // reel 2: 32–63 frames, 0.53–1.05 s
+  [0x40 * FRAME, 0x7f * FRAME], // reel 3: 64–127 frames, 1.07–2.12 s
+];
+
+// `RouletteRow_HitLockPos` then `RouletteRow_LockDecide`: the reel snaps to the
+// next cell edge, jitters at ±$10 flipping every 4 frames for $12 frames, and
+// only then is the payline read.
+const BOUNCE_SPEED = cps(0x10); // ≈ 0.47 cells/s
+const BOUNCE_FLIP = 4 * FRAME;
+const BOUNCE_TIME = 0x12 * FRAME; // 0.3 s
+
 const MAX_DT = 0.05; // clamp so a backgrounded tab can't teleport the reels
 
-// The stop is weighted, not instant — the original reels coast to a halt and
-// resist a pinpoint stop. On a tap the reel picks a whole-cell target a short,
-// slightly random distance ahead, then eases in. Timing mostly wins; the slip
-// keeps it from being a metronome.
-const STOP_APPROACH = 9; // higher = snappier ease-in
-const STOP_EXTRA_MIN = 1; // cells of coast after the tap
-const STOP_EXTRA_RAND = 1; // plus up to this many, random
-const SNAP_EPS = 0.02; // land when this close to the target cell
-
-// Reels start phase-shifted so the payline reads 🍄 / 🌸 / ⭐ — three prizes
-// mid-reassembly, the game's signature look. Deterministic, so the prerendered
-// HTML and the first client render agree (no hydration mismatch).
+// Reels start phase-shifted so an idle panel doesn't read as a fake win.
+// Deterministic, so the prerendered HTML and the first client render agree.
 const START_OFFSETS = [0, 1, 2];
 
 type Phase = "idle" | "spinning" | "result";
-type ReelPhase = "spinning" | "stopping" | "stopped";
+// The original's `Roulette_StopState`, one per reel. Order matters: a reel can
+// only be armed once the one before it has reached `slowing` or later, which is
+// why mashing the button can't stop all three at once.
+const REEL_STATES = [
+  "rolling", // free-running at full speed
+  "armed", // press registered, still at full speed, countdown ticking
+  "slowing", // bleeding off speed
+  "seeking", // crawling to the next cell edge
+  "bouncing", // snapped, wobbling in place
+  "locked",
+] as const;
+type ReelState = (typeof REEL_STATES)[number];
+const rank = (s: ReelState): number => REEL_STATES.indexOf(s);
+
 type Result = { symbol: string; prize: number };
 
-// Fold an offset back into [0, N). The strip has period N, so this is invisible
-// on screen but keeps the number tiny forever (perfect float precision).
-const wrap = (offset: number): number => ((offset % N) + N) % N;
+// Fold an offset back into [0, CELLS). Invisible on screen — the strip is
+// periodic — but it keeps the number tiny forever (perfect float precision).
+const wrap = (offset: number): number => ((offset % CELLS) + CELLS) % CELLS;
 
-// The prize index parked on the payline for a given offset — pure arithmetic.
+// The cell parked on the payline for a given offset — pure arithmetic.
 export function centered(offset: number): number {
-  return ((Math.round(offset) % N) + N) % N;
+  return ((Math.round(offset) % CELLS) + CELLS) % CELLS;
 }
 
 export function meta({}: Route.MetaArgs) {
@@ -83,7 +129,6 @@ export default function Slots() {
   // One offset per reel. The screen must redraw as they roll → useState.
   const [offsets, setOffsets] = useState<number[]>(START_OFFSETS);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [stopped, setStopped] = useState(0); // reels the player has tapped (0–3)
   const [result, setResult] = useState<Result | null>(null);
   const [lives, setLives] = useState(LIVES_START);
   const [{ best }, setBest] = useStoredGame("slots", { best: 0 });
@@ -98,9 +143,10 @@ export default function Slots() {
   const livesRef = useRef(lives);
   livesRef.current = lives;
   const phaseRef = useRef<Phase>("idle");
-  const reelPhaseRef = useRef<ReelPhase[]>(["stopped", "stopped", "stopped"]);
-  const stopTargetRef = useRef<number[]>([0, 0, 0]);
-  const tappedRef = useRef(0);
+  const stateRef = useRef<ReelState[]>(["locked", "locked", "locked"]);
+  const speedRef = useRef<number[]>([0, 0, 0]); // cells/s, signed
+  const timerRef = useRef<number[]>([0, 0, 0]); // seconds left in this state
+  const lockRef = useRef<number[]>([0, 0, 0]); // cell edge to settle back onto
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
 
@@ -111,9 +157,8 @@ export default function Slots() {
     if (lives < PULL_COST) return;
     setLives((l) => l - PULL_COST);
     setResult(null);
-    reelPhaseRef.current = ["spinning", "spinning", "spinning"];
-    tappedRef.current = 0;
-    setStopped(0);
+    stateRef.current = ["rolling", "rolling", "rolling"];
+    speedRef.current = [...SPEEDS];
     phaseRef.current = "spinning";
     setPhase("spinning");
     sfx.spin();
@@ -129,17 +174,19 @@ export default function Slots() {
     sfx.ui();
   };
 
-  // Stop the next reel: aim it at a whole cell a short, weighted distance ahead.
+  // Press the button: arm the next reel that is still free-running. The press
+  // does NOT place the reel — it only starts that reel's countdown, after which
+  // the reel coasts, decelerates and settles wherever it happens to land. A
+  // press aimed at a reel whose predecessor hasn't begun slowing yet is simply
+  // swallowed, exactly as the original gate does.
   const stop = () => {
     if (phaseRef.current !== "spinning") return;
-    const i = tappedRef.current;
-    if (i >= REELS) return;
-    const from = offsetsRef.current[i];
-    const extra = STOP_EXTRA_MIN + Math.random() * STOP_EXTRA_RAND;
-    stopTargetRef.current[i] = Math.round(from + DIRECTIONS[i] * extra);
-    reelPhaseRef.current[i] = "stopping";
-    tappedRef.current = i + 1;
-    setStopped(i + 1);
+    const i = stateRef.current.indexOf("rolling");
+    if (i < 0) return;
+    if (i > 0 && rank(stateRef.current[i - 1]) < rank("slowing")) return;
+    const [lo, hi] = STOP_DELAY[i];
+    stateRef.current[i] = "armed";
+    timerRef.current[i] = lo + Math.random() * (hi - lo);
     sfx.place();
   };
 
@@ -147,10 +194,11 @@ export default function Slots() {
   const score = () => {
     phaseRef.current = "result";
     stopSlotSpin();
-    const symbols = offsetsRef.current.map(centered);
-    const win = symbols[0] === symbols[1] && symbols[1] === symbols[2];
-    const prize = win ? PAYOUTS[symbols[0]] : 0;
-    setResult({ symbol: SYMBOLS[symbols[0]], prize });
+    const cells = offsetsRef.current.map(centered);
+    const [a, b, c] = cells.map(prizeOf);
+    const win = a === b && b === c;
+    const prize = win ? PAYOUTS[cells[0]] : 0;
+    setResult({ symbol: STRIP[cells[0]], prize });
     if (prize > 0) {
       setLives((l) => l + prize);
       sfx.win();
@@ -170,34 +218,76 @@ export default function Slots() {
 
   const primary = phase === "spinning" ? stop : broke ? restart : pull;
 
-  // The reel loop. Each frame: advance spinning reels, ease stopping ones toward
-  // their target cell, hold stopped ones. When the third rests, score.
+  // One reel, one frame. Walks the same six states the original's
+  // `RouletteRow_DoStopState` jump table walks, and returns the new offset.
+  const advance = (i: number, o: number, dt: number): number => {
+    const state = stateRef.current[i];
+    const v = speedRef.current[i];
+
+    switch (state) {
+      // Free-running, and running for as long as the countdown lasts. The
+      // press that armed the reel bought no precision at all.
+      case "armed":
+        timerRef.current[i] -= dt;
+        if (timerRef.current[i] <= 0) stateRef.current[i] = "slowing";
+      // fallthrough — an armed reel still moves at full speed this frame
+      case "rolling":
+        return wrap(o + v * dt);
+
+      // Bleed speed off until the reel is down to a crawl.
+      case "slowing": {
+        const slowed = v - Math.sign(v) * DECEL * dt;
+        speedRef.current[i] = slowed;
+        if (Math.abs(slowed) < CRAWL) stateRef.current[i] = "seeking";
+        return wrap(o + slowed * dt);
+      }
+
+      // Crawl on until the next cell edge comes under the payline, then take
+      // it — whichever one that turns out to be.
+      case "seeking": {
+        const edge = v > 0 ? Math.floor(o) + 1 : Math.ceil(o) - 1;
+        const moved = o + v * dt;
+        if (v > 0 ? moved < edge : moved > edge) return moved;
+        stateRef.current[i] = "bouncing";
+        timerRef.current[i] = BOUNCE_TIME;
+        lockRef.current[i] = wrap(edge);
+        // A different sound from the press, so the ear can tell "I asked" from
+        // "it landed" — the two moments the original also scores separately.
+        tone(196, 0.1, { type: "square", gain: 0.1 });
+        return lockRef.current[i];
+      }
+
+      // Settled, but still shivering: ±0.03 of a cell, flipping every four
+      // frames. Left deliberately unwrapped so the wobble stays around the
+      // lock position instead of jumping the seam.
+      case "bouncing": {
+        timerRef.current[i] -= dt;
+        if (timerRef.current[i] <= 0) {
+          stateRef.current[i] = "locked";
+          return lockRef.current[i];
+        }
+        const elapsed = BOUNCE_TIME - timerRef.current[i];
+        const dir = Math.floor(elapsed / BOUNCE_FLIP) % 2 ? -1 : 1;
+        return o + dir * BOUNCE_SPEED * dt;
+      }
+
+      default:
+        return o;
+    }
+  };
+
+  // The reel loop: step every reel, and score once the last one locks.
   useEffect(() => {
     const stepFrame = (t: number) => {
       if (lastTimeRef.current !== null) {
         const dt = Math.min((t - lastTimeRef.current) / 1000, MAX_DT);
-        const cur = offsetsRef.current;
-        const next = cur.map((o, i) => {
-          const rp = reelPhaseRef.current[i];
-          if (rp === "stopped") return o;
-          if (rp === "stopping") {
-            const target = stopTargetRef.current[i];
-            const eased =
-              o + (target - o) * (1 - Math.exp(-STOP_APPROACH * dt));
-            if (Math.abs(target - eased) < SNAP_EPS) {
-              reelPhaseRef.current[i] = "stopped";
-              return wrap(target);
-            }
-            return eased;
-          }
-          return wrap(o + DIRECTIONS[i] * SPIN_SPEED * dt);
-        });
+        const next = offsetsRef.current.map((o, i) => advance(i, o, dt));
         offsetsRef.current = next;
         setOffsets(next);
 
         if (
           phaseRef.current === "spinning" &&
-          reelPhaseRef.current.every((p) => p === "stopped")
+          stateRef.current.every((s) => s === "locked")
         ) {
           score();
         }
@@ -270,7 +360,7 @@ export default function Slots() {
                 {[0, 1, 2].map((r) => {
                   const offset = offsets[r];
                   // Only the handful of cells near the payline are drawn. Cell k
-                  // shows band r of SYMBOLS[k mod N] and sits at
+                  // shows band r of STRIP[k mod CELLS] and sits at
                   // x = 50% + (k − offset) cells, so cells slide and wrap.
                   const base = Math.floor(offset);
                   const cells = [];
@@ -279,7 +369,7 @@ export default function Slots() {
                     k <= base + HALF_WINDOW + 1;
                     k++
                   ) {
-                    const sym = SYMBOLS[((k % N) + N) % N];
+                    const sym = STRIP[((k % CELLS) + CELLS) % CELLS];
                     const x = 50 + (k - offset) * CELL;
                     cells.push(
                       <div
