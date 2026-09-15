@@ -79,8 +79,11 @@ const CRAWL = cps(0x40); // ≈ 1.875 cells/s
 
 // `Roulette_Run` arms a countdown on the press and the reel keeps running at
 // FULL speed until it expires — so no tap ever stops a reel where you saw it.
-// The windows are the giveaway: reels 1 and 2 slip under half a cell either
-// way, while reel 3 is handed a range four cells wide and is pure chance.
+// Each window is double the one before, and since the reel runs flat out for
+// the whole countdown, that doubling is positional uncertainty: reel 1 can only
+// land 0.82 cells either side of where your timing put it, reel 2 1.70 — but
+// reel 3 gets 3.91, on a strip four cells long. Your press decides the first
+// two reels and has essentially no bearing on the third.
 const STOP_DELAY: [number, number][] = [
   [0x20 * FRAME, 0x2f * FRAME], // reel 1: 32–47 frames, 0.53–0.78 s
   [0x20 * FRAME, 0x3f * FRAME], // reel 2: 32–63 frames, 0.53–1.05 s
