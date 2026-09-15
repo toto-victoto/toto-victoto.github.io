@@ -16,6 +16,30 @@
   --animate-cross-blink: cross-blink 180ms steps(2, end) infinite;
   --animate-cross-pop: cross-pop 700ms ease-out forwards;
   --animate-cross-shake: cross-shake 260ms ease-out;
+  --animate-slots-1up: slots-1up 3000ms linear forwards;
+
+  /* The Spade Panel's reward banner. On the NES the "×UP" sprite starts at
+     y=240 — just off the bottom of the 240px screen — and climbs 4px a frame
+     until it passes y=96, so the rise takes 36 frames (0.6s, a fifth of this
+     animation) at a constant speed. It then hangs there while the extra lives
+     are handed over, and finally fades. It rests higher than the NES's 40%
+     because a phone is far taller than a TV: this parks it in the gap above
+     the cabinet rather than across the payline the player wants to read. */
+  @keyframes slots-1up {
+    0% {
+      top: 100%;
+      opacity: 1;
+    }
+    20%,
+    90% {
+      top: 26%;
+      opacity: 1;
+    }
+    100% {
+      top: 26%;
+      opacity: 0;
+    }
+  }
 
   @keyframes fade-in {
     from {

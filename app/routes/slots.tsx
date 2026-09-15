@@ -42,14 +42,22 @@ const prizeOf = (cell: number): number => (cell === 2 ? 0 : cell);
 const LIVES_START = 5;
 const PULL_COST = 1;
 
-// Geometry, in px. One band is BAND tall; a whole icon spans all three
-// (ICON = 3 × BAND). GLYPH is the emoji size — kept under one cell's width so a
-// prize never clips sideways and the matched column reassembles seamlessly.
-const BAND = 34;
-const ICON = BAND * REELS;
-const GLYPH = 80;
-const CELL = 24; // % of the reel's width taken by one cell
-const HALF_WINDOW = 3; // cells drawn on each side of center
+// Geometry. Everything is in `cqw` — percent of the cabinet's own width — so
+// the machine scales with the screen instead of being pinned to a pixel size.
+//
+// A prize is 12 tiles wide on the NES's 32-tile screen, so barely 2⅔ of them
+// are ever in view at once. We go a little wider still — a phone is narrower
+// than a TV and the prize should be the biggest thing on the page. One band is
+// BAND tall, a whole prize spans all three, and the prize is square: GLYPH
+// stays just under a cell so it never clips sideways and a matched column
+// reassembles seamlessly.
+const PAD = 3; // cabinet padding
+const WINDOW_W = 100 - 2 * PAD; // reels window, as a share of the cabinet
+const CELL = 44; // % of the window taken by one cell
+const ICON = (WINDOW_W * CELL) / 100;
+const BAND = ICON / REELS;
+const GLYPH = ICON * 0.92;
+const HALF_WINDOW = 2; // cells drawn on each side of center
 
 // ── The original's numbers ────────────────────────────────────────────────
 // `Roulette_Pos` counts 128 units per cell; `Roulette_Speed` is a signed 8.4
@@ -108,6 +116,15 @@ type ReelState = (typeof REEL_STATES)[number];
 const rank = (s: ReelState): number => REEL_STATES.indexOf(s);
 
 type Result = { symbol: string; prize: number };
+// A won prize, tagged with a serial so a second win restarts the "×UP" rise
+// instead of leaving the finished animation frozen on screen.
+type Reward = { prize: number; id: number };
+
+// `Roulette_GiveReward` slides the "×UP" sprite up 4px a frame from y=240 until
+// it passes y=96 — the full height of a 240px screen in 36 frames — then holds
+// it there while the lives are handed over one at a time.
+const XUP_RISE = (240 - 96) / 4 / 60; // 0.6 s
+const XUP_HOLD = 2.4; // then it lingers while the 1-ups land
 
 // Fold an offset back into [0, CELLS). Invisible on screen — the strip is
 // periodic — but it keeps the number tiny forever (perfect float precision).
@@ -130,6 +147,7 @@ export default function Slots() {
   const [offsets, setOffsets] = useState<number[]>(START_OFFSETS);
   const [phase, setPhase] = useState<Phase>("idle");
   const [result, setResult] = useState<Result | null>(null);
+  const [reward, setReward] = useState<Reward | null>(null);
   const [lives, setLives] = useState(LIVES_START);
   const [{ best }, setBest] = useStoredGame("slots", { best: 0 });
 
@@ -147,6 +165,7 @@ export default function Slots() {
   const speedRef = useRef<number[]>([0, 0, 0]); // cells/s, signed
   const timerRef = useRef<number[]>([0, 0, 0]); // seconds left in this state
   const lockRef = useRef<number[]>([0, 0, 0]); // cell edge to settle back onto
+  const rewardIdRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
 
@@ -157,6 +176,7 @@ export default function Slots() {
     if (lives < PULL_COST) return;
     setLives((l) => l - PULL_COST);
     setResult(null);
+    setReward(null);
     stateRef.current = ["rolling", "rolling", "rolling"];
     speedRef.current = [...SPEEDS];
     phaseRef.current = "spinning";
@@ -169,6 +189,7 @@ export default function Slots() {
   const restart = () => {
     setLives(LIVES_START);
     setResult(null);
+    setReward(null);
     phaseRef.current = "idle";
     setPhase("idle");
     sfx.ui();
@@ -201,6 +222,7 @@ export default function Slots() {
     setResult({ symbol: STRIP[cells[0]], prize });
     if (prize > 0) {
       setLives((l) => l + prize);
+      setReward({ prize, id: ++rewardIdRef.current });
       sfx.win();
     } else if (livesRef.current < PULL_COST) {
       // That miss spent the last life — sting rather than the usual shrug.
@@ -313,6 +335,32 @@ export default function Slots() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  // Once the reels are rolling the WHOLE page is the stop button — no aiming at
+  // the panel mid-spin. Real controls (the lever, Home, the language picker)
+  // still speak for themselves, so taps that land on one are left alone. Only
+  // stopping is this generous: pulling stays on the button so a stray tap on
+  // the result screen can't quietly spend a life.
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      if (phaseRef.current !== "spinning") return;
+      if ((e.target as Element | null)?.closest("button, a")) return;
+      stop();
+    };
+    window.addEventListener("pointerdown", onDown);
+    return () => window.removeEventListener("pointerdown", onDown);
+  });
+
+  // Let the "×UP" banner clear itself, so a win left on screen doesn't sit
+  // there forever waiting for the next pull.
+  useEffect(() => {
+    if (!reward) return;
+    const id = window.setTimeout(
+      () => setReward(null),
+      (XUP_RISE + XUP_HOLD) * 1000,
+    );
+    return () => window.clearTimeout(id);
+  }, [reward]);
+
   // Best is the most lives ever banked in one session.
   useEffect(() => {
     if (lives > 0) setBest((s) => ({ best: Math.max(s.best, lives) }));
@@ -324,6 +372,29 @@ export default function Slots() {
   return (
     <>
       <BackButton />
+
+      {/* The cabinet's payoff: a "2 UP" / "3 UP" / "5 UP" banner that climbs up
+          from off the bottom of the screen and hangs there while the lives
+          land — the same move `Roulette_GiveReward` makes on the NES. Keyed by
+          the win's serial so back-to-back wins each get their own run. */}
+      {reward && (
+        <div
+          key={reward.id}
+          className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
+          aria-hidden="true"
+        >
+          <span
+            className="animate-slots-1up absolute left-1/2 -translate-x-1/2 text-[clamp(2.5rem,16vw,5rem)] leading-none font-black tracking-[0.12em] whitespace-nowrap text-amber-300 tabular-nums"
+            style={{
+              WebkitTextStroke: "0.1em #1c1917",
+              paintOrder: "stroke fill",
+            }}
+          >
+            {reward.prize} UP
+          </span>
+        </div>
+      )}
+
       <GameLayout>
         <header className="text-center">
           <h1 className="text-3xl font-semibold tracking-tight">
@@ -339,23 +410,30 @@ export default function Slots() {
           </p>
         </header>
 
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5">
-          {/* The cabinet: a Spade Panel marquee over the three sliced reels. */}
-          <div className="w-full max-w-sm">
-            <div className="relative rounded-3xl bg-gradient-to-b from-red-800 to-red-950 p-4 shadow-2xl ring-4 ring-amber-400/90">
-              <div className="mb-3 flex items-center justify-center gap-2 text-amber-300">
-                <span className="text-xl leading-none">♠</span>
-                <span className="text-xs font-bold uppercase tracking-[0.25em]">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4">
+          {/* The cabinet: a Spade Panel marquee over the three sliced reels.
+              It is the `cqw` container everything inside sizes against, and it
+              takes the full width unless the screen is too short for that. */}
+          <div
+            className="w-full max-w-[72vh]"
+            style={{ containerType: "inline-size" }}
+          >
+            <div
+              className="relative rounded-3xl bg-gradient-to-b from-red-800 to-red-950 shadow-2xl ring-4 ring-amber-400/90"
+              style={{ padding: `${PAD}cqw` }}
+            >
+              <div className="mb-[2cqw] flex items-center justify-center gap-[2cqw] text-amber-300">
+                <span className="text-[5cqw] leading-none">♠</span>
+                <span className="text-[3cqw] font-bold uppercase tracking-[0.25em]">
                   Spade Panel
                 </span>
-                <span className="text-xl leading-none">♠</span>
+                <span className="text-[5cqw] leading-none">♠</span>
               </div>
 
-              {/* Reels window. Tapping it stops the next reel, like the lever. */}
+              {/* Reels window. Mid-spin, anywhere on the page stops a reel. */}
               <div
-                onPointerDown={() => phase === "spinning" && stop()}
                 className="relative overflow-hidden rounded-xl bg-neutral-950 ring-2 ring-amber-900/70 select-none"
-                style={{ height: `${ICON}px` }}
+                style={{ height: `${ICON}cqw` }}
               >
                 {[0, 1, 2].map((r) => {
                   const offset = offsets[r];
@@ -378,7 +456,7 @@ export default function Slots() {
                         style={{
                           left: `${x}%`,
                           width: `${CELL}%`,
-                          height: `${BAND}px`,
+                          height: `${BAND}cqw`,
                           transform: "translateX(-50%)",
                         }}
                       >
@@ -389,9 +467,9 @@ export default function Slots() {
                           className="absolute left-0 flex w-full items-center justify-center"
                           style={{
                             top: 0,
-                            height: `${ICON}px`,
-                            transform: `translateY(-${r * BAND}px)`,
-                            fontSize: `${GLYPH}px`,
+                            height: `${ICON}cqw`,
+                            transform: `translateY(-${r * BAND}cqw)`,
+                            fontSize: `${GLYPH}cqw`,
                             lineHeight: 1,
                           }}
                         >
@@ -404,7 +482,7 @@ export default function Slots() {
                     <div
                       key={r}
                       className="absolute inset-x-0"
-                      style={{ top: `${r * BAND}px`, height: `${BAND}px` }}
+                      style={{ top: `${r * BAND}cqw`, height: `${BAND}cqw` }}
                     >
                       {cells}
                     </div>
@@ -442,7 +520,7 @@ export default function Slots() {
 
           <button
             onClick={primary}
-            className="rounded-full bg-amber-500 px-8 py-3 text-lg font-semibold text-neutral-900 hover:bg-amber-400"
+            className="rounded-full bg-amber-500 px-10 py-4 text-xl font-semibold text-neutral-900 hover:bg-amber-400"
           >
             {phase === "spinning" ? (
               <Trans id="slots.stop" message="Stop" />
