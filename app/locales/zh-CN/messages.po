@@ -493,7 +493,7 @@ msgstr "{name} 赢下这一回合"
 msgid "rps.victory.unlocked"
 msgstr "♾️ 无限模式已解锁！"
 
-#: app/routes/slots.tsx:208
+#: app/routes/slots.tsx:240
 msgid "slots.title"
 msgstr "1-UP 老虎机"
 
@@ -521,12 +521,12 @@ msgstr "石头剪刀布 RPG"
 msgid "roulette.balance"
 msgstr "余额"
 
-#: app/routes/cross.tsx:447
-#: app/routes/cross.tsx:618
+#: app/routes/cross.tsx:522
+#: app/routes/cross.tsx:705
 #: app/routes/flappy.tsx:269
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
-#: app/routes/slots.tsx:214
+#: app/routes/slots.tsx:246
 #: app/routes/snake.tsx:237
 #: app/routes/threader.tsx:888
 #: app/routes/trias.tsx:940
@@ -537,7 +537,7 @@ msgstr "最高"
 msgid "roulette.black"
 msgstr "黑"
 
-#: app/routes/cross.tsx:605
+#: app/routes/cross.tsx:692
 msgid "cross.legend.shield"
 msgstr "抵挡一次攻击"
 
@@ -592,7 +592,7 @@ msgstr "确认"
 msgid "rps.rpg.continue"
 msgstr "继续"
 
-#: app/routes/cross.tsx:418
+#: app/routes/cross.tsx:493
 msgid "cross.title"
 msgstr "Cross"
 
@@ -624,7 +624,7 @@ msgstr "无尽"
 msgid "roulette.even"
 msgstr "双"
 
-#: app/routes/cross.tsx:607
+#: app/routes/cross.tsx:694
 msgid "cross.legend.life"
 msgstr "额外生命"
 
@@ -636,12 +636,12 @@ msgstr "战斗！"
 msgid "flappy.title"
 msgstr "飞翔的小鸟"
 
-#: app/routes/threader.tsx:885
-msgid "threader.gameover"
-msgstr "游戏结束"
-
 #: app/routes/snake.tsx:290
 msgid "snake.gameover"
+msgstr "游戏结束"
+
+#: app/routes/threader.tsx:885
+msgid "threader.gameover"
 msgstr "游戏结束"
 
 #: app/routes/flappy.tsx:266
@@ -673,7 +673,7 @@ msgstr "暂存"
 msgid "nav.home"
 msgstr "首页"
 
-#: app/routes/cross.tsx:596
+#: app/routes/cross.tsx:683
 msgid "cross.start"
 msgstr "在五个方格间跳跃，躲开一切——并接住奖励。"
 
@@ -721,6 +721,10 @@ msgstr "模式"
 msgid "trias.next"
 msgstr "下一个"
 
+#: app/routes/slots.tsx:347
+msgid "slots.nomatch"
+msgstr "没有中奖"
+
 #: app/routes/roulette.tsx:484
 msgid "roulette.no_more_bets"
 msgstr "买定离手，停止下注"
@@ -732,6 +736,10 @@ msgstr "单"
 #: app/routes/roulette.tsx:670
 msgid "roulette.broke"
 msgstr "筹码用尽"
+
+#: app/routes/slots.tsx:337
+msgid "slots.broke"
+msgstr "没有生命了"
 
 #: app/routes/threader.tsx:768
 msgid "threader.perfect"
@@ -749,13 +757,14 @@ msgstr "由 toto-victoto 发布的非商业个人网站。由 GitHub, Inc.（88 
 msgid "roulette.place_bets"
 msgstr "请下注"
 
-#: app/routes/cross.tsx:628
+#: app/routes/cross.tsx:715
 msgid "cross.play"
 msgstr "开始"
 
-#: app/routes/cross.tsx:630
+#: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
+#: app/routes/slots.tsx:360
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -763,15 +772,15 @@ msgstr "开始"
 msgid "common.play_again"
 msgstr "再玩一次"
 
-#: app/routes/cross.tsx:604
+#: app/routes/cross.tsx:691
 msgid "cross.legend.star"
 msgstr "得分"
 
-#: app/routes/slots.tsx:322
+#: app/routes/slots.tsx:362
 msgid "slots.again"
 msgstr "再来一次"
 
-#: app/routes/slots.tsx:324
+#: app/routes/slots.tsx:364
 msgid "slots.pull"
 msgstr "拉动拉杆"
 
@@ -820,16 +829,16 @@ msgstr "轮盘"
 msgid "rps.title"
 msgstr "RPS Saga"
 
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "分数"
+
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
 msgid "trias.score"
 msgstr "得分"
 
-#: app/routes/snake.tsx:230
-msgid "snake.score"
-msgstr "分数"
-
-#: app/routes/cross.tsx:606
+#: app/routes/cross.tsx:693
 msgid "cross.legend.slow"
 msgstr "减缓时间"
 
@@ -853,7 +862,7 @@ msgstr "分配点数"
 msgid "roulette.spins"
 msgstr "次数"
 
-#: app/routes/cross.tsx:613
+#: app/routes/cross.tsx:700
 msgid "cross.gameover"
 msgstr "被砸扁了！"
 
@@ -885,7 +894,7 @@ msgstr "统计"
 msgid "rps.stats.title"
 msgstr "属性"
 
-#: app/routes/slots.tsx:320
+#: app/routes/slots.tsx:358
 msgid "slots.stop"
 msgstr "停"
 
@@ -901,7 +910,7 @@ msgstr "在棋盘上滑动 · 电脑端方向键或 WASD"
 msgid "snake.start"
 msgstr "滑动屏幕或使用方向键开始"
 
-#: app/routes/cross.tsx:602
+#: app/routes/cross.tsx:689
 msgid "cross.legend.controls"
 msgstr "滑动移动 — 松手回到中心。或按住方向键 / WASD / ZQSD。"
 

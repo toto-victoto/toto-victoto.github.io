@@ -22,6 +22,14 @@ const REELS = 3;
 // award 3, three ⭐ award 5. Any mismatch pays nothing.
 const PAYOUTS = [2, 3, 5];
 
+// You buy in with five lives and every pull costs one, so the panel is a wager
+// rather than a free toy. Stopped at random the three reels only agree 1 in 9
+// times, which averages 1/9 × mean(2,3,5) ≈ 0.37 lives back per 1 spent — a
+// losing game. Reading the bands and timing the stops is what turns it
+// positive, which is the whole point of the original cabinet.
+const LIVES_START = 5;
+const PULL_COST = 1;
+
 // Geometry, in px. One band is BAND tall; a whole icon spans all three
 // (ICON = 3 × BAND). GLYPH is the emoji size — kept under one cell's width so a
 // prize never clips sideways and the matched column reassembles seamlessly.
@@ -77,7 +85,7 @@ export default function Slots() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [stopped, setStopped] = useState(0); // reels the player has tapped (0–3)
   const [result, setResult] = useState<Result | null>(null);
-  const [lives, setLives] = useState(0);
+  const [lives, setLives] = useState(LIVES_START);
   const [{ best }, setBest] = useStoredGame("slots", { best: 0 });
 
   // The rAF loop runs once (empty deps) and reads live values from refs, not
@@ -85,6 +93,10 @@ export default function Slots() {
   // callback and handed to setOffsets as a finished array, so the updater stays
   // pure.
   const offsetsRef = useRef<number[]>(START_OFFSETS);
+  // score() is captured by the rAF loop's first render, so it reads the live
+  // count through a ref rather than a stale closure.
+  const livesRef = useRef(lives);
+  livesRef.current = lives;
   const phaseRef = useRef<Phase>("idle");
   const reelPhaseRef = useRef<ReelPhase[]>(["stopped", "stopped", "stopped"]);
   const stopTargetRef = useRef<number[]>([0, 0, 0]);
@@ -92,8 +104,12 @@ export default function Slots() {
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
 
-  // Pull the lever: every reel rolls again from where it rests.
+  // Pull the lever: pay a life, then every reel rolls again from where it
+  // rests. The stake is taken up front, so the counter can sit at 0 through a
+  // spin — that last pull can still pay you back out.
   const pull = () => {
+    if (lives < PULL_COST) return;
+    setLives((l) => l - PULL_COST);
     setResult(null);
     reelPhaseRef.current = ["spinning", "spinning", "spinning"];
     tappedRef.current = 0;
@@ -102,6 +118,15 @@ export default function Slots() {
     setPhase("spinning");
     sfx.spin();
     startSlotSpin();
+  };
+
+  // Buy back in after busting out.
+  const restart = () => {
+    setLives(LIVES_START);
+    setResult(null);
+    phaseRef.current = "idle";
+    setPhase("idle");
+    sfx.ui();
   };
 
   // Stop the next reel: aim it at a whole cell a short, weighted distance ahead.
@@ -129,6 +154,9 @@ export default function Slots() {
     if (prize > 0) {
       setLives((l) => l + prize);
       sfx.win();
+    } else if (livesRef.current < PULL_COST) {
+      // That miss spent the last life — sting rather than the usual shrug.
+      sfx.lose();
     } else {
       tone(330, 0.12, { type: "triangle" });
       tone(247, 0.16, { type: "triangle", delay: 0.1 });
@@ -136,7 +164,11 @@ export default function Slots() {
     setPhase("result");
   };
 
-  const primary = phase === "spinning" ? stop : pull;
+  // Out of credit. Only ever true between spins: the stake for a spin in
+  // flight is already paid, and that spin can still pay out.
+  const broke = lives < PULL_COST && phase !== "spinning";
+
+  const primary = phase === "spinning" ? stop : broke ? restart : pull;
 
   // The reel loop. Each frame: advance spinning reels, ease stopping ones toward
   // their target cell, hold stopped ones. When the third rests, score.
@@ -300,16 +332,22 @@ export default function Slots() {
           </div>
 
           <div className="flex h-7 items-center justify-center">
-            {result &&
+            {broke ? (
+              <p className="text-lg font-semibold text-rose-300">
+                <Trans id="slots.broke" message="Out of lives" />
+              </p>
+            ) : (
+              result &&
               (result.prize > 0 ? (
                 <p className="text-lg font-semibold text-amber-400">
                   {result.symbol} 1-UP! +{result.prize}
                 </p>
               ) : (
                 <p className="text-lg font-semibold text-neutral-400">
-                  No match — pull again
+                  <Trans id="slots.nomatch" message="No match" />
                 </p>
-              ))}
+              ))
+            )}
           </div>
 
           <button
@@ -318,6 +356,8 @@ export default function Slots() {
           >
             {phase === "spinning" ? (
               <Trans id="slots.stop" message="Stop" />
+            ) : broke ? (
+              <Trans id="common.play_again" message="Play again" />
             ) : phase === "result" ? (
               <Trans id="slots.again" message="Pull again" />
             ) : (

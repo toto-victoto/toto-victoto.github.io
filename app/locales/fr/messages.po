@@ -493,7 +493,7 @@ msgstr "{name} gagne la manche"
 msgid "rps.victory.unlocked"
 msgstr "♾️ Mode infini débloqué !"
 
-#: app/routes/slots.tsx:208
+#: app/routes/slots.tsx:240
 msgid "slots.title"
 msgstr "1-UP Slots"
 
@@ -521,12 +521,12 @@ msgstr "Un RPG au pierre-feuille-ciseaux"
 msgid "roulette.balance"
 msgstr "Solde"
 
-#: app/routes/cross.tsx:447
-#: app/routes/cross.tsx:618
+#: app/routes/cross.tsx:522
+#: app/routes/cross.tsx:705
 #: app/routes/flappy.tsx:269
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
-#: app/routes/slots.tsx:214
+#: app/routes/slots.tsx:246
 #: app/routes/snake.tsx:237
 #: app/routes/threader.tsx:888
 #: app/routes/trias.tsx:940
@@ -537,7 +537,7 @@ msgstr "Record"
 msgid "roulette.black"
 msgstr "Noir"
 
-#: app/routes/cross.tsx:605
+#: app/routes/cross.tsx:692
 msgid "cross.legend.shield"
 msgstr "encaisse un coup"
 
@@ -592,7 +592,7 @@ msgstr "Confirmer"
 msgid "rps.rpg.continue"
 msgstr "Continuer"
 
-#: app/routes/cross.tsx:418
+#: app/routes/cross.tsx:493
 msgid "cross.title"
 msgstr "Cross"
 
@@ -624,7 +624,7 @@ msgstr "Sans fin"
 msgid "roulette.even"
 msgstr "Pair"
 
-#: app/routes/cross.tsx:607
+#: app/routes/cross.tsx:694
 msgid "cross.legend.life"
 msgstr "vie en plus"
 
@@ -636,12 +636,12 @@ msgstr "Combattre !"
 msgid "flappy.title"
 msgstr "Flappy"
 
-#: app/routes/threader.tsx:885
-msgid "threader.gameover"
-msgstr "Perdu !"
-
 #: app/routes/snake.tsx:290
 msgid "snake.gameover"
+msgstr "Perdu !"
+
+#: app/routes/threader.tsx:885
+msgid "threader.gameover"
 msgstr "Perdu !"
 
 #: app/routes/flappy.tsx:266
@@ -673,7 +673,7 @@ msgstr "Hold"
 msgid "nav.home"
 msgstr "Accueil"
 
-#: app/routes/cross.tsx:596
+#: app/routes/cross.tsx:683
 msgid "cross.start"
 msgstr "Saute entre les cinq cases pour tout esquiver — et attrape les bonus."
 
@@ -721,6 +721,10 @@ msgstr "Modes"
 msgid "trias.next"
 msgstr "Suite"
 
+#: app/routes/slots.tsx:347
+msgid "slots.nomatch"
+msgstr "Raté"
+
 #: app/routes/roulette.tsx:484
 msgid "roulette.no_more_bets"
 msgstr "Les jeux sont faits, rien ne va plus"
@@ -732,6 +736,10 @@ msgstr "Impair"
 #: app/routes/roulette.tsx:670
 msgid "roulette.broke"
 msgstr "Plus de jetons"
+
+#: app/routes/slots.tsx:337
+msgid "slots.broke"
+msgstr "Plus de vies"
 
 #: app/routes/threader.tsx:768
 msgid "threader.perfect"
@@ -749,13 +757,14 @@ msgstr "Site personnel non-commercial publié par toto-victoto. Hébergé par Gi
 msgid "roulette.place_bets"
 msgstr "Faites vos jeux"
 
-#: app/routes/cross.tsx:628
+#: app/routes/cross.tsx:715
 msgid "cross.play"
 msgstr "Jouer"
 
-#: app/routes/cross.tsx:630
+#: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
+#: app/routes/slots.tsx:360
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -763,15 +772,15 @@ msgstr "Jouer"
 msgid "common.play_again"
 msgstr "Rejouer"
 
-#: app/routes/cross.tsx:604
+#: app/routes/cross.tsx:691
 msgid "cross.legend.star"
 msgstr "points"
 
-#: app/routes/slots.tsx:322
+#: app/routes/slots.tsx:362
 msgid "slots.again"
 msgstr "Rejouer"
 
-#: app/routes/slots.tsx:324
+#: app/routes/slots.tsx:364
 msgid "slots.pull"
 msgstr "Tirez le levier"
 
@@ -820,16 +829,16 @@ msgstr "Roulette"
 msgid "rps.title"
 msgstr "RPS Saga"
 
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "Score"
+
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
 msgid "trias.score"
 msgstr "Score"
 
-#: app/routes/snake.tsx:230
-msgid "snake.score"
-msgstr "Score"
-
-#: app/routes/cross.tsx:606
+#: app/routes/cross.tsx:693
 msgid "cross.legend.slow"
 msgstr "ralentit le temps"
 
@@ -853,7 +862,7 @@ msgstr "Répartis tes points"
 msgid "roulette.spins"
 msgstr "Tirages"
 
-#: app/routes/cross.tsx:613
+#: app/routes/cross.tsx:700
 msgid "cross.gameover"
 msgstr "Écrasé !"
 
@@ -885,7 +894,7 @@ msgstr "Statistiques"
 msgid "rps.stats.title"
 msgstr "Stats"
 
-#: app/routes/slots.tsx:320
+#: app/routes/slots.tsx:358
 msgid "slots.stop"
 msgstr "Arrêter"
 
@@ -901,7 +910,7 @@ msgstr "Glisse sur le plateau · flèches ou ZQSD sur ordi"
 msgid "snake.start"
 msgstr "Glisse ou utilise les flèches pour démarrer"
 
-#: app/routes/cross.tsx:602
+#: app/routes/cross.tsx:689
 msgid "cross.legend.controls"
 msgstr "Glisse pour bouger — relâche pour revenir au centre. Ou maintiens les flèches / ZQSD / WASD."
 
