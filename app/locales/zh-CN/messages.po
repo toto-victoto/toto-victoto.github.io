@@ -493,7 +493,7 @@ msgstr "{name} 赢下这一回合"
 msgid "rps.victory.unlocked"
 msgstr "♾️ 无限模式已解锁！"
 
-#: app/routes/slots.tsx:240
+#: app/routes/slots.tsx:404
 msgid "slots.title"
 msgstr "1-UP 老虎机"
 
@@ -526,7 +526,7 @@ msgstr "余额"
 #: app/routes/flappy.tsx:269
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
-#: app/routes/slots.tsx:246
+#: app/routes/slots.tsx:410
 #: app/routes/snake.tsx:237
 #: app/routes/threader.tsx:888
 #: app/routes/trias.tsx:940
@@ -705,6 +705,10 @@ msgstr "等级"
 msgid "rps.rpg.levelup"
 msgstr "升级！"
 
+#: app/routes/slots.tsx:423
+msgid "slots.host.line1"
+msgstr "把图案排成一行就能赢得奖励！"
+
 #: app/routes/trias.tsx:339
 msgid "trias.mode.marathon"
 msgstr "马拉松"
@@ -721,7 +725,7 @@ msgstr "模式"
 msgid "trias.next"
 msgstr "下一个"
 
-#: app/routes/slots.tsx:347
+#: app/routes/slots.tsx:537
 msgid "slots.nomatch"
 msgstr "没有中奖"
 
@@ -737,7 +741,7 @@ msgstr "单"
 msgid "roulette.broke"
 msgstr "筹码用尽"
 
-#: app/routes/slots.tsx:337
+#: app/routes/slots.tsx:527
 msgid "slots.broke"
 msgstr "没有生命了"
 
@@ -764,7 +768,7 @@ msgstr "开始"
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
-#: app/routes/slots.tsx:360
+#: app/routes/slots.tsx:550
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -776,11 +780,11 @@ msgstr "再玩一次"
 msgid "cross.legend.star"
 msgstr "得分"
 
-#: app/routes/slots.tsx:362
+#: app/routes/slots.tsx:552
 msgid "slots.again"
 msgstr "再来一次"
 
-#: app/routes/slots.tsx:364
+#: app/routes/slots.tsx:554
 msgid "slots.pull"
 msgstr "拉动拉杆"
 
@@ -894,7 +898,7 @@ msgstr "统计"
 msgid "rps.stats.title"
 msgstr "属性"
 
-#: app/routes/slots.tsx:358
+#: app/routes/slots.tsx:548
 msgid "slots.stop"
 msgstr "停"
 
@@ -986,6 +990,10 @@ msgstr "对战电脑"
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "获胜!"
+
+#: app/routes/slots.tsx:429
+msgid "slots.host.line2"
+msgstr "你只有一次机会。"
 
 #: app/routes/rps.tsx:1212
 msgid "rps.rpg.defeated"

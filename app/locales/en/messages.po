@@ -493,7 +493,7 @@ msgstr "{name} wins the round"
 msgid "rps.victory.unlocked"
 msgstr "♾️ Infinite mode unlocked!"
 
-#: app/routes/slots.tsx:240
+#: app/routes/slots.tsx:404
 msgid "slots.title"
 msgstr "1-UP Slots"
 
@@ -526,7 +526,7 @@ msgstr "Balance"
 #: app/routes/flappy.tsx:269
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
-#: app/routes/slots.tsx:246
+#: app/routes/slots.tsx:410
 #: app/routes/snake.tsx:237
 #: app/routes/threader.tsx:888
 #: app/routes/trias.tsx:940
@@ -705,6 +705,10 @@ msgstr "Level"
 msgid "rps.rpg.levelup"
 msgstr "Level up!"
 
+#: app/routes/slots.tsx:423
+msgid "slots.host.line1"
+msgstr "Line up the pictures and get a prize!"
+
 #: app/routes/trias.tsx:339
 msgid "trias.mode.marathon"
 msgstr "Marathon"
@@ -721,7 +725,7 @@ msgstr "Modes"
 msgid "trias.next"
 msgstr "Next"
 
-#: app/routes/slots.tsx:347
+#: app/routes/slots.tsx:537
 msgid "slots.nomatch"
 msgstr "No match"
 
@@ -737,7 +741,7 @@ msgstr "Odd"
 msgid "roulette.broke"
 msgstr "Out of chips"
 
-#: app/routes/slots.tsx:337
+#: app/routes/slots.tsx:527
 msgid "slots.broke"
 msgstr "Out of lives"
 
@@ -764,7 +768,7 @@ msgstr "Play"
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
-#: app/routes/slots.tsx:360
+#: app/routes/slots.tsx:550
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -776,11 +780,11 @@ msgstr "Play again"
 msgid "cross.legend.star"
 msgstr "points"
 
-#: app/routes/slots.tsx:362
+#: app/routes/slots.tsx:552
 msgid "slots.again"
 msgstr "Pull again"
 
-#: app/routes/slots.tsx:364
+#: app/routes/slots.tsx:554
 msgid "slots.pull"
 msgstr "Pull the lever"
 
@@ -894,7 +898,7 @@ msgstr "Statistics"
 msgid "rps.stats.title"
 msgstr "Stats"
 
-#: app/routes/slots.tsx:358
+#: app/routes/slots.tsx:548
 msgid "slots.stop"
 msgstr "Stop"
 
@@ -986,6 +990,10 @@ msgstr "vs CPU"
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "wins!"
+
+#: app/routes/slots.tsx:429
+msgid "slots.host.line2"
+msgstr "You only get one try."
 
 #: app/routes/rps.tsx:1212
 msgid "rps.rpg.defeated"

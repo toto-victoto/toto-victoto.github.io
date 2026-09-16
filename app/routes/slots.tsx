@@ -414,6 +414,27 @@ export default function Slots() {
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4">
+          {/* The host's spiel, word for word from the ROM
+              (`BonusGame_Spade_Text`), in the cream dialogue box SMB3 puts it
+              in. The ROM stores it as three rows because its box is 28 columns
+              wide; they are really two sentences, so they are two lines here. */}
+          {/* On a short screen (landscape phones) the box would push the lever
+              off the bottom, and the machine matters more than the flavour. */}
+          <div className="w-full max-w-[72vh] rounded-lg border-4 border-neutral-100 bg-[#f8f0d8] px-4 py-3 text-center text-sm leading-snug font-semibold text-neutral-900 [@media(max-height:600px)]:hidden sm:text-base">
+            <p>
+              <Trans
+                id="slots.host.line1"
+                message="Line up the pictures and get a prize!"
+              />
+            </p>
+            <p>
+              <Trans
+                id="slots.host.line2"
+                message="You only get one try."
+              />
+            </p>
+          </div>
+
           {/* The cabinet: a Spade Panel marquee over the three sliced reels.
               It is the `cqw` container everything inside sizes against, and it
               takes the full width unless the screen is too short for that. */}
