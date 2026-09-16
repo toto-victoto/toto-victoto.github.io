@@ -110,6 +110,12 @@ export const sfx = {
     [0, 4, 7, 12].forEach((s, i) =>
       tone(440 * 2 ** (s / 12), 0.2, { type: "triangle", gain: 0.12, delay: i * 0.09 }),
     ),
+  // The 1-up jingle, one per extra life as the Spade Panel hands them over.
+  // Short enough (0.44s) to fit between two lives without the two overlapping.
+  oneUp: () =>
+    [659.25, 783.99, 1318.51, 1046.5, 1174.66, 1567.98].forEach((f, i) =>
+      tone(f, 0.08, { type: "square", gain: 0.07, delay: i * 0.06 }),
+    ),
   lose: () => {
     tone(200, 0.28, { type: "sawtooth", gain: 0.14 });
     tone(150, 0.34, { type: "sawtooth", gain: 0.12, delay: 0.09 });

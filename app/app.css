@@ -22,21 +22,22 @@
      y=240 — just off the bottom of the 240px screen — and climbs 4px a frame
      until it passes y=96, so the rise takes 36 frames (0.6s, a fifth of this
      animation) at a constant speed. It then hangs there while the extra lives
-     are handed over, and finally fades. It rests higher than the NES's 40%
-     because a phone is far taller than a TV: this parks it in the gap above
-     the cabinet rather than across the payline the player wants to read. */
+     are handed over, and finally fades. These offsets are percentages of the
+     CABINET, not the screen, so the banner belongs to the machine: it starts
+     below it, sweeps up across the reels, and comes to rest straddling the top
+     edge — clear of the payline, which is what the player wants to read. */
   @keyframes slots-1up {
     0% {
-      top: 100%;
+      top: 130%;
       opacity: 1;
     }
     20%,
     90% {
-      top: 26%;
+      top: 3%;
       opacity: 1;
     }
     100% {
-      top: 26%;
+      top: 3%;
       opacity: 0;
     }
   }

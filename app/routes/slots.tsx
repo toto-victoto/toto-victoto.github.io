@@ -128,6 +128,11 @@ type Reward = { prize: number; id: number };
 // it there while the lives are handed over one at a time.
 const XUP_RISE = (240 - 96) / 4 / 60; // 0.6 s
 const XUP_HOLD = 2.4; // then it lingers while the 1-ups land
+// …and the lives arrive one at a time, not in a lump: `Roulette_GiveReward`
+// grants the next only once the 1-up sound has finished. Ours runs 0.44s, so
+// half a second a life keeps them from treading on each other, and even the
+// 5-life jackpot finishes (0.6 + 4 × 0.5 = 2.6s) before the banner fades.
+const LIFE_TICK = 0.5;
 
 // Fold an offset back into [0, CELLS). Invisible on screen — the strip is
 // periodic — but it keeps the number tiny forever (perfect float precision).
@@ -169,6 +174,7 @@ export default function Slots() {
   const timerRef = useRef<number[]>([0, 0, 0]); // seconds left in this state
   const lockRef = useRef<number[]>([0, 0, 0]); // cell edge to settle back onto
   const rewardIdRef = useRef(0);
+  const owedRef = useRef(0); // lives won but not yet counted in
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
 
@@ -176,7 +182,9 @@ export default function Slots() {
   // rests. The stake is taken up front, so the counter can sit at 0 through a
   // spin — that last pull can still pay you back out.
   const pull = () => {
-    if (lives < PULL_COST) return;
+    // Lives still being counted in are already yours — clearing the reward
+    // below pays out whatever is left, so spend against the full balance.
+    if (lives + owedRef.current < PULL_COST) return;
     setLives((l) => l - PULL_COST);
     setResult(null);
     setReward(null);
@@ -224,9 +232,9 @@ export default function Slots() {
     const prize = win ? PAYOUTS[cells[0]] : 0;
     setResult({ symbol: STRIP[cells[0]], prize });
     if (prize > 0) {
-      setLives((l) => l + prize);
+      // No fanfare here: the cabinet plays nothing on the match itself, it just
+      // raises the banner and then counts the lives in, one 1-up at a time.
       setReward({ prize, id: ++rewardIdRef.current });
-      sfx.win();
     } else if (livesRef.current < PULL_COST) {
       // That miss spent the last life — sting rather than the usual shrug.
       sfx.lose();
@@ -238,8 +246,9 @@ export default function Slots() {
   };
 
   // Out of credit. Only ever true between spins: the stake for a spin in
-  // flight is already paid, and that spin can still pay out.
-  const broke = lives < PULL_COST && phase !== "spinning";
+  // flight is already paid, and that spin can still pay out — nor are you
+  // broke while a win is still being counted in.
+  const broke = lives < PULL_COST && phase !== "spinning" && !reward;
 
   const primary = phase === "spinning" ? stop : broke ? restart : pull;
 
@@ -364,6 +373,29 @@ export default function Slots() {
     return () => window.clearTimeout(id);
   }, [reward]);
 
+  // Count the prize in, a life and a 1-up at a time, starting once the banner
+  // has finished climbing. `owedRef` holds what is won but not yet paid, so the
+  // lever still knows you can afford a pull in the middle of the payout.
+  useEffect(() => {
+    if (!reward) return;
+    owedRef.current = reward.prize;
+    let timer = 0;
+    const tick = () => {
+      owedRef.current -= 1;
+      setLives((l) => l + 1);
+      sfx.oneUp();
+      if (owedRef.current > 0) timer = window.setTimeout(tick, LIFE_TICK * 1000);
+    };
+    timer = window.setTimeout(tick, XUP_RISE * 1000);
+    return () => {
+      window.clearTimeout(timer);
+      // Cut short by a fresh pull or by leaving: hand over the rest at once
+      // rather than pocketing what the player already won.
+      if (owedRef.current > 0) setLives((l) => l + owedRef.current);
+      owedRef.current = 0;
+    };
+  }, [reward]);
+
   // Best is the most lives ever banked in one session.
   useEffect(() => {
     if (lives > 0) setBest((s) => ({ best: Math.max(s.best, lives) }));
@@ -375,28 +407,6 @@ export default function Slots() {
   return (
     <>
       <BackButton />
-
-      {/* The cabinet's payoff: a "2 UP" / "3 UP" / "5 UP" banner that climbs up
-          from off the bottom of the screen and hangs there while the lives
-          land — the same move `Roulette_GiveReward` makes on the NES. Keyed by
-          the win's serial so back-to-back wins each get their own run. */}
-      {reward && (
-        <div
-          key={reward.id}
-          className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
-          aria-hidden="true"
-        >
-          <span
-            className="animate-slots-1up absolute left-1/2 -translate-x-1/2 text-[clamp(2.5rem,16vw,5rem)] leading-none font-black tracking-[0.12em] whitespace-nowrap text-amber-300 tabular-nums"
-            style={{
-              WebkitTextStroke: "0.1em #1c1917",
-              paintOrder: "stroke fill",
-            }}
-          >
-            {reward.prize} UP
-          </span>
-        </div>
-      )}
 
       <GameLayout>
         <header className="text-center">
@@ -419,9 +429,16 @@ export default function Slots() {
               (`BonusGame_Spade_Text`). The second replaces its "You only get
               one try." — true of the cabinet, which gave exactly one pull, but
               a lie here, where you buy in with five lives and spend one a go. */}
-          {/* On a short screen (landscape phones) the box would push the lever
-              off the bottom, and the machine matters more than the flavour. */}
-          <div className="w-full max-w-[72vh] rounded-lg border-4 border-neutral-100 bg-[#f8f0d8] px-4 py-3 text-center text-sm leading-snug font-semibold text-neutral-900 [@media(max-height:600px)]:hidden sm:text-base">
+          {/* Fades out under the reward banner, which parks across this gap —
+              nobody needs the rules read to them mid-win, and fading keeps the
+              layout still where hiding it would make the machine jump. On a
+              short screen (landscape phones) the box would push the lever off
+              the bottom, and the machine matters more than the flavour. */}
+          <div
+            className={`w-full max-w-[72vh] rounded-lg border-4 border-neutral-100 bg-[#f8f0d8] px-4 py-3 text-center text-sm leading-snug font-semibold text-neutral-900 transition-opacity duration-300 [@media(max-height:600px)]:hidden sm:text-base ${
+              reward ? "opacity-0" : "opacity-100"
+            }`}
+          >
             <p>
               <Trans
                 id="slots.host.line1"
@@ -440,9 +457,30 @@ export default function Slots() {
               It is the `cqw` container everything inside sizes against, and it
               takes the full width unless the screen is too short for that. */}
           <div
-            className="w-full max-w-[72vh]"
+            className="relative w-full max-w-[72vh]"
             style={{ containerType: "inline-size" }}
           >
+            {/* The cabinet's payoff: a "2 UP" / "3 UP" / "5 UP" banner that
+                sweeps up from under the machine and parks across its top edge —
+                the move `Roulette_GiveReward` makes on the NES. Anchored to the
+                cabinet, and sized in cqw, so it belongs to the machine and
+                scales with it; it comes to rest clear of the payline, which is
+                the one thing you actually want to look at when you win. Keyed
+                by the win's serial so back-to-back wins each get a run. */}
+            {reward && (
+              <span
+                key={reward.id}
+                aria-hidden="true"
+                className="animate-slots-1up pointer-events-none absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 text-[16cqw] leading-none font-black tracking-[0.12em] whitespace-nowrap text-amber-300 tabular-nums"
+                style={{
+                  WebkitTextStroke: "0.1em #1c1917",
+                  paintOrder: "stroke fill",
+                }}
+              >
+                {reward.prize} UP
+              </span>
+            )}
+
             <div
               className="relative rounded-3xl bg-gradient-to-b from-red-800 to-red-950 shadow-2xl ring-4 ring-amber-400/90"
               style={{ padding: `${PAD}cqw` }}
