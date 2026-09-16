@@ -616,6 +616,10 @@ msgstr "Nuls"
 msgid "rps.victory.body"
 msgstr "Dread Volk — le démon derrière le trône — est banni ! Le roi Aldwin s'éveille en marmonnant un rêve étrange. Le Royaume de RPS est libre, et te voilà presque de sang royal."
 
+#: app/routes/slots.tsx:432
+msgid "slots.host.line2"
+msgstr "Chaque essai vous coûte une vie."
+
 #: app/routes/trias.tsx:337
 msgid "trias.mode.endless"
 msgstr "Sans fin"
@@ -705,7 +709,7 @@ msgstr "Niveau"
 msgid "rps.rpg.levelup"
 msgstr "Niveau supérieur !"
 
-#: app/routes/slots.tsx:423
+#: app/routes/slots.tsx:426
 msgid "slots.host.line1"
 msgstr "Alignez les images et gagnez un prix !"
 
@@ -725,7 +729,7 @@ msgstr "Modes"
 msgid "trias.next"
 msgstr "Suite"
 
-#: app/routes/slots.tsx:537
+#: app/routes/slots.tsx:540
 msgid "slots.nomatch"
 msgstr "Raté"
 
@@ -741,7 +745,7 @@ msgstr "Impair"
 msgid "roulette.broke"
 msgstr "Plus de jetons"
 
-#: app/routes/slots.tsx:527
+#: app/routes/slots.tsx:530
 msgid "slots.broke"
 msgstr "Plus de vies"
 
@@ -768,7 +772,7 @@ msgstr "Jouer"
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
-#: app/routes/slots.tsx:550
+#: app/routes/slots.tsx:553
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -780,11 +784,11 @@ msgstr "Rejouer"
 msgid "cross.legend.star"
 msgstr "points"
 
-#: app/routes/slots.tsx:552
+#: app/routes/slots.tsx:555
 msgid "slots.again"
 msgstr "Rejouer"
 
-#: app/routes/slots.tsx:554
+#: app/routes/slots.tsx:557
 msgid "slots.pull"
 msgstr "Tirez le levier"
 
@@ -833,13 +837,13 @@ msgstr "Roulette"
 msgid "rps.title"
 msgstr "RPS Saga"
 
-#: app/routes/snake.tsx:230
-msgid "snake.score"
-msgstr "Score"
-
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
 msgid "trias.score"
+msgstr "Score"
+
+#: app/routes/snake.tsx:230
+msgid "snake.score"
 msgstr "Score"
 
 #: app/routes/cross.tsx:693
@@ -898,7 +902,7 @@ msgstr "Statistiques"
 msgid "rps.stats.title"
 msgstr "Stats"
 
-#: app/routes/slots.tsx:548
+#: app/routes/slots.tsx:551
 msgid "slots.stop"
 msgstr "Arrêter"
 
@@ -990,10 +994,6 @@ msgstr "vs Ordi"
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "gagne !"
-
-#: app/routes/slots.tsx:429
-msgid "slots.host.line2"
-msgstr "Vous n'avez droit qu'à un seul essai."
 
 #: app/routes/rps.tsx:1212
 msgid "rps.rpg.defeated"

@@ -616,6 +616,10 @@ msgstr "平局数"
 msgid "rps.victory.body"
 msgstr "王座背后的恶魔恐惧沃尔克被驱逐了！奥德温国王醒来，喃喃自语着一个奇怪的梦。RPS 王国重获自由，而你如今基本上算得上皇室成员了。"
 
+#: app/routes/slots.tsx:432
+msgid "slots.host.line2"
+msgstr "每次尝试消耗一条命。"
+
 #: app/routes/trias.tsx:337
 msgid "trias.mode.endless"
 msgstr "无尽"
@@ -705,7 +709,7 @@ msgstr "等级"
 msgid "rps.rpg.levelup"
 msgstr "升级！"
 
-#: app/routes/slots.tsx:423
+#: app/routes/slots.tsx:426
 msgid "slots.host.line1"
 msgstr "把图案排成一行就能赢得奖励！"
 
@@ -725,7 +729,7 @@ msgstr "模式"
 msgid "trias.next"
 msgstr "下一个"
 
-#: app/routes/slots.tsx:537
+#: app/routes/slots.tsx:540
 msgid "slots.nomatch"
 msgstr "没有中奖"
 
@@ -741,7 +745,7 @@ msgstr "单"
 msgid "roulette.broke"
 msgstr "筹码用尽"
 
-#: app/routes/slots.tsx:527
+#: app/routes/slots.tsx:530
 msgid "slots.broke"
 msgstr "没有生命了"
 
@@ -768,7 +772,7 @@ msgstr "开始"
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
-#: app/routes/slots.tsx:550
+#: app/routes/slots.tsx:553
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -780,11 +784,11 @@ msgstr "再玩一次"
 msgid "cross.legend.star"
 msgstr "得分"
 
-#: app/routes/slots.tsx:552
+#: app/routes/slots.tsx:555
 msgid "slots.again"
 msgstr "再来一次"
 
-#: app/routes/slots.tsx:554
+#: app/routes/slots.tsx:557
 msgid "slots.pull"
 msgstr "拉动拉杆"
 
@@ -833,14 +837,14 @@ msgstr "轮盘"
 msgid "rps.title"
 msgstr "RPS Saga"
 
-#: app/routes/snake.tsx:230
-msgid "snake.score"
-msgstr "分数"
-
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
 msgid "trias.score"
 msgstr "得分"
+
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "分数"
 
 #: app/routes/cross.tsx:693
 msgid "cross.legend.slow"
@@ -898,7 +902,7 @@ msgstr "统计"
 msgid "rps.stats.title"
 msgstr "属性"
 
-#: app/routes/slots.tsx:548
+#: app/routes/slots.tsx:551
 msgid "slots.stop"
 msgstr "停"
 
@@ -990,10 +994,6 @@ msgstr "对战电脑"
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "获胜!"
-
-#: app/routes/slots.tsx:429
-msgid "slots.host.line2"
-msgstr "你只有一次机会。"
 
 #: app/routes/rps.tsx:1212
 msgid "rps.rpg.defeated"
