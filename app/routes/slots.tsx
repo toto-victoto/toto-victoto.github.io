@@ -122,9 +122,9 @@ const MAX_DT = 0.05; // clamp so a backgrounded tab can't teleport the reels
 const START_OFFSETS = [0, 1, 2];
 
 type Phase = "idle" | "spinning" | "result";
-// The original's `Roulette_StopState`, one per reel. Order matters: a reel can
-// only be armed once the one before it has reached `slowing` or later, which is
-// why mashing the button can't stop all three at once.
+// The original's `Roulette_StopState`, one per reel. A reel can only be armed
+// once the one before it has come to rest, so the three stop strictly in turn
+// and mashing the button cannot take two at once.
 const REEL_STATES = [
   "rolling", // free-running at full speed
   "armed", // press registered, still at full speed, countdown ticking
@@ -134,7 +134,6 @@ const REEL_STATES = [
   "locked",
 ] as const;
 type ReelState = (typeof REEL_STATES)[number];
-const rank = (s: ReelState): number => REEL_STATES.indexOf(s);
 
 type Result = { symbol: string; prize: number };
 // A won prize, tagged with a serial so a second win restarts the "×UP" rise
@@ -226,14 +225,18 @@ export default function Slots() {
 
   // Press the button: arm the next reel that is still free-running. The press
   // does NOT place the reel — it only starts that reel's countdown, after which
-  // the reel coasts, decelerates and settles wherever it happens to land. A
-  // press aimed at a reel whose predecessor hasn't begun slowing yet is simply
-  // swallowed, exactly as the original gate does.
+  // the reel coasts, decelerates and settles wherever it happens to land.
+  //
+  // One reel at a time: until the reel before this one has come to rest the
+  // press is swallowed, so you always take them in order and never lose two to
+  // a double tap. (`Roulette_Run` opens its gate a touch earlier, the moment
+  // the previous reel starts braking — but waiting for the full stop is what
+  // the machine reads as, and it makes each press unambiguous.)
   const stop = () => {
     if (phaseRef.current !== "spinning") return;
     const i = stateRef.current.indexOf("rolling");
     if (i < 0) return;
-    if (i > 0 && rank(stateRef.current[i - 1]) < rank("slowing")) return;
+    if (i > 0 && stateRef.current[i - 1] !== "locked") return;
     const [lo, hi] = STOP_DELAY[i];
     stateRef.current[i] = "armed";
     timerRef.current[i] = lo + Math.random() * (hi - lo);
