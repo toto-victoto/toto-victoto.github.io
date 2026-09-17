@@ -58,6 +58,24 @@ const ICON = (WINDOW_W * CELL) / 100;
 const BAND = ICON / REELS;
 const GLYPH = ICON * 0.92;
 const HALF_WINDOW = 2; // cells drawn on each side of center
+// Bands butted edge to edge draw a hairline between them, and it is NOT a gap.
+// A boundary lands mid-device-pixel, so both bands clip there at partial
+// coverage and that row gets painted twice, each time at about half alpha.
+// Compositing gives C(f + g − f·g) — three quarters of the colour at f = g = ½,
+// measurably (0.76×) darker than its neighbours. Rounding sharpens it at the
+// 2nd/3rd boundary, where `2 × BAND` and `BAND + BAND` disagree by 1/64px.
+//
+// The cure is to overlap the bands by a little over one device pixel, so the
+// band above covers that row completely and the one below redraws the very
+// same pixels on top of it. It works only because the glyphs line up exactly —
+// see the band contents below. The cost is about 0.6px of the reel above
+// showing past the boundary, which is under a pixel and reads as antialiasing.
+//
+// Do NOT give the bands an opaque background to hide that overhang: the band
+// below then wipes the one above at its own partial coverage and paints back
+// the exact hairline this removes. Measured, not guessed. The last band's
+// overhang is clipped by the window.
+const SEAM = 0.3;
 
 // ── The original's numbers ────────────────────────────────────────────────
 // `Roulette_Pos` counts 128 units per cell; `Roulette_Speed` is a signed 8.4
@@ -519,19 +537,22 @@ export default function Slots() {
                         style={{
                           left: `${x}%`,
                           width: `${CELL}%`,
-                          height: `${BAND}cqw`,
+                          height: `${BAND + SEAM}cqw`,
                           transform: "translateX(-50%)",
                         }}
                       >
-                        {/* A full icon, shifted up so this band shows. Identical
-                            geometry on every reel, so a matched column stacks
-                            back into one seamless picture. */}
+                        {/* A full icon, shifted up so this band shows. The
+                            shift is `top`, not a transform: `top` resolves to
+                            the same rounded length as the band's own `top`, so
+                            the two cancel exactly and every band lands the
+                            glyph on the identical pixel. A transform is
+                            resolved at composite time instead, which left the
+                            picture a hair out of step across a boundary. */}
                         <div
                           className="absolute left-0 flex w-full items-center justify-center"
                           style={{
-                            top: 0,
+                            top: `-${r * BAND}cqw`,
                             height: `${ICON}cqw`,
-                            transform: `translateY(-${r * BAND}cqw)`,
                             fontSize: `${GLYPH}cqw`,
                             lineHeight: 1,
                           }}
@@ -545,7 +566,10 @@ export default function Slots() {
                     <div
                       key={r}
                       className="absolute inset-x-0"
-                      style={{ top: `${r * BAND}cqw`, height: `${BAND}cqw` }}
+                      style={{
+                        top: `${r * BAND}cqw`,
+                        height: `${BAND + SEAM}cqw`,
+                      }}
                     >
                       {cells}
                     </div>
