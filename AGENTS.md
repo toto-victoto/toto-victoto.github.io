@@ -189,6 +189,44 @@ For games whose persisted shape doesn't match component state one-for-one
 refresh refunds the wager), skip the hook and do hydration + save effects
 by hand.
 
+## Multiplayer (two devices)
+
+`app/net.ts` is to a second phone what `sound.ts` is to audio: one shared
+thing, set up once, that any game can opt into. Games never touch
+`RTCPeerConnection`.
+
+There is no server — the site is static — so the peers are introduced by
+hand. The host makes an invite code, the guest turns it into a reply code,
+and the host takes that back; `PairingPanel` shows each code as a QR to be
+scanned across the table, with a paste box for browsers that have no
+`BarcodeDetector`. Nothing about the pairing leaves the two devices.
+
+That also fixes the range: `ICE_SERVERS` is deliberately empty, so only
+addresses the browser can see itself are offered and **both devices must be
+on the same network**. Adding a STUN URL would reach further at the cost of
+telling that server your IP — don't, without asking.
+
+To give a game a multiplayer mode:
+
+```tsx
+const { state, dispatch, isHost, net } = useNetGame(INITIAL, reduce);
+```
+
+`reduce(state, intent, from)` must be pure, and runs **on the host only** —
+it is the referee. Either player calls `dispatch`; on the host that applies
+and broadcasts, on the guest it ships the intent over and the new state
+comes back, so the two screens cannot drift. With no peer the host branch
+still runs, which is what keeps a game playable solo before anyone pairs
+(see `duel.tsx`'s practice mode).
+
+Two rules worth keeping:
+
+- **Never compare clocks across the link, only durations.** Reflex Duel has
+  each device time its own green-to-tap and report the number; lag changes
+  when each screen turns green, not how fast someone reacts to it.
+- Anything that schedules (timers, the random delay) belongs behind
+  `isHost`, or both devices will race.
+
 ## Conventions
 
 - **i18n**: explicit-id mode (`explicitIdAsDefault`). The `id` prop is the

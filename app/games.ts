@@ -40,6 +40,13 @@ export const GAMES: GameMeta[] = [
     icon: "🕹️",
   },
   {
+    slug: "duel",
+    titleId: "duel.title",
+    title: "Reflex Duel",
+    tone: "bg-gradient-to-br from-emerald-400 to-cyan-600",
+    icon: "⚡",
+  },
+  {
     slug: "roulette",
     titleId: "roulette.title",
     title: "Roulette",

@@ -493,7 +493,7 @@ msgstr "{name} 赢下这一回合"
 msgid "rps.victory.unlocked"
 msgstr "♾️ 无限模式已解锁！"
 
-#: app/routes/slots.tsx:404
+#: app/routes/slots.tsx:435
 msgid "slots.title"
 msgstr "1-UP 老虎机"
 
@@ -517,6 +517,10 @@ msgstr "全押"
 msgid "rps.splash.tagline"
 msgstr "石头剪刀布 RPG"
 
+#: app/routes/duel.tsx:487
+msgid "duel.back"
+msgstr "返回配对"
+
 #: app/routes/roulette.tsx:462
 msgid "roulette.balance"
 msgstr "余额"
@@ -526,12 +530,17 @@ msgstr "余额"
 #: app/routes/flappy.tsx:269
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
-#: app/routes/slots.tsx:410
+#: app/routes/slots.tsx:441
 #: app/routes/snake.tsx:237
 #: app/routes/threader.tsx:888
 #: app/routes/trias.tsx:940
 msgid "common.best"
 msgstr "最高"
+
+#: app/routes/duel.tsx:228
+#: app/routes/duel.tsx:429
+msgid "duel.best"
+msgstr "最佳"
 
 #: app/routes/roulette.tsx:837
 msgid "roulette.black"
@@ -544,6 +553,10 @@ msgstr "抵挡一次攻击"
 #: app/routes/about.tsx:82
 msgid "about.section.built_with"
 msgstr "构建工具"
+
+#: app/components/PairingPanel.tsx:413
+msgid "common.cancel"
+msgstr "取消"
 
 #: app/routes/roulette.tsx:619
 msgid "roulette.chip"
@@ -592,6 +605,26 @@ msgstr "确认"
 msgid "rps.rpg.continue"
 msgstr "继续"
 
+#: app/components/PairingPanel.tsx:381
+msgid "net.copied"
+msgstr "已复制。"
+
+#: app/components/PairingPanel.tsx:179
+msgid "net.copy"
+msgstr "复制"
+
+#: app/components/PairingPanel.tsx:384
+msgid "net.err.copy"
+msgstr "无法复制——请手动选择文本。"
+
+#: app/components/PairingPanel.tsx:387
+msgid "net.err.start"
+msgstr "无法创建邀请。"
+
+#: app/components/PairingPanel.tsx:400
+msgid "net.err.connect"
+msgstr "无法连接到另一台设备。两台手机必须在同一个 Wi-Fi 下。"
+
 #: app/routes/cross.tsx:493
 msgid "cross.title"
 msgstr "Cross"
@@ -616,7 +649,7 @@ msgstr "平局数"
 msgid "rps.victory.body"
 msgstr "王座背后的恶魔恐惧沃尔克被驱逐了！奥德温国王醒来，喃喃自语着一个奇怪的梦。RPS 王国重获自由，而你如今基本上算得上皇室成员了。"
 
-#: app/routes/slots.tsx:432
+#: app/routes/slots.tsx:470
 msgid "slots.host.line2"
 msgstr "每次尝试消耗一条命。"
 
@@ -636,16 +669,20 @@ msgstr "额外生命"
 msgid "rps.rpg.fight"
 msgstr "战斗！"
 
+#: app/routes/duel.tsx:269
+msgid "duel.firstto"
+msgstr "先达到"
+
 #: app/routes/flappy.tsx:188
 msgid "flappy.title"
 msgstr "飞翔的小鸟"
 
-#: app/routes/snake.tsx:290
-msgid "snake.gameover"
-msgstr "游戏结束"
-
 #: app/routes/threader.tsx:885
 msgid "threader.gameover"
+msgstr "游戏结束"
+
+#: app/routes/snake.tsx:290
+msgid "snake.gameover"
 msgstr "游戏结束"
 
 #: app/routes/flappy.tsx:266
@@ -659,6 +696,10 @@ msgstr "备战"
 #: app/routes/rps.tsx:1342
 msgid "rps.stats.gotit"
 msgstr "知道了"
+
+#: app/routes/duel.tsx:297
+msgid "duel.sent"
+msgstr "已记录"
 
 #: app/routes/rps.tsx:1395
 msgid "rps.banner.healed"
@@ -693,13 +734,33 @@ msgstr "下注中"
 msgid "rps.splash.infinite"
 msgstr "无限"
 
+#: app/components/PairingPanel.tsx:277
+msgid "net.invite"
+msgstr "邀请"
+
+#: app/components/PairingPanel.tsx:288
+msgid "net.join"
+msgstr "加入"
+
 #: app/routes/rps.tsx:996
 msgid "rps.prologue.body"
 msgstr "善良的奥德温国王曾以仁治国——直到一个恶魔白住进来，把他和他的勇士们都变坏了。拿起你的拳头、手掌和剪刀吧，冒险者：总得有人把它赶出去。"
 
+#: app/routes/duel.tsx:264
+msgid "duel.left"
+msgstr "左边"
+
 #: app/routes/about.tsx:153
 msgid "about.section.legal"
 msgstr "法律声明"
+
+#: app/components/PairingPanel.tsx:303
+msgid "net.show.reply"
+msgstr "让第一台手机扫描这个即可完成。"
+
+#: app/components/PairingPanel.tsx:298
+msgid "net.show.invite"
+msgstr "让另一台手机扫描这个，然后扫描对方的回复。"
 
 #: app/routes/trias.tsx:928
 msgid "trias.level"
@@ -709,7 +770,7 @@ msgstr "等级"
 msgid "rps.rpg.levelup"
 msgstr "升级！"
 
-#: app/routes/slots.tsx:426
+#: app/routes/slots.tsx:464
 msgid "slots.host.line1"
 msgstr "把图案排成一行就能赢得奖励！"
 
@@ -729,13 +790,22 @@ msgstr "模式"
 msgid "trias.next"
 msgstr "下一个"
 
-#: app/routes/slots.tsx:540
+#: app/routes/duel.tsx:359
+msgid "duel.next"
+msgstr "下一局"
+
+#: app/routes/slots.tsx:605
 msgid "slots.nomatch"
 msgstr "没有中奖"
 
 #: app/routes/roulette.tsx:484
 msgid "roulette.no_more_bets"
 msgstr "买定离手，停止下注"
+
+#: app/routes/duel.tsx:299
+#: app/routes/duel.tsx:456
+msgid "duel.now"
+msgstr "就是现在"
 
 #: app/routes/roulette.tsx:844
 msgid "roulette.odd"
@@ -745,7 +815,7 @@ msgstr "单"
 msgid "roulette.broke"
 msgstr "筹码用尽"
 
-#: app/routes/slots.tsx:530
+#: app/routes/slots.tsx:595
 msgid "slots.broke"
 msgstr "没有生命了"
 
@@ -772,7 +842,7 @@ msgstr "开始"
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
-#: app/routes/slots.tsx:553
+#: app/routes/slots.tsx:618
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -780,15 +850,27 @@ msgstr "开始"
 msgid "common.play_again"
 msgstr "再玩一次"
 
+#: app/components/PairingPanel.tsx:265
+msgid "net.intro"
+msgstr "和朋友用各自的手机对战。一人发起邀请，另一人扫码。"
+
 #: app/routes/cross.tsx:691
 msgid "cross.legend.star"
 msgstr "得分"
 
-#: app/routes/slots.tsx:555
+#: app/routes/duel.tsx:425
+msgid "duel.practice.title"
+msgstr "练习"
+
+#: app/routes/duel.tsx:224
+msgid "duel.practice"
+msgstr "单人练习"
+
+#: app/routes/slots.tsx:620
 msgid "slots.again"
 msgstr "再来一次"
 
-#: app/routes/slots.tsx:557
+#: app/routes/slots.tsx:622
 msgid "slots.pull"
 msgstr "拉动拉杆"
 
@@ -808,6 +890,11 @@ msgstr "达到第 {max} 级"
 msgid "rps.rpg.reached"
 msgstr "达到第 {level} 级"
 
+#: app/routes/duel.tsx:357
+#: app/routes/duel.tsx:481
+msgid "duel.start"
+msgstr "准备"
+
 #: app/routes/about.tsx:101
 msgid "about.section.records"
 msgstr "纪录"
@@ -816,6 +903,11 @@ msgstr "纪录"
 msgid "roulette.red"
 msgstr "红"
 
+#: app/routes/duel.tsx:209
+msgid "duel.title"
+msgstr "反应对决"
+
+#: app/routes/duel.tsx:348
 #: app/routes/roulette.tsx:687
 #: app/routes/ultimate.tsx:566
 msgid "common.reset"
@@ -829,13 +921,37 @@ msgstr "重置"
 msgid "rps.splash.restart"
 msgstr "重新开始"
 
+#: app/routes/duel.tsx:266
+msgid "duel.right"
+msgstr "右边"
+
 #: app/routes/roulette.tsx:431
 msgid "roulette.title"
 msgstr "轮盘"
 
+#: app/routes/duel.tsx:319
+msgid "duel.lost"
+msgstr "对方赢下这局"
+
+#: app/routes/duel.tsx:317
+msgid "duel.won"
+msgstr "你赢下这局"
+
 #: app/routes/rps.tsx:1016
 msgid "rps.title"
 msgstr "RPS Saga"
+
+#: app/components/PairingPanel.tsx:346
+msgid "net.scan.start"
+msgstr "扫描二维码"
+
+#: app/components/PairingPanel.tsx:323
+msgid "net.scan.invite"
+msgstr "扫描对方的邀请"
+
+#: app/components/PairingPanel.tsx:321
+msgid "net.scan.reply"
+msgstr "扫描对方的回复"
 
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
@@ -902,9 +1018,13 @@ msgstr "统计"
 msgid "rps.stats.title"
 msgstr "属性"
 
-#: app/routes/slots.tsx:551
+#: app/routes/slots.tsx:616
 msgid "slots.stop"
 msgstr "停"
+
+#: app/components/PairingPanel.tsx:344
+msgid "net.scan.stop"
+msgstr "关闭摄像头"
 
 #: app/routes/trias.tsx:1125
 msgid "trias.hint"
@@ -930,6 +1050,14 @@ msgstr "点击应用开始游戏。"
 msgid "flappy.start"
 msgstr "点击或按空格开始"
 
+#: app/routes/duel.tsx:286
+msgid "duel.ready"
+msgstr "两人都准备好后点击准备。"
+
+#: app/routes/duel.tsx:446
+msgid "duel.practice.hint"
+msgstr "点击准备，然后等待变绿。"
+
 #: app/routes/threader.tsx:849
 msgid "threader.start"
 msgstr "点击切换形状 · 拖动对准缺口"
@@ -938,9 +1066,37 @@ msgstr "点击切换形状 · 拖动对准缺口"
 msgid "trias.won.timeattack"
 msgstr "目标达成！"
 
+#: app/components/PairingPanel.tsx:390
+msgid "net.err.invite"
+msgstr "这不是本游戏的有效邀请。"
+
+#: app/components/PairingPanel.tsx:393
+msgid "net.err.reply"
+msgstr "这不是有效的回复。"
+
+#: app/routes/duel.tsx:367
+msgid "net.lost"
+msgstr "另一台手机已断开。"
+
 #: app/routes/rps.tsx:994
 msgid "rps.prologue.title"
 msgstr "RPS 王国"
+
+#: app/routes/duel.tsx:326
+msgid "duel.them"
+msgstr "对方"
+
+#: app/routes/duel.tsx:312
+msgid "duel.theyjumped"
+msgstr "对方抢跑了"
+
+#: app/routes/duel.tsx:334
+msgid "duel.matchlost"
+msgstr "对方赢得了比赛。"
+
+#: app/components/PairingPanel.tsx:250
+msgid "net.unsupported"
+msgstr "此浏览器无法在两台设备之间建立连接。"
 
 #: app/routes/threader.tsx:863
 msgid "threader.legend.bead"
@@ -958,6 +1114,15 @@ msgstr "时间"
 #: app/routes/trias.tsx:340
 msgid "trias.mode.timeattack"
 msgstr "计时赛"
+
+#: app/routes/duel.tsx:314
+#: app/routes/duel.tsx:463
+msgid "duel.youjumped"
+msgstr "太早了！"
+
+#: app/components/PairingPanel.tsx:134
+msgid "net.qr.toobig"
+msgstr "内容过长，无法生成二维码——请使用下方的文本。"
 
 #: app/routes/home.tsx:26
 msgid "home.title"
@@ -983,6 +1148,10 @@ msgstr "轮到"
 msgid "ultimate.title"
 msgstr "终极井字棋"
 
+#: app/components/PairingPanel.tsx:366
+msgid "net.use"
+msgstr "使用"
+
 #: app/routes/rps.tsx:975
 msgid "rps.victory.title"
 msgstr "胜利！"
@@ -991,13 +1160,38 @@ msgstr "胜利！"
 msgid "ultimate.mode.ai"
 msgstr "对战电脑"
 
+#: app/routes/duel.tsx:212
+msgid "duel.tagline"
+msgstr "等待变绿。手速最快的人赢下这一局。"
+
+#: app/routes/duel.tsx:291
+#: app/routes/duel.tsx:451
+msgid "duel.wait"
+msgstr "等待变绿……"
+
+#: app/components/PairingPanel.tsx:374
+msgid "net.waiting"
+msgstr "正在等待另一台手机……"
+
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "获胜!"
 
+#: app/routes/duel.tsx:323
+msgid "duel.you"
+msgstr "你"
+
+#: app/routes/duel.tsx:262
+msgid "duel.youare"
+msgstr "你是"
+
 #: app/routes/rps.tsx:1212
 msgid "rps.rpg.defeated"
 msgstr "你被击败了"
+
+#: app/routes/duel.tsx:332
+msgid "duel.matchwon"
+msgstr "你赢得了比赛！"
 
 #: app/routes/rps.tsx:1143
 msgid "rps.round.win"

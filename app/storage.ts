@@ -43,6 +43,8 @@ export type Persisted = {
   flappy: { best: number };
   threader: { best: number };
   cross: { best: number };
+  // Reflex Duel keeps only a personal best reaction, in ms (lower is better).
+  duel: { best: number };
   rps: {
     bestLevel: number;
     // Best "infinite" run, measured as levels reached past the roster.
@@ -77,6 +79,7 @@ const GAME_KEYS = [
   "flappy",
   "threader",
   "cross",
+  "duel",
   "rps",
   "roulette",
   "slots",

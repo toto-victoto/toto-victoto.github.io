@@ -493,7 +493,7 @@ msgstr "{name} gagne la manche"
 msgid "rps.victory.unlocked"
 msgstr "♾️ Mode infini débloqué !"
 
-#: app/routes/slots.tsx:404
+#: app/routes/slots.tsx:435
 msgid "slots.title"
 msgstr "1-UP Slots"
 
@@ -517,6 +517,10 @@ msgstr "Tapis"
 msgid "rps.splash.tagline"
 msgstr "Un RPG au pierre-feuille-ciseaux"
 
+#: app/routes/duel.tsx:487
+msgid "duel.back"
+msgstr "Retour à l'appairage"
+
 #: app/routes/roulette.tsx:462
 msgid "roulette.balance"
 msgstr "Solde"
@@ -526,11 +530,16 @@ msgstr "Solde"
 #: app/routes/flappy.tsx:269
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
-#: app/routes/slots.tsx:410
+#: app/routes/slots.tsx:441
 #: app/routes/snake.tsx:237
 #: app/routes/threader.tsx:888
 #: app/routes/trias.tsx:940
 msgid "common.best"
+msgstr "Record"
+
+#: app/routes/duel.tsx:228
+#: app/routes/duel.tsx:429
+msgid "duel.best"
 msgstr "Record"
 
 #: app/routes/roulette.tsx:837
@@ -544,6 +553,10 @@ msgstr "encaisse un coup"
 #: app/routes/about.tsx:82
 msgid "about.section.built_with"
 msgstr "Réalisé avec"
+
+#: app/components/PairingPanel.tsx:413
+msgid "common.cancel"
+msgstr "Annuler"
 
 #: app/routes/roulette.tsx:619
 msgid "roulette.chip"
@@ -592,6 +605,26 @@ msgstr "Confirmer"
 msgid "rps.rpg.continue"
 msgstr "Continuer"
 
+#: app/components/PairingPanel.tsx:381
+msgid "net.copied"
+msgstr "Copié."
+
+#: app/components/PairingPanel.tsx:179
+msgid "net.copy"
+msgstr "Copier"
+
+#: app/components/PairingPanel.tsx:384
+msgid "net.err.copy"
+msgstr "Copie impossible — sélectionnez le texte à la main."
+
+#: app/components/PairingPanel.tsx:387
+msgid "net.err.start"
+msgstr "Impossible de créer une invitation."
+
+#: app/components/PairingPanel.tsx:400
+msgid "net.err.connect"
+msgstr "Impossible de joindre l'autre appareil. Les deux téléphones doivent être sur le même Wi-Fi."
+
 #: app/routes/cross.tsx:493
 msgid "cross.title"
 msgstr "Cross"
@@ -616,7 +649,7 @@ msgstr "Nuls"
 msgid "rps.victory.body"
 msgstr "Dread Volk — le démon derrière le trône — est banni ! Le roi Aldwin s'éveille en marmonnant un rêve étrange. Le Royaume de RPS est libre, et te voilà presque de sang royal."
 
-#: app/routes/slots.tsx:432
+#: app/routes/slots.tsx:470
 msgid "slots.host.line2"
 msgstr "Chaque essai vous coûte une vie."
 
@@ -636,16 +669,20 @@ msgstr "vie en plus"
 msgid "rps.rpg.fight"
 msgstr "Combattre !"
 
+#: app/routes/duel.tsx:269
+msgid "duel.firstto"
+msgstr "Premier à"
+
 #: app/routes/flappy.tsx:188
 msgid "flappy.title"
 msgstr "Flappy"
 
-#: app/routes/snake.tsx:290
-msgid "snake.gameover"
-msgstr "Perdu !"
-
 #: app/routes/threader.tsx:885
 msgid "threader.gameover"
+msgstr "Perdu !"
+
+#: app/routes/snake.tsx:290
+msgid "snake.gameover"
 msgstr "Perdu !"
 
 #: app/routes/flappy.tsx:266
@@ -659,6 +696,10 @@ msgstr "Prépare-toi"
 #: app/routes/rps.tsx:1342
 msgid "rps.stats.gotit"
 msgstr "Compris"
+
+#: app/routes/duel.tsx:297
+msgid "duel.sent"
+msgstr "C'est parti"
 
 #: app/routes/rps.tsx:1395
 msgid "rps.banner.healed"
@@ -693,13 +734,33 @@ msgstr "En jeu"
 msgid "rps.splash.infinite"
 msgstr "Infini"
 
+#: app/components/PairingPanel.tsx:277
+msgid "net.invite"
+msgstr "Inviter"
+
+#: app/components/PairingPanel.tsx:288
+msgid "net.join"
+msgstr "Rejoindre"
+
 #: app/routes/rps.tsx:996
 msgid "rps.prologue.body"
 msgstr "Le bon roi Aldwin régnait avec justice — jusqu'à ce qu'un démon s'installe, gratuitement, et le corrompe, ses champions avec lui. Prends tes poings, tes paumes et tes ciseaux, aventurier : quelqu'un doit l'expulser."
 
+#: app/routes/duel.tsx:264
+msgid "duel.left"
+msgstr "à gauche"
+
 #: app/routes/about.tsx:153
 msgid "about.section.legal"
 msgstr "Mentions légales"
+
+#: app/components/PairingPanel.tsx:303
+msgid "net.show.reply"
+msgstr "Faites scanner ceci par le premier téléphone pour terminer."
+
+#: app/components/PairingPanel.tsx:298
+msgid "net.show.invite"
+msgstr "Faites scanner ceci par l'autre téléphone, puis scannez sa réponse."
 
 #: app/routes/trias.tsx:928
 msgid "trias.level"
@@ -709,7 +770,7 @@ msgstr "Niveau"
 msgid "rps.rpg.levelup"
 msgstr "Niveau supérieur !"
 
-#: app/routes/slots.tsx:426
+#: app/routes/slots.tsx:464
 msgid "slots.host.line1"
 msgstr "Alignez les images et gagnez un prix !"
 
@@ -729,13 +790,22 @@ msgstr "Modes"
 msgid "trias.next"
 msgstr "Suite"
 
-#: app/routes/slots.tsx:540
+#: app/routes/duel.tsx:359
+msgid "duel.next"
+msgstr "Manche suivante"
+
+#: app/routes/slots.tsx:605
 msgid "slots.nomatch"
 msgstr "Raté"
 
 #: app/routes/roulette.tsx:484
 msgid "roulette.no_more_bets"
 msgstr "Les jeux sont faits, rien ne va plus"
+
+#: app/routes/duel.tsx:299
+#: app/routes/duel.tsx:456
+msgid "duel.now"
+msgstr "MAINTENANT"
 
 #: app/routes/roulette.tsx:844
 msgid "roulette.odd"
@@ -745,7 +815,7 @@ msgstr "Impair"
 msgid "roulette.broke"
 msgstr "Plus de jetons"
 
-#: app/routes/slots.tsx:530
+#: app/routes/slots.tsx:595
 msgid "slots.broke"
 msgstr "Plus de vies"
 
@@ -772,7 +842,7 @@ msgstr "Jouer"
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
 #: app/routes/roulette.tsx:676
-#: app/routes/slots.tsx:553
+#: app/routes/slots.tsx:618
 #: app/routes/snake.tsx:296
 #: app/routes/threader.tsx:895
 #: app/routes/trias.tsx:1100
@@ -780,15 +850,27 @@ msgstr "Jouer"
 msgid "common.play_again"
 msgstr "Rejouer"
 
+#: app/components/PairingPanel.tsx:265
+msgid "net.intro"
+msgstr "Jouez contre un ami sur son propre téléphone. L'un invite, l'autre scanne."
+
 #: app/routes/cross.tsx:691
 msgid "cross.legend.star"
 msgstr "points"
 
-#: app/routes/slots.tsx:555
+#: app/routes/duel.tsx:425
+msgid "duel.practice.title"
+msgstr "Entraînement"
+
+#: app/routes/duel.tsx:224
+msgid "duel.practice"
+msgstr "S'entraîner seul"
+
+#: app/routes/slots.tsx:620
 msgid "slots.again"
 msgstr "Rejouer"
 
-#: app/routes/slots.tsx:557
+#: app/routes/slots.tsx:622
 msgid "slots.pull"
 msgstr "Tirez le levier"
 
@@ -808,6 +890,11 @@ msgstr "Atteins le niveau {max}"
 msgid "rps.rpg.reached"
 msgstr "Niveau {level} atteint"
 
+#: app/routes/duel.tsx:357
+#: app/routes/duel.tsx:481
+msgid "duel.start"
+msgstr "Prêt"
+
 #: app/routes/about.tsx:101
 msgid "about.section.records"
 msgstr "Records"
@@ -816,6 +903,11 @@ msgstr "Records"
 msgid "roulette.red"
 msgstr "Rouge"
 
+#: app/routes/duel.tsx:209
+msgid "duel.title"
+msgstr "Duel Réflexe"
+
+#: app/routes/duel.tsx:348
 #: app/routes/roulette.tsx:687
 #: app/routes/ultimate.tsx:566
 msgid "common.reset"
@@ -829,13 +921,37 @@ msgstr "Effacer"
 msgid "rps.splash.restart"
 msgstr "Recommencer"
 
+#: app/routes/duel.tsx:266
+msgid "duel.right"
+msgstr "à droite"
+
 #: app/routes/roulette.tsx:431
 msgid "roulette.title"
 msgstr "Roulette"
 
+#: app/routes/duel.tsx:319
+msgid "duel.lost"
+msgstr "Manche pour l'autre"
+
+#: app/routes/duel.tsx:317
+msgid "duel.won"
+msgstr "Manche pour vous"
+
 #: app/routes/rps.tsx:1016
 msgid "rps.title"
 msgstr "RPS Saga"
+
+#: app/components/PairingPanel.tsx:346
+msgid "net.scan.start"
+msgstr "Scanner le QR"
+
+#: app/components/PairingPanel.tsx:323
+msgid "net.scan.invite"
+msgstr "Scanner son invitation"
+
+#: app/components/PairingPanel.tsx:321
+msgid "net.scan.reply"
+msgstr "Scanner sa réponse"
 
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
@@ -902,9 +1018,13 @@ msgstr "Statistiques"
 msgid "rps.stats.title"
 msgstr "Stats"
 
-#: app/routes/slots.tsx:551
+#: app/routes/slots.tsx:616
 msgid "slots.stop"
 msgstr "Arrêter"
+
+#: app/components/PairingPanel.tsx:344
+msgid "net.scan.stop"
+msgstr "Arrêter la caméra"
 
 #: app/routes/trias.tsx:1125
 msgid "trias.hint"
@@ -930,6 +1050,14 @@ msgstr "Tape sur une app pour jouer."
 msgid "flappy.start"
 msgstr "Tape ou appuie sur Espace pour démarrer"
 
+#: app/routes/duel.tsx:286
+msgid "duel.ready"
+msgstr "Touchez Prêt quand vous l'êtes tous les deux."
+
+#: app/routes/duel.tsx:446
+msgid "duel.practice.hint"
+msgstr "Touchez Prêt, puis attendez le vert."
+
 #: app/routes/threader.tsx:849
 msgid "threader.start"
 msgstr "Tape pour changer de forme · glisse pour l'aligner"
@@ -938,9 +1066,37 @@ msgstr "Tape pour changer de forme · glisse pour l'aligner"
 msgid "trias.won.timeattack"
 msgstr "Objectif explosé !"
 
+#: app/components/PairingPanel.tsx:390
+msgid "net.err.invite"
+msgstr "Ce n'est pas une invitation valide pour ce jeu."
+
+#: app/components/PairingPanel.tsx:393
+msgid "net.err.reply"
+msgstr "Ce n'est pas une réponse valide."
+
+#: app/routes/duel.tsx:367
+msgid "net.lost"
+msgstr "L'autre téléphone s'est déconnecté."
+
 #: app/routes/rps.tsx:994
 msgid "rps.prologue.title"
 msgstr "Le Royaume de RPS"
+
+#: app/routes/duel.tsx:326
+msgid "duel.them"
+msgstr "L'autre"
+
+#: app/routes/duel.tsx:312
+msgid "duel.theyjumped"
+msgstr "L'autre a brûlé le départ"
+
+#: app/routes/duel.tsx:334
+msgid "duel.matchlost"
+msgstr "L'autre gagne le match."
+
+#: app/components/PairingPanel.tsx:250
+msgid "net.unsupported"
+msgstr "Ce navigateur ne peut pas établir de lien entre deux appareils."
 
 #: app/routes/threader.tsx:863
 msgid "threader.legend.bead"
@@ -958,6 +1114,15 @@ msgstr "Temps"
 #: app/routes/trias.tsx:340
 msgid "trias.mode.timeattack"
 msgstr "Contre-la-montre"
+
+#: app/routes/duel.tsx:314
+#: app/routes/duel.tsx:463
+msgid "duel.youjumped"
+msgstr "Trop tôt !"
+
+#: app/components/PairingPanel.tsx:134
+msgid "net.qr.toobig"
+msgstr "Trop long pour un QR code — utilisez le texte ci-dessous."
 
 #: app/routes/home.tsx:26
 msgid "home.title"
@@ -983,6 +1148,10 @@ msgstr "Au tour de"
 msgid "ultimate.title"
 msgstr "Morpion Ultime"
 
+#: app/components/PairingPanel.tsx:366
+msgid "net.use"
+msgstr "Utiliser"
+
 #: app/routes/rps.tsx:975
 msgid "rps.victory.title"
 msgstr "Victoire !"
@@ -991,13 +1160,38 @@ msgstr "Victoire !"
 msgid "ultimate.mode.ai"
 msgstr "vs Ordi"
 
+#: app/routes/duel.tsx:212
+msgid "duel.tagline"
+msgstr "Attendez le vert. Le pouce le plus rapide remporte la manche."
+
+#: app/routes/duel.tsx:291
+#: app/routes/duel.tsx:451
+msgid "duel.wait"
+msgstr "Attendez le vert…"
+
+#: app/components/PairingPanel.tsx:374
+msgid "net.waiting"
+msgstr "En attente de l'autre téléphone…"
+
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "gagne !"
 
+#: app/routes/duel.tsx:323
+msgid "duel.you"
+msgstr "Vous"
+
+#: app/routes/duel.tsx:262
+msgid "duel.youare"
+msgstr "Vous êtes"
+
 #: app/routes/rps.tsx:1212
 msgid "rps.rpg.defeated"
 msgstr "Tu as été vaincu"
+
+#: app/routes/duel.tsx:332
+msgid "duel.matchwon"
+msgstr "Vous gagnez le match !"
 
 #: app/routes/rps.tsx:1143
 msgid "rps.round.win"
