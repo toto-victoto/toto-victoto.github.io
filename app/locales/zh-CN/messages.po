@@ -677,12 +677,12 @@ msgstr "先达到"
 msgid "flappy.title"
 msgstr "飞翔的小鸟"
 
-#: app/routes/threader.tsx:885
-msgid "threader.gameover"
-msgstr "游戏结束"
-
 #: app/routes/snake.tsx:290
 msgid "snake.gameover"
+msgstr "游戏结束"
+
+#: app/routes/threader.tsx:885
+msgid "threader.gameover"
 msgstr "游戏结束"
 
 #: app/routes/flappy.tsx:266
@@ -774,6 +774,11 @@ msgstr "升级！"
 msgid "slots.host.line1"
 msgstr "把图案排成一行就能赢得奖励！"
 
+#: app/routes/pong.tsx:304
+#: app/routes/pong.tsx:339
+msgid "pong.longest"
+msgstr "最长回合"
+
 #: app/routes/trias.tsx:339
 msgid "trias.mode.marathon"
 msgstr "马拉松"
@@ -811,6 +816,10 @@ msgstr "就是现在"
 msgid "roulette.odd"
 msgstr "单"
 
+#: app/routes/pong.tsx:285
+msgid "pong.tagline"
+msgstr "一人一块球拍，一颗球在两台手机之间。"
+
 #: app/routes/roulette.tsx:670
 msgid "roulette.broke"
 msgstr "筹码用尽"
@@ -841,6 +850,7 @@ msgstr "开始"
 
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
+#: app/routes/pong.tsx:429
 #: app/routes/roulette.tsx:676
 #: app/routes/slots.tsx:618
 #: app/routes/snake.tsx:296
@@ -854,9 +864,17 @@ msgstr "再玩一次"
 msgid "net.intro"
 msgstr "和朋友用各自的手机对战。一人发起邀请，另一人扫码。"
 
+#: app/routes/pong.tsx:300
+msgid "pong.solo"
+msgstr "与电脑对战"
+
 #: app/routes/cross.tsx:691
 msgid "cross.legend.star"
 msgstr "得分"
+
+#: app/routes/pong.tsx:282
+msgid "pong.title"
+msgstr "乒乓"
 
 #: app/routes/duel.tsx:425
 msgid "duel.practice.title"
@@ -877,6 +895,10 @@ msgstr "拉动拉杆"
 #: app/routes/rps.tsx:1096
 msgid "rps.rip"
 msgstr "安息 {name}"
+
+#: app/routes/pong.tsx:335
+msgid "pong.rally"
+msgstr "回合"
 
 #: app/routes/trias.tsx:357
 msgid "trias.goal.timeattack"
@@ -961,6 +983,14 @@ msgstr "得分"
 #: app/routes/snake.tsx:230
 msgid "snake.score"
 msgstr "分数"
+
+#: app/routes/pong.tsx:431
+msgid "pong.serve"
+msgstr "发球"
+
+#: app/routes/pong.tsx:417
+msgid "pong.hint"
+msgstr "沿着底部滑动拇指来移动。"
 
 #: app/routes/cross.tsx:693
 msgid "cross.legend.slow"
@@ -1075,6 +1105,7 @@ msgid "net.err.reply"
 msgstr "这不是有效的回复。"
 
 #: app/routes/duel.tsx:367
+#: app/routes/pong.tsx:446
 msgid "net.lost"
 msgstr "另一台手机已断开。"
 
@@ -1093,6 +1124,10 @@ msgstr "对方抢跑了"
 #: app/routes/duel.tsx:334
 msgid "duel.matchlost"
 msgstr "对方赢得了比赛。"
+
+#: app/routes/pong.tsx:412
+msgid "pong.lost"
+msgstr "对方赢了。"
 
 #: app/components/PairingPanel.tsx:250
 msgid "net.unsupported"
@@ -1173,6 +1208,10 @@ msgstr "等待变绿……"
 msgid "net.waiting"
 msgstr "正在等待另一台手机……"
 
+#: app/routes/pong.tsx:436
+msgid "pong.waitserve"
+msgstr "正在等待发球……"
+
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "获胜!"
@@ -1196,6 +1235,10 @@ msgstr "你赢得了比赛！"
 #: app/routes/rps.tsx:1143
 msgid "rps.round.win"
 msgstr "你赢下这一回合！"
+
+#: app/routes/pong.tsx:410
+msgid "pong.won"
+msgstr "你赢了！"
 
 #: app/routes/rps.tsx:1445
 msgid "rps.banner.faster_you"

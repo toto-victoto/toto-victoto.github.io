@@ -45,6 +45,8 @@ export type Persisted = {
   cross: { best: number };
   // Reflex Duel keeps only a personal best reaction, in ms (lower is better).
   duel: { best: number };
+  // Pong keeps the longest rally, counted in paddle hits.
+  pong: { best: number };
   rps: {
     bestLevel: number;
     // Best "infinite" run, measured as levels reached past the roster.
@@ -80,6 +82,7 @@ const GAME_KEYS = [
   "threader",
   "cross",
   "duel",
+  "pong",
   "rps",
   "roulette",
   "slots",

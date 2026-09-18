@@ -13,4 +13,5 @@ export default [
   route("threader", "routes/threader.tsx"),
   route("cross", "routes/cross.tsx"),
   route("duel", "routes/duel.tsx"),
+  route("pong", "routes/pong.tsx"),
 ] satisfies RouteConfig;

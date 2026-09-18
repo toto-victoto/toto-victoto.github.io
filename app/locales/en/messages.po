@@ -677,12 +677,12 @@ msgstr "First to"
 msgid "flappy.title"
 msgstr "Flappy"
 
-#: app/routes/threader.tsx:885
-msgid "threader.gameover"
-msgstr "Game over"
-
 #: app/routes/snake.tsx:290
 msgid "snake.gameover"
+msgstr "Game over"
+
+#: app/routes/threader.tsx:885
+msgid "threader.gameover"
 msgstr "Game over"
 
 #: app/routes/flappy.tsx:266
@@ -774,6 +774,11 @@ msgstr "Level up!"
 msgid "slots.host.line1"
 msgstr "Line up the pictures and get a prize!"
 
+#: app/routes/pong.tsx:304
+#: app/routes/pong.tsx:339
+msgid "pong.longest"
+msgstr "Longest rally"
+
 #: app/routes/trias.tsx:339
 msgid "trias.mode.marathon"
 msgstr "Marathon"
@@ -811,6 +816,10 @@ msgstr "NOW"
 msgid "roulette.odd"
 msgstr "Odd"
 
+#: app/routes/pong.tsx:285
+msgid "pong.tagline"
+msgstr "One paddle each, one ball between two phones."
+
 #: app/routes/roulette.tsx:670
 msgid "roulette.broke"
 msgstr "Out of chips"
@@ -841,6 +850,7 @@ msgstr "Play"
 
 #: app/routes/cross.tsx:717
 #: app/routes/flappy.tsx:276
+#: app/routes/pong.tsx:429
 #: app/routes/roulette.tsx:676
 #: app/routes/slots.tsx:618
 #: app/routes/snake.tsx:296
@@ -854,9 +864,17 @@ msgstr "Play again"
 msgid "net.intro"
 msgstr "Play against a friend on their own phone. One of you invites, the other scans."
 
+#: app/routes/pong.tsx:300
+msgid "pong.solo"
+msgstr "Play the computer"
+
 #: app/routes/cross.tsx:691
 msgid "cross.legend.star"
 msgstr "points"
+
+#: app/routes/pong.tsx:282
+msgid "pong.title"
+msgstr "Pong"
 
 #: app/routes/duel.tsx:425
 msgid "duel.practice.title"
@@ -877,6 +895,10 @@ msgstr "Pull the lever"
 #: app/routes/rps.tsx:1096
 msgid "rps.rip"
 msgstr "R.I.P. {name}"
+
+#: app/routes/pong.tsx:335
+msgid "pong.rally"
+msgstr "Rally"
 
 #: app/routes/trias.tsx:357
 msgid "trias.goal.timeattack"
@@ -961,6 +983,14 @@ msgstr "Score"
 #: app/routes/snake.tsx:230
 msgid "snake.score"
 msgstr "Score"
+
+#: app/routes/pong.tsx:431
+msgid "pong.serve"
+msgstr "Serve"
+
+#: app/routes/pong.tsx:417
+msgid "pong.hint"
+msgstr "Slide your thumb along the bottom to move."
 
 #: app/routes/cross.tsx:693
 msgid "cross.legend.slow"
@@ -1075,6 +1105,7 @@ msgid "net.err.reply"
 msgstr "That isn't a valid reply."
 
 #: app/routes/duel.tsx:367
+#: app/routes/pong.tsx:446
 msgid "net.lost"
 msgstr "The other phone dropped out."
 
@@ -1093,6 +1124,10 @@ msgstr "They jumped the gun"
 #: app/routes/duel.tsx:334
 msgid "duel.matchlost"
 msgstr "They win the match."
+
+#: app/routes/pong.tsx:412
+msgid "pong.lost"
+msgstr "They win."
 
 #: app/components/PairingPanel.tsx:250
 msgid "net.unsupported"
@@ -1173,6 +1208,10 @@ msgstr "Wait for green…"
 msgid "net.waiting"
 msgstr "Waiting for the other phone…"
 
+#: app/routes/pong.tsx:436
+msgid "pong.waitserve"
+msgstr "Waiting for the serve…"
+
 #: app/routes/ultimate.tsx:465
 msgid "ultimate.wins"
 msgstr "wins!"
@@ -1196,6 +1235,10 @@ msgstr "You win the match!"
 #: app/routes/rps.tsx:1143
 msgid "rps.round.win"
 msgstr "You win the round!"
+
+#: app/routes/pong.tsx:410
+msgid "pong.won"
+msgstr "You win!"
 
 #: app/routes/rps.tsx:1445
 msgid "rps.banner.faster_you"

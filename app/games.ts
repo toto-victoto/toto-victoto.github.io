@@ -47,6 +47,13 @@ export const GAMES: GameMeta[] = [
     icon: "⚡",
   },
   {
+    slug: "pong",
+    titleId: "pong.title",
+    title: "Pong",
+    tone: "bg-gradient-to-br from-neutral-300 to-neutral-600",
+    icon: "🏓",
+  },
+  {
     slug: "roulette",
     titleId: "roulette.title",
     title: "Roulette",

@@ -224,8 +224,17 @@ Two rules worth keeping:
 - **Never compare clocks across the link, only durations.** Reflex Duel has
   each device time its own green-to-tap and report the number; lag changes
   when each screen turns green, not how fast someone reacts to it.
-- Anything that schedules (timers, the random delay) belongs behind
-  `isHost`, or both devices will race.
+- Anything that schedules (timers, the random delay, the rAF loop) belongs
+  behind `isHost`, or both devices will race.
+
+Turn-based games dispatch on input alone (`duel.tsx`). A continuous one
+drives the simulation the same way: the host's rAF loop dispatches a
+`{ type: "tick", dt }` every frame and the physics lives in the reducer, so
+every change still goes through one pure function and there is no second
+writer to race with (`pong.tsx`). Keep the playfield's coordinates
+normalised 0–100 per axis rather than fixing an aspect ratio — two phones
+with different screens then agree on every position for free, and only
+round things have to undo the stretch.
 
 ## Conventions
 
