@@ -27,6 +27,18 @@ npm run i18n:extract / i18n:compile   # Lingui catalog tooling
 Deploy is automatic: pushing to `main` triggers the GitHub Actions workflow that
 builds and publishes to GitHub Pages.
 
+**Checking a build locally — don't use `vite preview`.** Each route is
+prerendered to its own file (`build/client/cross/index.html`), but `vite
+preview` is an SPA server: it rewrites `/cross` to the root `index.html`, so
+every game route is served the *home page's* markup and then hydrates into the
+game. That looks exactly like a hydration bug (React error #418 on every game
+route, home clean) and isn't one. Serve it the way Pages does instead, so
+`/cross/` resolves to `/cross/index.html`:
+
+```bash
+cd build/client && python3 -m http.server 4180
+```
+
 ## Repo identity (git author)
 
 This repo uses a dedicated git identity that differs from the global one.
