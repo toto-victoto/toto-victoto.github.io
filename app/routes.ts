@@ -14,4 +14,5 @@ export default [
   route("cross", "routes/cross.tsx"),
   route("duel", "routes/duel.tsx"),
   route("pong", "routes/pong.tsx"),
+  route("piano", "routes/piano.tsx"),
 ] satisfies RouteConfig;

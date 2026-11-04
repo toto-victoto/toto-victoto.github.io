@@ -96,6 +96,50 @@ export function tone(freq: number, dur: number, opts: ToneOpts = {}): void {
   osc.stop(t + dur);
 }
 
+// A struck-string voice. A piano is not one frequency: it is a stack of
+// harmonics where the high ones die away first, and that uneven decay is most
+// of what makes a note sound struck rather than blown. Six partials is enough
+// to read as a piano and cheap enough to fire on every tap.
+const PARTIALS: [number, number][] = [
+  // harmonic, share of the gain
+  [1, 1],
+  [2, 0.45],
+  [3, 0.22],
+  [4, 0.12],
+  [5, 0.06],
+  [6, 0.03],
+];
+
+export function piano(
+  freq: number,
+  dur = 1.8,
+  opts: { gain?: number; delay?: number } = {},
+): void {
+  if (muted) return;
+  const c = getCtx();
+  if (!c) return;
+  const { gain = 0.2, delay = 0 } = opts;
+  const t = c.currentTime + delay;
+  for (const [n, share] of PARTIALS) {
+    const f = freq * n;
+    if (f > 16000) continue; // past hearing — don't spend a node on it
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(f, t);
+    const life = dur / (1 + (n - 1) * 0.55);
+    // Ramp up over a few ms rather than starting at full gain: an instant
+    // start is a step change, and a step change is an audible click.
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain * share, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + life);
+    osc.connect(g);
+    g.connect(c.destination);
+    osc.start(t);
+    osc.stop(t + life);
+  }
+}
+
 // A shared vocabulary of effects, reused across games.
 export const sfx = {
   ui: () => tone(480, 0.05, { type: "square", gain: 0.05 }),

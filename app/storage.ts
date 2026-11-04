@@ -47,6 +47,8 @@ export type Persisted = {
   duel: { best: number };
   // Pong keeps the longest rally, counted in paddle hits.
   pong: { best: number };
+  // Absolute Piano keeps the longest run of correct notes.
+  piano: { best: number };
   rps: {
     bestLevel: number;
     // Best "infinite" run, measured as levels reached past the roster.
@@ -83,6 +85,7 @@ const GAME_KEYS = [
   "cross",
   "duel",
   "pong",
+  "piano",
   "rps",
   "roulette",
   "slots",

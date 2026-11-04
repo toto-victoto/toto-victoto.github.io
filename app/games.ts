@@ -54,6 +54,13 @@ export const GAMES: GameMeta[] = [
     icon: "🏓",
   },
   {
+    slug: "piano",
+    titleId: "piano.title",
+    title: "Absolute Piano",
+    tone: "bg-gradient-to-br from-slate-100 to-indigo-900",
+    icon: "🎹",
+  },
+  {
     slug: "roulette",
     titleId: "roulette.title",
     title: "Roulette",
