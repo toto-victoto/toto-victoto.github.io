@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Trans } from "@lingui/react";
+import { Trans, useLingui } from "@lingui/react";
 import type { Route } from "./+types/piano";
 import { BackButton } from "../components/BackButton";
 import { GameLayout } from "../components/GameLayout";
@@ -19,21 +19,13 @@ import { piano, sfx } from "../sound";
 // when you touch it. If it did you could hunt for the answer by comparing
 // tones, which is relative pitch, which is the thing this game isn't.
 
-// Semitones above C, and the name each one wears.
-const NAMES = [
-  "C",
-  "C♯",
-  "D",
-  "D♯",
-  "E",
-  "F",
-  "F♯",
-  "G",
-  "G♯",
-  "A",
-  "A♯",
-  "B",
-] as const;
+// Semitones above C. The NAMES are not universal — France says Do Ré Mi where
+// English says C D E — so they live in the catalogs, as one entry holding the
+// seven naturals in order. Every black key is a semitone above a white one, so
+// the five sharps are built from that same list and need no entry of their own.
+const SEMITONES = 12;
+const SHARP = "♯";
+const ALL = Array.from({ length: SEMITONES }, (_, i) => i);
 
 // The octave the whole game lives in. C4 is middle C = MIDI 60.
 const OCTAVE = 4;
@@ -70,6 +62,7 @@ export function meta({}: Route.MetaArgs) {
 type Phase = "idle" | "asking" | "revealed";
 
 export default function Piano() {
+  const { i18n } = useLingui();
   const [phase, setPhase] = useState<Phase>("idle");
   const [target, setTarget] = useState<number | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
@@ -77,7 +70,17 @@ export default function Piano() {
   const [hard, setHard] = useState(false); // all twelve, vs the white keys only
   const [{ best }, setBest] = useStoredGame("piano", { best: 0 });
 
-  const pool = hard ? NAMES.map((_, i) => i) : WHITE;
+  // Seven naturals in keyboard order, in whatever the reader calls them.
+  const naturals = i18n
+    ._({ id: "piano.notes", message: "C D E F G A B" })
+    .split(/\s+/);
+  const nameOf = (semitone: number): string => {
+    const white = WHITE.indexOf(semitone);
+    if (white >= 0) return naturals[white];
+    return naturals[WHITE.indexOf(semitone - 1)] + SHARP;
+  };
+
+  const pool = hard ? ALL : WHITE;
 
   // Pick a note that isn't the one just asked — a repeat reads as a bug even
   // when it's honest chance.
@@ -187,12 +190,12 @@ export default function Piano() {
             {phase === "revealed" && target !== null ? (
               right ? (
                 <span className="text-emerald-400">
-                  <Trans id="piano.right" message="Yes —" /> {NAMES[target]}
+                  <Trans id="piano.right" message="Yes —" /> {nameOf(target)}
                   {OCTAVE}
                 </span>
               ) : (
                 <span className="text-rose-300">
-                  <Trans id="piano.wrong" message="It was" /> {NAMES[target]}
+                  <Trans id="piano.wrong" message="It was" /> {nameOf(target)}
                   {OCTAVE}
                 </span>
               )
@@ -231,7 +234,7 @@ export default function Piano() {
                           : "bg-neutral-100 text-neutral-500 active:bg-neutral-300"
                     }`}
                   >
-                    {NAMES[semitone]}
+                    {nameOf(semitone)}
                   </button>
                 );
               })}
@@ -260,7 +263,7 @@ export default function Piano() {
                           : "bg-neutral-900 text-neutral-400 active:bg-neutral-700"
                   }`}
                 >
-                  {NAMES[semitone]}
+                  {nameOf(semitone)}
                 </button>
               );
             })}
