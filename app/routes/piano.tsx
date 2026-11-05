@@ -94,27 +94,33 @@ export default function Piano() {
   };
 
   // Every note in play: each allowed pitch class, in each octave of the span.
-  const classes = hard ? ALL : WHITE;
-  const pool = SPANS[span - 1].flatMap((octave) =>
-    classes.map((semitone) => midiOf(octave, semitone)),
-  );
+  // Taken as arguments rather than read from state, because the settings
+  // handler needs a pool built from values React has not committed yet.
+  const poolFor = (twelve: boolean, octaves: number) =>
+    SPANS[octaves - 1].flatMap((octave) =>
+      (twelve ? ALL : WHITE).map((semitone) => midiOf(octave, semitone)),
+    );
 
   // Avoid the pitch class just asked, not the exact note — the same key twice
   // in a row reads as a bug even an octave apart, and even when it's honest
   // chance.
-  const ask = useCallback(
-    (avoid: number | null) => {
-      const choices = pool.filter((m) => semitoneOf(m) !== avoid);
-      const from = choices.length > 0 ? choices : pool;
+  const askFrom = useCallback(
+    (twelve: boolean, octaves: number, avoid: number | null) => {
+      const all = poolFor(twelve, octaves);
+      const choices = all.filter((m) => semitoneOf(m) !== avoid);
+      const from = choices.length > 0 ? choices : all;
       const next = from[Math.floor(Math.random() * from.length)];
       setTarget(next);
       setPicked(null);
       setPhase("asking");
       piano(freqOf(next));
     },
-    // `pool` is rebuilt every render; its contents only change with these two.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hard, span],
+    [],
+  );
+
+  const ask = useCallback(
+    (avoid: number | null) => askFrom(hard, span, avoid),
+    [askFrom, hard, span],
   );
 
   const answer = (semitone: number) => {
@@ -150,16 +156,32 @@ export default function Piano() {
     return () => window.clearTimeout(t);
   }, [right, ask]);
 
-  // Changing difficulty mid-question would leave an unanswerable note hanging.
-  // Widening the range doesn't: the answer is a pitch class either way, so the
-  // slider can move whenever it likes.
-  const setDifficulty = (next: boolean) => {
-    if (next === hard) return;
-    setHard(next);
-    setPhase("idle");
-    setTarget(null);
-    setPicked(null);
+  // One rule for all three settings, because all three change how hard a
+  // correct answer is — names make the keyboard a lookup table, the slider
+  // widens the range, the pills add the black keys. A streak earned under the
+  // old settings is not a claim about the new ones, so changing any of them
+  // ends the run.
+  //
+  // It does NOT send you back to the start screen though: if a note was in
+  // flight it is replaced by a fresh one from the new pool straight away, so
+  // the only thing a change costs you is the number. That also means a target
+  // can never outlive the settings that made it legal — the stale case was a
+  // black key left unanswerable by switching to white-only, and a note from an
+  // octave the slider had just excluded.
+  const retune = (next: {
+    hard?: boolean;
+    span?: number;
+    showNames?: boolean;
+  }) => {
+    const twelve = next.hard ?? hard;
+    const octaves = next.span ?? span;
+    const names = next.showNames ?? showNames;
+    if (twelve === hard && octaves === span && names === showNames) return;
+    setHard(twelve);
+    setSpan(octaves);
+    setShowNames(names);
     setStreak(0);
+    if (phase !== "idle") askFrom(twelve, octaves, null);
   };
 
   const keyState = (semitone: number): "right" | "wrong" | null => {
@@ -326,7 +348,7 @@ export default function Piano() {
           <div className="flex items-center gap-2">
             <div className="flex rounded-full bg-neutral-900 p-1 text-sm">
               <button
-                onClick={() => setDifficulty(false)}
+                onClick={() => retune({ hard: false })}
                 className={`rounded-full px-4 py-1.5 font-medium transition-colors ${
                   hard ? "text-neutral-400" : "bg-neutral-700 text-neutral-100"
                 }`}
@@ -334,7 +356,7 @@ export default function Piano() {
                 <Trans id="piano.white" message="White keys" />
               </button>
               <button
-                onClick={() => setDifficulty(true)}
+                onClick={() => retune({ hard: true })}
                 className={`rounded-full px-4 py-1.5 font-medium transition-colors ${
                   hard ? "bg-neutral-700 text-neutral-100" : "text-neutral-400"
                 }`}
@@ -344,7 +366,7 @@ export default function Piano() {
             </div>
 
             <button
-              onClick={() => setShowNames((s) => !s)}
+              onClick={() => retune({ showNames: !showNames })}
               aria-pressed={showNames}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 showNames
@@ -364,7 +386,7 @@ export default function Piano() {
               max={SPANS.length}
               step={1}
               value={span}
-              onChange={(e) => setSpan(Number(e.target.value))}
+              onChange={(e) => retune({ span: Number(e.target.value) })}
               aria-label={i18n._({ id: "piano.octaves", message: "Octaves" })}
               className="h-1 w-32 accent-indigo-500"
             />
