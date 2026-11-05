@@ -509,11 +509,11 @@ msgstr "关于"
 msgid "about.title"
 msgstr "关于"
 
-#: app/routes/piano.tsx:181
+#: app/routes/piano.tsx:219
 msgid "piano.title"
 msgstr "绝对音感钢琴"
 
-#: app/routes/piano.tsx:342
+#: app/routes/piano.tsx:391
 msgid "piano.all"
 msgstr "全部十二个"
 
@@ -525,7 +525,7 @@ msgstr "全押"
 msgid "rps.splash.tagline"
 msgstr "石头剪刀布 RPG"
 
-#: app/routes/piano.tsx:255
+#: app/routes/piano.tsx:304
 msgid "piano.hint.wide"
 msgstr "哪个八度都行——重要的是音名。"
 
@@ -540,7 +540,7 @@ msgstr "余额"
 #: app/routes/cross.tsx:522
 #: app/routes/cross.tsx:705
 #: app/routes/flappy.tsx:269
-#: app/routes/piano.tsx:189
+#: app/routes/piano.tsx:227
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
 #: app/routes/slots.tsx:441
@@ -686,7 +686,7 @@ msgstr "额外生命"
 msgid "rps.rpg.fight"
 msgstr "战斗！"
 
-#: app/routes/piano.tsx:245
+#: app/routes/piano.tsx:294
 msgid "piano.find"
 msgstr "在键盘上找到它"
 
@@ -726,7 +726,7 @@ msgstr "已记录"
 msgid "rps.banner.healed"
 msgstr "回复 {amount}"
 
-#: app/routes/piano.tsx:213
+#: app/routes/piano.tsx:251
 msgid "piano.again"
 msgstr "再听一次"
 
@@ -763,7 +763,7 @@ msgstr "无限"
 msgid "net.invite"
 msgstr "邀请"
 
-#: app/routes/piano.tsx:238
+#: app/routes/piano.tsx:277
 msgid "piano.wrong"
 msgstr "答案是"
 
@@ -820,7 +820,7 @@ msgstr "马拉松完成！"
 msgid "trias.modes"
 msgstr "模式"
 
-#: app/routes/piano.tsx:355
+#: app/routes/piano.tsx:404
 msgid "piano.shownames"
 msgstr "音名"
 
@@ -828,7 +828,7 @@ msgstr "音名"
 msgid "trias.next"
 msgstr "下一个"
 
-#: app/routes/piano.tsx:223
+#: app/routes/piano.tsx:261
 msgid "piano.next"
 msgstr "下一个音"
 
@@ -849,8 +849,8 @@ msgstr "买定离手，停止下注"
 msgid "duel.now"
 msgstr "就是现在"
 
-#: app/routes/piano.tsx:360
-#: app/routes/piano.tsx:368
+#: app/routes/piano.tsx:409
+#: app/routes/piano.tsx:417
 msgid "piano.octaves"
 msgstr "八度"
 
@@ -858,7 +858,7 @@ msgstr "八度"
 msgid "roulette.odd"
 msgstr "单"
 
-#: app/routes/piano.tsx:250
+#: app/routes/piano.tsx:299
 msgid "piano.hint"
 msgstr "一个八度。是十二个音中的哪一个？"
 
@@ -894,7 +894,7 @@ msgstr "请下注"
 msgid "cross.play"
 msgstr "开始"
 
-#: app/routes/piano.tsx:205
+#: app/routes/piano.tsx:243
 msgid "piano.start"
 msgstr "播放一个音"
 
@@ -1025,14 +1025,14 @@ msgstr "扫描对方的邀请"
 msgid "net.scan.reply"
 msgstr "扫描对方的回复"
 
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "分数"
+
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
 msgid "trias.score"
 msgstr "得分"
-
-#: app/routes/snake.tsx:230
-msgid "snake.score"
-msgstr "分数"
 
 #: app/routes/pong.tsx:431
 msgid "pong.serve"
@@ -1106,7 +1106,7 @@ msgstr "停"
 msgid "net.scan.stop"
 msgstr "关闭摄像头"
 
-#: app/routes/piano.tsx:184
+#: app/routes/piano.tsx:222
 msgid "piano.streak"
 msgstr "连对"
 
@@ -1229,6 +1229,10 @@ msgstr "三行"
 msgid "rps.rpg.tryagain"
 msgstr "再试一次"
 
+#: app/routes/piano.tsx:285
+msgid "piano.explore"
+msgstr "可以试按琴键"
+
 #: app/routes/ultimate.tsx:473
 msgid "ultimate.turn"
 msgstr "轮到"
@@ -1266,7 +1270,7 @@ msgstr "正在等待另一台手机……"
 msgid "pong.waitserve"
 msgstr "正在等待发球……"
 
-#: app/routes/piano.tsx:334
+#: app/routes/piano.tsx:383
 msgid "piano.white"
 msgstr "白键"
 
@@ -1274,7 +1278,7 @@ msgstr "白键"
 msgid "ultimate.wins"
 msgstr "获胜!"
 
-#: app/routes/piano.tsx:232
+#: app/routes/piano.tsx:270
 msgid "piano.right"
 msgstr "答对了 —"
 

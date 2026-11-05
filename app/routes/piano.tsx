@@ -191,8 +191,24 @@ export default function Piano() {
     return null;
   };
 
-  const playable = phase === "asking";
-  const dim = (semitone: number) => !hard && !WHITE.includes(semitone);
+  // A miss opens the keyboard up: every key sounds, in the octave the note you
+  // missed came from, until you ask for the next one. That is the one moment
+  // where letting keys sing can't be cheated — the answer is already on screen
+  // — and it is the moment it teaches most, because you can walk around the
+  // note you got wrong and hear what it actually sits between.
+  const exploring = phase === "revealed" && !right;
+  const answering = phase === "asking";
+  const exploreOctave = target === null ? SPANS[0][0] : octaveOf(target);
+
+  const touch = (semitone: number) => {
+    if (answering) return answer(semitone);
+    if (exploring) piano(freqOf(midiOf(exploreOctave, semitone)));
+  };
+
+  // Black keys are greyed out in white-keys mode — but not while exploring:
+  // free means free, and hearing the semitone either side is the point.
+  const dim = (semitone: number) =>
+    !exploring && !hard && !WHITE.includes(semitone);
 
   return (
     <>
@@ -256,11 +272,22 @@ export default function Piano() {
                   {octaveOf(target)}
                 </span>
               ) : (
-                <span className="text-rose-300">
-                  <Trans id="piano.wrong" message="It was" />{" "}
-                  {nameOf(semitoneOf(target))}
-                  {octaveOf(target)}
-                </span>
+                <>
+                  <span className="text-rose-300">
+                    <Trans id="piano.wrong" message="It was" />{" "}
+                    {nameOf(semitoneOf(target))}
+                    {octaveOf(target)}
+                  </span>
+                  {/* On the same line, so opening free mode doesn't resize
+                      the keyboard underneath. */}
+                  <span className="text-neutral-500">
+                    {" · "}
+                    <Trans
+                      id="piano.explore"
+                      message="try any key"
+                    />
+                  </span>
+                </>
               )
             ) : phase === "asking" ? (
               <span className="text-neutral-400">
@@ -294,8 +321,8 @@ export default function Piano() {
                 return (
                   <button
                     key={semitone}
-                    onPointerDown={() => answer(semitone)}
-                    disabled={!playable}
+                    onPointerDown={() => touch(semitone)}
+                    disabled={!answering && !exploring}
                     aria-label={nameOf(semitone)}
                     className={`relative flex flex-1 items-end justify-center rounded-b-lg pb-2 text-sm font-semibold transition-colors ${
                       state === "right"
@@ -316,8 +343,8 @@ export default function Piano() {
               return (
                 <button
                   key={semitone}
-                  onPointerDown={() => answer(semitone)}
-                  disabled={!playable || dim(semitone)}
+                  onPointerDown={() => touch(semitone)}
+                  disabled={(!answering && !exploring) || dim(semitone)}
                   aria-label={nameOf(semitone)}
                   style={{
                     left: `${(seam / WHITE.length) * 100}%`,

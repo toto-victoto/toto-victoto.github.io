@@ -509,11 +509,11 @@ msgstr "À propos"
 msgid "about.title"
 msgstr "À propos"
 
-#: app/routes/piano.tsx:181
+#: app/routes/piano.tsx:219
 msgid "piano.title"
 msgstr "Piano Absolu"
 
-#: app/routes/piano.tsx:342
+#: app/routes/piano.tsx:391
 msgid "piano.all"
 msgstr "Les douze"
 
@@ -525,7 +525,7 @@ msgstr "Tapis"
 msgid "rps.splash.tagline"
 msgstr "Un RPG au pierre-feuille-ciseaux"
 
-#: app/routes/piano.tsx:255
+#: app/routes/piano.tsx:304
 msgid "piano.hint.wide"
 msgstr "Peu importe l'octave — c'est la note qui compte."
 
@@ -540,7 +540,7 @@ msgstr "Solde"
 #: app/routes/cross.tsx:522
 #: app/routes/cross.tsx:705
 #: app/routes/flappy.tsx:269
-#: app/routes/piano.tsx:189
+#: app/routes/piano.tsx:227
 #: app/routes/roulette.tsx:473
 #: app/routes/rps.tsx:1219
 #: app/routes/slots.tsx:441
@@ -686,7 +686,7 @@ msgstr "vie en plus"
 msgid "rps.rpg.fight"
 msgstr "Combattre !"
 
-#: app/routes/piano.tsx:245
+#: app/routes/piano.tsx:294
 msgid "piano.find"
 msgstr "Trouvez-la sur le clavier"
 
@@ -726,7 +726,7 @@ msgstr "C'est parti"
 msgid "rps.banner.healed"
 msgstr "Soin +{amount}"
 
-#: app/routes/piano.tsx:213
+#: app/routes/piano.tsx:251
 msgid "piano.again"
 msgstr "Réécouter"
 
@@ -763,7 +763,7 @@ msgstr "Infini"
 msgid "net.invite"
 msgstr "Inviter"
 
-#: app/routes/piano.tsx:238
+#: app/routes/piano.tsx:277
 msgid "piano.wrong"
 msgstr "C'était"
 
@@ -820,7 +820,7 @@ msgstr "Marathon terminé !"
 msgid "trias.modes"
 msgstr "Modes"
 
-#: app/routes/piano.tsx:355
+#: app/routes/piano.tsx:404
 msgid "piano.shownames"
 msgstr "Noms"
 
@@ -828,7 +828,7 @@ msgstr "Noms"
 msgid "trias.next"
 msgstr "Suite"
 
-#: app/routes/piano.tsx:223
+#: app/routes/piano.tsx:261
 msgid "piano.next"
 msgstr "Note suivante"
 
@@ -849,8 +849,8 @@ msgstr "Les jeux sont faits, rien ne va plus"
 msgid "duel.now"
 msgstr "MAINTENANT"
 
-#: app/routes/piano.tsx:360
-#: app/routes/piano.tsx:368
+#: app/routes/piano.tsx:409
+#: app/routes/piano.tsx:417
 msgid "piano.octaves"
 msgstr "Octaves"
 
@@ -858,7 +858,7 @@ msgstr "Octaves"
 msgid "roulette.odd"
 msgstr "Impair"
 
-#: app/routes/piano.tsx:250
+#: app/routes/piano.tsx:299
 msgid "piano.hint"
 msgstr "Une octave. Laquelle des douze est-ce ?"
 
@@ -894,7 +894,7 @@ msgstr "Faites vos jeux"
 msgid "cross.play"
 msgstr "Jouer"
 
-#: app/routes/piano.tsx:205
+#: app/routes/piano.tsx:243
 msgid "piano.start"
 msgstr "Jouer une note"
 
@@ -1025,13 +1025,13 @@ msgstr "Scanner son invitation"
 msgid "net.scan.reply"
 msgstr "Scanner sa réponse"
 
+#: app/routes/snake.tsx:230
+msgid "snake.score"
+msgstr "Score"
+
 #: app/routes/trias.tsx:907
 #: app/routes/trias.tsx:1085
 msgid "trias.score"
-msgstr "Score"
-
-#: app/routes/snake.tsx:230
-msgid "snake.score"
 msgstr "Score"
 
 #: app/routes/pong.tsx:431
@@ -1106,7 +1106,7 @@ msgstr "Arrêter"
 msgid "net.scan.stop"
 msgstr "Arrêter la caméra"
 
-#: app/routes/piano.tsx:184
+#: app/routes/piano.tsx:222
 msgid "piano.streak"
 msgstr "Série"
 
@@ -1229,6 +1229,10 @@ msgstr "Triplé"
 msgid "rps.rpg.tryagain"
 msgstr "Réessayer"
 
+#: app/routes/piano.tsx:285
+msgid "piano.explore"
+msgstr "essayez les touches"
+
 #: app/routes/ultimate.tsx:473
 msgid "ultimate.turn"
 msgstr "Au tour de"
@@ -1266,7 +1270,7 @@ msgstr "En attente de l'autre téléphone…"
 msgid "pong.waitserve"
 msgstr "En attente du service…"
 
-#: app/routes/piano.tsx:334
+#: app/routes/piano.tsx:383
 msgid "piano.white"
 msgstr "Touches blanches"
 
@@ -1274,7 +1278,7 @@ msgstr "Touches blanches"
 msgid "ultimate.wins"
 msgstr "gagne !"
 
-#: app/routes/piano.tsx:232
+#: app/routes/piano.tsx:270
 msgid "piano.right"
 msgstr "Oui —"
 
