@@ -10,10 +10,12 @@ import { piano, sfx } from "../sound";
 // only ever "which of the twelve is this?" — never "which octave was that?".
 // That is the absolute-pitch question in its smallest form.
 //
-// The keys carry their names, deliberately. Hiding them would add a second
-// test — do you know where F♯ lives on a keyboard — on top of the one this
-// game is about. With the names shown, the only thing standing between you and
-// the right key is your ear.
+// The keys are blank. Writing the names on them would turn the keyboard into
+// a lookup table — you would hear a note, name it in your head, and then just
+// read the labels until one matched. Blank keys mean you have to know both the
+// pitch AND where it lives, which is what playing by ear actually is. The
+// reveal does the teaching instead: the right key lights up, so you see where
+// it was, and the line above names it, so you learn what it was called.
 //
 // The one rule that keeps it honest: during a question a key does NOT sound
 // when you touch it. If it did you could hunt for the answer by comparing
@@ -226,16 +228,15 @@ export default function Piano() {
                     key={semitone}
                     onPointerDown={() => answer(semitone)}
                     disabled={!playable}
-                    className={`relative flex flex-1 items-end justify-center rounded-b-lg pb-2 text-sm font-semibold transition-colors ${
+                    aria-label={nameOf(semitone)}
+                    className={`relative flex-1 rounded-b-lg transition-colors ${
                       state === "right"
-                        ? "bg-emerald-400 text-emerald-950"
+                        ? "bg-emerald-400"
                         : state === "wrong"
-                          ? "bg-rose-400 text-rose-950"
-                          : "bg-neutral-100 text-neutral-500 active:bg-neutral-300"
+                          ? "bg-rose-400"
+                          : "bg-neutral-100 active:bg-neutral-300"
                     }`}
-                  >
-                    {nameOf(semitone)}
-                  </button>
+                  />
                 );
               })}
             </div>
@@ -247,24 +248,23 @@ export default function Piano() {
                   key={semitone}
                   onPointerDown={() => answer(semitone)}
                   disabled={!playable || dim(semitone)}
+                  aria-label={nameOf(semitone)}
                   style={{
                     left: `${(seam / WHITE.length) * 100}%`,
                     width: `${(BLACK_W / WHITE.length) * 100}%`,
                     height: `${BLACK_H}%`,
                     transform: "translateX(-50%)",
                   }}
-                  className={`absolute top-0 flex items-end justify-center rounded-b-md pb-1.5 text-[0.7rem] font-semibold transition-colors ${
+                  className={`absolute top-0 rounded-b-md transition-colors ${
                     state === "right"
-                      ? "bg-emerald-400 text-emerald-950"
+                      ? "bg-emerald-400"
                       : state === "wrong"
-                        ? "bg-rose-400 text-rose-950"
+                        ? "bg-rose-400"
                         : dim(semitone)
-                          ? "bg-neutral-800 text-neutral-700"
-                          : "bg-neutral-900 text-neutral-400 active:bg-neutral-700"
+                          ? "bg-neutral-800"
+                          : "bg-neutral-900 active:bg-neutral-700"
                   }`}
-                >
-                  {nameOf(semitone)}
-                </button>
+                />
               );
             })}
           </div>
