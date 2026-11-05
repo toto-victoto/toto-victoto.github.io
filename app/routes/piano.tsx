@@ -29,9 +29,19 @@ const SEMITONES = 12;
 const SHARP = "♯";
 const ALL = Array.from({ length: SEMITONES }, (_, i) => i);
 
-// The octave the whole game lives in. C4 is middle C = MIDI 60.
-const OCTAVE = 4;
-const MIDI_C = 12 * (OCTAVE + 1);
+// The keyboard always shows ONE octave, but the note you hear can come from up
+// to three. That is deliberate: the answer is the note, not the register, so
+// tapping Fa is right whether it was Fa3, Fa4 or Fa5. Recognising a pitch
+// regardless of how high it was played is what absolute pitch actually is —
+// and it means a wider range costs no extra keys.
+//
+// Spans grow upward first so that "one octave" stays exactly the game it was.
+const SPANS: number[][] = [[4], [4, 5], [3, 4, 5]];
+
+// MIDI numbering: C-1 is 0, so octave o starts at 12 * (o + 1). C4 = 60.
+const midiOf = (octave: number, semitone: number) => 12 * (octave + 1) + semitone;
+const semitoneOf = (midi: number) => midi % SEMITONES;
+const octaveOf = (midi: number) => Math.floor(midi / SEMITONES) - 1;
 
 // Which semitones are white, in keyboard order, and where the black ones sit.
 // A black key straddles the seam between two whites, so its centre is a whole
@@ -49,8 +59,7 @@ const BLACK_W = 0.62; // of a white key's width
 const BLACK_H = 62; // % of the keyboard's height
 
 // Equal temperament, anchored at A4 = 440Hz (MIDI 69).
-const freqOf = (semitone: number): number =>
-  440 * 2 ** ((MIDI_C + semitone - 69) / 12);
+const freqOf = (midi: number): number => 440 * 2 ** ((midi - 69) / 12);
 
 const REVEAL_HOLD = 1000; // ms a correct answer sits before the next note
 
@@ -70,6 +79,8 @@ export default function Piano() {
   const [picked, setPicked] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
   const [hard, setHard] = useState(false); // all twelve, vs the white keys only
+  const [span, setSpan] = useState(1); // how many octaves notes are drawn from
+  const [showNames, setShowNames] = useState(false);
   const [{ best }, setBest] = useStoredGame("piano", { best: 0 });
 
   // Seven naturals in keyboard order, in whatever the reader calls them.
@@ -82,22 +93,28 @@ export default function Piano() {
     return naturals[WHITE.indexOf(semitone - 1)] + SHARP;
   };
 
-  const pool = hard ? ALL : WHITE;
+  // Every note in play: each allowed pitch class, in each octave of the span.
+  const classes = hard ? ALL : WHITE;
+  const pool = SPANS[span - 1].flatMap((octave) =>
+    classes.map((semitone) => midiOf(octave, semitone)),
+  );
 
-  // Pick a note that isn't the one just asked — a repeat reads as a bug even
-  // when it's honest chance.
+  // Avoid the pitch class just asked, not the exact note — the same key twice
+  // in a row reads as a bug even an octave apart, and even when it's honest
+  // chance.
   const ask = useCallback(
     (avoid: number | null) => {
-      const choices = pool.length > 1 ? pool.filter((n) => n !== avoid) : pool;
-      const next = choices[Math.floor(Math.random() * choices.length)];
+      const choices = pool.filter((m) => semitoneOf(m) !== avoid);
+      const from = choices.length > 0 ? choices : pool;
+      const next = from[Math.floor(Math.random() * from.length)];
       setTarget(next);
       setPicked(null);
       setPhase("asking");
       piano(freqOf(next));
     },
-    // `pool` is rebuilt every render; its contents only change with `hard`.
+    // `pool` is rebuilt every render; its contents only change with these two.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hard],
+    [hard, span],
   );
 
   const answer = (semitone: number) => {
@@ -107,7 +124,7 @@ export default function Piano() {
     // Sound the right note, not the one that was touched: the point of the
     // reveal is to tie the pitch you just heard to the key it belongs to.
     piano(freqOf(target));
-    if (semitone === target) {
+    if (semitone === semitoneOf(target)) {
       const run = streak + 1;
       setStreak(run);
       if (run > best) setBest({ best: run });
@@ -120,16 +137,22 @@ export default function Piano() {
 
   // A right answer rolls straight on; a wrong one waits, so there is a moment
   // to connect the sound to the key you missed.
-  const right = phase === "revealed" && picked === target;
+  const right =
+    phase === "revealed" && target !== null && picked === semitoneOf(target);
   const targetRef = useRef(target);
   targetRef.current = target;
   useEffect(() => {
     if (!right) return;
-    const t = window.setTimeout(() => ask(targetRef.current), REVEAL_HOLD);
+    const t = window.setTimeout(
+      () => ask(targetRef.current === null ? null : semitoneOf(targetRef.current)),
+      REVEAL_HOLD,
+    );
     return () => window.clearTimeout(t);
   }, [right, ask]);
 
   // Changing difficulty mid-question would leave an unanswerable note hanging.
+  // Widening the range doesn't: the answer is a pitch class either way, so the
+  // slider can move whenever it likes.
   const setDifficulty = (next: boolean) => {
     if (next === hard) return;
     setHard(next);
@@ -140,8 +163,8 @@ export default function Piano() {
   };
 
   const keyState = (semitone: number): "right" | "wrong" | null => {
-    if (phase !== "revealed") return null;
-    if (semitone === target) return "right";
+    if (phase !== "revealed" || target === null) return null;
+    if (semitone === semitoneOf(target)) return "right";
     if (semitone === picked) return "wrong";
     return null;
   };
@@ -169,36 +192,52 @@ export default function Piano() {
           </p>
         </header>
 
-        {/* The prompt. Replaying is free — this is a trainer, not an exam. */}
+        {/* The prompt. Replaying is free — this is a trainer, not an exam.
+            "Next note" lives up here rather than below so that revealing an
+            answer never resizes the keyboard. */}
         <div className="flex flex-col items-center gap-2">
-          {phase === "idle" ? (
-            <button
-              onClick={() => ask(null)}
-              className="rounded-full bg-indigo-500 px-8 py-3 text-lg font-semibold text-neutral-50 hover:bg-indigo-400"
-            >
-              <Trans id="piano.start" message="Play a note" />
-            </button>
-          ) : (
-            <button
-              onClick={() => target !== null && piano(freqOf(target))}
-              className="flex items-center gap-2 rounded-full bg-neutral-800 px-6 py-2.5 font-semibold hover:bg-neutral-700"
-            >
-              <span aria-hidden="true">🔊</span>
-              <Trans id="piano.again" message="Hear it again" />
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {phase === "idle" ? (
+              <button
+                onClick={() => ask(null)}
+                className="rounded-full bg-indigo-500 px-8 py-3 text-lg font-semibold text-neutral-50 hover:bg-indigo-400"
+              >
+                <Trans id="piano.start" message="Play a note" />
+              </button>
+            ) : (
+              <button
+                onClick={() => target !== null && piano(freqOf(target))}
+                className="flex items-center gap-2 rounded-full bg-neutral-800 px-6 py-2.5 font-semibold hover:bg-neutral-700"
+              >
+                <span aria-hidden="true">🔊</span>
+                <Trans id="piano.again" message="Hear it again" />
+              </button>
+            )}
+            {phase === "revealed" && !right && (
+              <button
+                onClick={() =>
+                  ask(target === null ? null : semitoneOf(target))
+                }
+                className="rounded-full bg-indigo-500 px-6 py-2.5 font-semibold text-neutral-50 hover:bg-indigo-400"
+              >
+                <Trans id="piano.next" message="Next note" />
+              </button>
+            )}
+          </div>
 
           <p className="h-6 text-sm font-medium">
             {phase === "revealed" && target !== null ? (
               right ? (
                 <span className="text-emerald-400">
-                  <Trans id="piano.right" message="Yes —" /> {nameOf(target)}
-                  {OCTAVE}
+                  <Trans id="piano.right" message="Yes —" />{" "}
+                  {nameOf(semitoneOf(target))}
+                  {octaveOf(target)}
                 </span>
               ) : (
                 <span className="text-rose-300">
-                  <Trans id="piano.wrong" message="It was" /> {nameOf(target)}
-                  {OCTAVE}
+                  <Trans id="piano.wrong" message="It was" />{" "}
+                  {nameOf(semitoneOf(target))}
+                  {octaveOf(target)}
                 </span>
               )
             ) : phase === "asking" ? (
@@ -207,10 +246,17 @@ export default function Piano() {
               </span>
             ) : (
               <span className="text-neutral-500">
-                <Trans
-                  id="piano.hint"
-                  message="One octave. Which of the twelve is it?"
-                />
+                {span === 1 ? (
+                  <Trans
+                    id="piano.hint"
+                    message="One octave. Which of the twelve is it?"
+                  />
+                ) : (
+                  <Trans
+                    id="piano.hint.wide"
+                    message="Any octave — the note is what counts."
+                  />
+                )}
               </span>
             )}
           </p>
@@ -229,14 +275,16 @@ export default function Piano() {
                     onPointerDown={() => answer(semitone)}
                     disabled={!playable}
                     aria-label={nameOf(semitone)}
-                    className={`relative flex-1 rounded-b-lg transition-colors ${
+                    className={`relative flex flex-1 items-end justify-center rounded-b-lg pb-2 text-sm font-semibold transition-colors ${
                       state === "right"
-                        ? "bg-emerald-400"
+                        ? "bg-emerald-400 text-emerald-950"
                         : state === "wrong"
-                          ? "bg-rose-400"
-                          : "bg-neutral-100 active:bg-neutral-300"
+                          ? "bg-rose-400 text-rose-950"
+                          : "bg-neutral-100 text-neutral-500 active:bg-neutral-300"
                     }`}
-                  />
+                  >
+                    {showNames && nameOf(semitone)}
+                  </button>
                 );
               })}
             </div>
@@ -255,30 +303,27 @@ export default function Piano() {
                     height: `${BLACK_H}%`,
                     transform: "translateX(-50%)",
                   }}
-                  className={`absolute top-0 rounded-b-md transition-colors ${
+                  className={`absolute top-0 flex items-end justify-center rounded-b-md pb-1.5 text-[0.7rem] font-semibold transition-colors ${
                     state === "right"
-                      ? "bg-emerald-400"
+                      ? "bg-emerald-400 text-emerald-950"
                       : state === "wrong"
-                        ? "bg-rose-400"
+                        ? "bg-rose-400 text-rose-950"
                         : dim(semitone)
-                          ? "bg-neutral-800"
-                          : "bg-neutral-900 active:bg-neutral-700"
+                          ? "bg-neutral-800 text-neutral-700"
+                          : "bg-neutral-900 text-neutral-400 active:bg-neutral-700"
                   }`}
-                />
+                >
+                  {showNames && nameOf(semitone)}
+                </button>
               );
             })}
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-2">
-          {phase === "revealed" && !right ? (
-            <button
-              onClick={() => ask(target)}
-              className="rounded-full bg-indigo-500 px-6 py-2 font-semibold text-neutral-50 hover:bg-indigo-400"
-            >
-              <Trans id="piano.next" message="Next note" />
-            </button>
-          ) : (
+        {/* Settings. Always on screen, so nothing below the keyboard moves
+            when an answer is revealed. */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-2">
             <div className="flex rounded-full bg-neutral-900 p-1 text-sm">
               <button
                 onClick={() => setDifficulty(false)}
@@ -297,7 +342,36 @@ export default function Piano() {
                 <Trans id="piano.all" message="All twelve" />
               </button>
             </div>
-          )}
+
+            <button
+              onClick={() => setShowNames((s) => !s)}
+              aria-pressed={showNames}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                showNames
+                  ? "bg-indigo-500 text-neutral-50"
+                  : "bg-neutral-900 text-neutral-400"
+              }`}
+            >
+              <Trans id="piano.shownames" message="Names" />
+            </button>
+          </div>
+
+          <label className="flex items-center gap-2 text-xs text-neutral-400">
+            <Trans id="piano.octaves" message="Octaves" />
+            <input
+              type="range"
+              min={1}
+              max={SPANS.length}
+              step={1}
+              value={span}
+              onChange={(e) => setSpan(Number(e.target.value))}
+              aria-label={i18n._({ id: "piano.octaves", message: "Octaves" })}
+              className="h-1 w-32 accent-indigo-500"
+            />
+            <span className="w-3 font-semibold text-neutral-200 tabular-nums">
+              {span}
+            </span>
+          </label>
         </div>
       </GameLayout>
     </>
