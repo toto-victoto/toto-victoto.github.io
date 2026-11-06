@@ -38,6 +38,34 @@ const ALL = Array.from({ length: SEMITONES }, (_, i) => i);
 // Spans grow upward first so that "one octave" stays exactly the game it was.
 const SPANS: number[][] = [[4], [4, 5], [3, 4, 5]];
 
+// Typing keys to semitones, in the layout every DAW and web piano already
+// uses — the home row is the white keys, the row above holds the black ones
+// where they physically sit:
+//
+//     W E   T Y U
+//    A S D F G H J
+//
+// Worth having because the piano keys are the one control a mouse is bad at:
+// twelve small targets you want to hit quickly and in sequence, especially
+// while exploring after a miss. On a phone it costs nothing.
+const TYPED: Record<string, number> = {
+  a: 0,
+  w: 1,
+  s: 2,
+  e: 3,
+  d: 4,
+  f: 5,
+  t: 6,
+  g: 7,
+  y: 8,
+  h: 9,
+  u: 10,
+  j: 11,
+};
+const TYPED_FOR: Record<number, string> = Object.fromEntries(
+  Object.entries(TYPED).map(([k, s]) => [s, k.toUpperCase()]),
+);
+
 // MIDI numbering: C-1 is 0, so octave o starts at 12 * (o + 1). C4 = 60.
 const midiOf = (octave: number, semitone: number) => 12 * (octave + 1) + semitone;
 const semitoneOf = (midi: number) => midi % SEMITONES;
@@ -81,6 +109,12 @@ export default function Piano() {
   const [hard, setHard] = useState(false); // all twelve, vs the white keys only
   const [span, setSpan] = useState(1); // how many octaves notes are drawn from
   const [showNames, setShowNames] = useState(false);
+  // Whether to bother showing the typing letters. Starts false so the
+  // prerendered HTML and the first client render agree, then asks the browser.
+  const [typable, setTypable] = useState(false);
+  useEffect(() => {
+    setTypable(window.matchMedia("(pointer: fine)").matches);
+  }, []);
   const [{ best }, setBest] = useStoredGame("piano", { best: 0 });
 
   // Seven naturals in keyboard order, in whatever the reader calls them.
@@ -210,6 +244,42 @@ export default function Piano() {
   const dim = (semitone: number) =>
     !exploring && !hard && !WHITE.includes(semitone);
 
+  // Space and Enter do whatever the obvious button does right now.
+  const primary = () => {
+    if (phase === "idle") return ask(null);
+    if (exploring) return ask(target === null ? null : semitoneOf(target));
+    if (answering && target !== null) piano(freqOf(target)); // hear it again
+  };
+
+  // Playing from the typing keyboard. Two rules keep it from fighting the
+  // page: a held key must not machine-gun notes (`repeat`), and Space or
+  // Enter is left alone whenever a control has focus, so tabbing to a button
+  // and pressing Space still works that button rather than firing both it and
+  // this. No dependency array — it re-registers each render so the handler
+  // always closes over the current phase.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      const on = document.activeElement;
+      if (on instanceof HTMLInputElement || on instanceof HTMLTextAreaElement) {
+        return;
+      }
+      const semitone = TYPED[e.key.toLowerCase()];
+      if (semitone !== undefined) {
+        if (dim(semitone)) return;
+        e.preventDefault();
+        touch(semitone);
+        return;
+      }
+      if (e.key !== " " && e.key !== "Enter") return;
+      if (on instanceof HTMLButtonElement) return; // let the button have it
+      e.preventDefault();
+      primary();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   return (
     <>
       <BackButton />
@@ -332,7 +402,16 @@ export default function Piano() {
                           : "bg-neutral-100 text-neutral-500 active:bg-neutral-300"
                     }`}
                   >
-                    {showNames && nameOf(semitone)}
+                    {showNames && (
+                      <span className="flex flex-col items-center leading-none">
+                        {typable && (
+                          <span className="mb-1 text-[0.6rem] font-normal opacity-45">
+                            {TYPED_FOR[semitone]}
+                          </span>
+                        )}
+                        {nameOf(semitone)}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -362,7 +441,16 @@ export default function Piano() {
                           : "bg-neutral-900 text-neutral-400 active:bg-neutral-700"
                   }`}
                 >
-                  {showNames && nameOf(semitone)}
+                  {showNames && (
+                    <span className="flex flex-col items-center leading-none">
+                      {typable && (
+                      <span className="mb-1 text-[0.6rem] font-normal opacity-45">
+                        {TYPED_FOR[semitone]}
+                      </span>
+                    )}
+                      {nameOf(semitone)}
+                    </span>
+                  )}
                 </button>
               );
             })}
