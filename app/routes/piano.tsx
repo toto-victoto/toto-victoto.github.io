@@ -40,7 +40,7 @@ const SPANS: number[][] = [[4], [4, 5], [3, 4, 5]];
 
 // Typing keys to semitones, in the layout every DAW and web piano already
 // uses — the home row is the white keys, the row above holds the black ones
-// where they physically sit:
+// where they physically sit (shown here with QWERTY captions):
 //
 //     W E   T Y U
 //    A S D F G H J
@@ -48,22 +48,32 @@ const SPANS: number[][] = [[4], [4, 5], [3, 4, 5]];
 // Worth having because the piano keys are the one control a mouse is bad at:
 // twelve small targets you want to hit quickly and in sequence, especially
 // while exploring after a miss. On a phone it costs nothing.
+//
+// Keyed by `KeyboardEvent.code`, the PHYSICAL key, not `key`, the character it
+// produces. On AZERTY the home row reads Q S D F G H J and the row above
+// A Z E R T Y U, so matching on characters would put C and C♯ on the wrong
+// keys entirely — C on the top row, C♯ down on the bottom one. Matching on
+// position means the shape of the thing is the same on every layout.
 const TYPED: Record<string, number> = {
-  a: 0,
-  w: 1,
-  s: 2,
-  e: 3,
-  d: 4,
-  f: 5,
-  t: 6,
-  g: 7,
-  y: 8,
-  h: 9,
-  u: 10,
-  j: 11,
+  KeyA: 0,
+  KeyW: 1,
+  KeyS: 2,
+  KeyE: 3,
+  KeyD: 4,
+  KeyF: 5,
+  KeyT: 6,
+  KeyG: 7,
+  KeyY: 8,
+  KeyH: 9,
+  KeyU: 10,
+  KeyJ: 11,
 };
-const TYPED_FOR: Record<number, string> = Object.fromEntries(
-  Object.entries(TYPED).map(([k, s]) => [s, k.toUpperCase()]),
+const CODE_FOR: Record<number, string> = Object.fromEntries(
+  Object.entries(TYPED).map(([code, s]) => [s, code]),
+);
+// What to print on a key when the browser won't tell us the real layout.
+const QWERTY_FOR: Record<number, string> = Object.fromEntries(
+  Object.entries(TYPED).map(([code, s]) => [s, code.slice(3)]),
 );
 
 // MIDI numbering: C-1 is 0, so octave o starts at 12 * (o + 1). C4 = 60.
@@ -112,9 +122,31 @@ export default function Piano() {
   // Whether to bother showing the typing letters. Starts false so the
   // prerendered HTML and the first client render agree, then asks the browser.
   const [typable, setTypable] = useState(false);
+  // What each physical key is actually captioned on THIS keyboard, so an
+  // AZERTY user is told to press Q and Z rather than A and W. Chromium-only;
+  // elsewhere we fall back to the QWERTY captions, which is the common case
+  // and still only affects what is printed, never which key works.
+  const [caption, setCaption] = useState<Record<string, string> | null>(null);
   useEffect(() => {
     setTypable(window.matchMedia("(pointer: fine)").matches);
+    const kb = (
+      navigator as Navigator & {
+        keyboard?: { getLayoutMap?: () => Promise<Map<string, string>> };
+      }
+    ).keyboard;
+    kb?.getLayoutMap?.()
+      .then((map) => {
+        const found: Record<string, string> = {};
+        for (const code of Object.keys(TYPED)) {
+          const printed = map.get(code);
+          if (printed) found[code] = printed.toUpperCase();
+        }
+        setCaption(found);
+      })
+      .catch(() => {});
   }, []);
+  const typedFor = (semitone: number) =>
+    caption?.[CODE_FOR[semitone]] ?? QWERTY_FOR[semitone];
   const [{ best }, setBest] = useStoredGame("piano", { best: 0 });
 
   // Seven naturals in keyboard order, in whatever the reader calls them.
@@ -264,7 +296,7 @@ export default function Piano() {
       if (on instanceof HTMLInputElement || on instanceof HTMLTextAreaElement) {
         return;
       }
-      const semitone = TYPED[e.key.toLowerCase()];
+      const semitone = TYPED[e.code];
       if (semitone !== undefined) {
         if (dim(semitone)) return;
         e.preventDefault();
@@ -406,7 +438,7 @@ export default function Piano() {
                       <span className="flex flex-col items-center leading-none">
                         {typable && (
                           <span className="mb-1 text-[0.6rem] font-normal opacity-45">
-                            {TYPED_FOR[semitone]}
+                            {typedFor(semitone)}
                           </span>
                         )}
                         {nameOf(semitone)}
@@ -445,7 +477,7 @@ export default function Piano() {
                     <span className="flex flex-col items-center leading-none">
                       {typable && (
                       <span className="mb-1 text-[0.6rem] font-normal opacity-45">
-                        {TYPED_FOR[semitone]}
+                        {typedFor(semitone)}
                       </span>
                     )}
                       {nameOf(semitone)}
