@@ -182,6 +182,40 @@ function CodeBox({
   );
 }
 
+// A QR holding a bare pairing code is useless: point a phone camera at it and
+// you get a screenful of base64, with nothing to tap. So the codes travel as
+// LINKS back to this same game page, with the code in a query parameter — the
+// camera offers to open it, the page reads the parameter and pairs itself.
+//
+// Only the invite can be taken that way. The host's page is holding the live
+// RTCPeerConnection, so it must not navigate anywhere to read the reply;
+// the host scans that one with the in-page camera button instead. Both are
+// still links, because a link that opens the game beats a wall of base64 even
+// when you meant to scan it in-app.
+const JOIN = "join";
+const REPLY = "reply";
+
+function linkFor(param: string, code: string): string {
+  if (typeof window === "undefined") return code;
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set(param, code);
+  return url.toString();
+}
+
+// Accepts whatever the other phone hands over: a full link, or a bare code
+// pasted by hand.
+function codeFrom(text: string): string {
+  const clean = text.trim();
+  try {
+    const url = new URL(clean);
+    return url.searchParams.get(JOIN) ?? url.searchParams.get(REPLY) ?? clean;
+  } catch {
+    return clean;
+  }
+}
+
 export function PairingPanel({ game }: { game: string }) {
   const net = useNet();
   const [step, setStep] = useState<Step>("menu");
@@ -195,10 +229,39 @@ export function PairingPanel({ game }: { game: string }) {
   const [supported, setSupported] = useState(true);
   useEffect(() => setSupported(isNetSupported()), []);
 
+  // Arriving from a scanned invite link: accept it straight away and show the
+  // reply, so the guest's whole job is "point camera, tap notification". The
+  // parameter is stripped afterwards — a reload would otherwise try to answer
+  // an invite whose host has long since given up.
+  const joined = useRef(false);
+  useEffect(() => {
+    if (joined.current) return;
+    const url = new URL(window.location.href);
+    const invite = url.searchParams.get(JOIN);
+    if (!invite) return;
+    joined.current = true;
+    url.searchParams.delete(JOIN);
+    window.history.replaceState({}, "", url.toString());
+    void (async () => {
+      setBusy(true);
+      try {
+        setMine(await acceptInvite(game, invite));
+        setStep("reply");
+        sfx.ui();
+      } catch {
+        setNote("net.err.invite");
+        setStep("menu");
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, [game]);
+
   const fail = (id: string) => setNote(id);
 
   const takeCode = useCallback(
-    async (code: string) => {
+    async (text: string) => {
+      const code = codeFrom(text);
       setBusy(true);
       setNote(null);
       try {
@@ -241,8 +304,7 @@ export function PairingPanel({ game }: { game: string }) {
     setStep("menu");
     setMine("");
     setTyped("");
-    setNote(null);
-  };
+    setNote(null);  };
 
   if (!supported) {
     return (
@@ -306,9 +368,9 @@ export function PairingPanel({ game }: { game: string }) {
               />
             )}
           </p>
-          <QrCode text={mine} />
+          <QrCode text={linkFor(step === "invite" ? JOIN : REPLY, mine)} />
           <CodeBox
-            text={mine}
+            text={linkFor(step === "invite" ? JOIN : REPLY, mine)}
             onCopy={(ok) => setNote(ok ? "net.copied" : "net.err.copy")}
           />
         </div>
