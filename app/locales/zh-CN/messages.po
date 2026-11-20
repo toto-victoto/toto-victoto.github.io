@@ -583,7 +583,11 @@ msgstr "构建工具"
 msgid "piano.notes"
 msgstr "C D E F G A B"
 
-#: app/components/PairingPanel.tsx:413
+#: app/components/PairingPanel.tsx:473
+msgid "net.scan.denied"
+msgstr "相机被拒绝。请为本站开启权限，或在下方粘贴对方的代码。"
+
+#: app/components/PairingPanel.tsx:557
 msgid "common.cancel"
 msgstr "取消"
 
@@ -634,23 +638,27 @@ msgstr "确认"
 msgid "rps.rpg.continue"
 msgstr "继续"
 
-#: app/components/PairingPanel.tsx:381
+#: app/components/PairingPanel.tsx:525
 msgid "net.copied"
 msgstr "已复制。"
 
-#: app/components/PairingPanel.tsx:179
+#: app/components/PairingPanel.tsx:225
 msgid "net.copy"
 msgstr "复制"
 
-#: app/components/PairingPanel.tsx:384
+#: app/components/PairingPanel.tsx:528
 msgid "net.err.copy"
 msgstr "无法复制——请手动选择文本。"
 
-#: app/components/PairingPanel.tsx:387
+#: app/components/PairingPanel.tsx:531
 msgid "net.err.start"
 msgstr "无法创建邀请。"
 
-#: app/components/PairingPanel.tsx:400
+#: app/components/PairingPanel.tsx:481
+msgid "net.scan.nocam"
+msgstr "无法打开相机——请在下方粘贴对方的代码。"
+
+#: app/components/PairingPanel.tsx:544
 msgid "net.err.connect"
 msgstr "无法连接到另一台设备。两台手机必须在同一个 Wi-Fi 下。"
 
@@ -775,7 +783,7 @@ msgstr "下注中"
 msgid "rps.splash.infinite"
 msgstr "无限"
 
-#: app/components/PairingPanel.tsx:277
+#: app/components/PairingPanel.tsx:385
 msgid "net.invite"
 msgstr "邀请"
 
@@ -783,7 +791,7 @@ msgstr "邀请"
 msgid "piano.wrong"
 msgstr "答案是"
 
-#: app/components/PairingPanel.tsx:288
+#: app/components/PairingPanel.tsx:396
 msgid "net.join"
 msgstr "加入"
 
@@ -799,11 +807,11 @@ msgstr "左边"
 msgid "about.section.legal"
 msgstr "法律声明"
 
-#: app/components/PairingPanel.tsx:303
+#: app/components/PairingPanel.tsx:411
 msgid "net.show.reply"
 msgstr "让第一台手机扫描这个即可完成。"
 
-#: app/components/PairingPanel.tsx:298
+#: app/components/PairingPanel.tsx:406
 msgid "net.show.invite"
 msgstr "让另一台手机扫描这个，然后扫描对方的回复。"
 
@@ -875,6 +883,10 @@ msgstr "没有中奖"
 #: app/routes/roulette.tsx:484
 msgid "roulette.no_more_bets"
 msgstr "买定离手，停止下注"
+
+#: app/components/PairingPanel.tsx:465
+msgid "net.scan.none"
+msgstr "此浏览器没有二维码扫描功能——请在下方粘贴对方的代码。"
 
 #: app/routes/piano.tsx:610
 msgid "piano.length"
@@ -950,7 +962,7 @@ msgstr "播放一组音"
 msgid "common.play_again"
 msgstr "再玩一次"
 
-#: app/components/PairingPanel.tsx:265
+#: app/components/PairingPanel.tsx:373
 msgid "net.intro"
 msgstr "和朋友用各自的手机对战。一人发起邀请，另一人扫码。"
 
@@ -1053,15 +1065,15 @@ msgstr "你赢下这局"
 msgid "rps.title"
 msgstr "RPS Saga"
 
-#: app/components/PairingPanel.tsx:346
+#: app/components/PairingPanel.tsx:454
 msgid "net.scan.start"
 msgstr "扫描二维码"
 
-#: app/components/PairingPanel.tsx:323
+#: app/components/PairingPanel.tsx:431
 msgid "net.scan.invite"
 msgstr "扫描对方的邀请"
 
-#: app/components/PairingPanel.tsx:321
+#: app/components/PairingPanel.tsx:429
 msgid "net.scan.reply"
 msgstr "扫描对方的回复"
 
@@ -1142,7 +1154,7 @@ msgstr "属性"
 msgid "slots.stop"
 msgstr "停"
 
-#: app/components/PairingPanel.tsx:344
+#: app/components/PairingPanel.tsx:452
 msgid "net.scan.stop"
 msgstr "关闭摄像头"
 
@@ -1190,11 +1202,11 @@ msgstr "点击切换形状 · 拖动对准缺口"
 msgid "trias.won.timeattack"
 msgstr "目标达成！"
 
-#: app/components/PairingPanel.tsx:390
+#: app/components/PairingPanel.tsx:534
 msgid "net.err.invite"
 msgstr "这不是本游戏的有效邀请。"
 
-#: app/components/PairingPanel.tsx:393
+#: app/components/PairingPanel.tsx:537
 msgid "net.err.reply"
 msgstr "这不是有效的回复。"
 
@@ -1223,9 +1235,13 @@ msgstr "对方赢得了比赛。"
 msgid "pong.lost"
 msgstr "对方赢了。"
 
-#: app/components/PairingPanel.tsx:250
+#: app/components/PairingPanel.tsx:358
 msgid "net.unsupported"
 msgstr "此浏览器无法在两台设备之间建立连接。"
+
+#: app/components/PairingPanel.tsx:489
+msgid "net.scan.broken"
+msgstr "这台手机无法读取二维码——请在下方粘贴对方的代码。"
 
 #: app/routes/threader.tsx:863
 msgid "threader.legend.bead"
@@ -1249,7 +1265,7 @@ msgstr "计时赛"
 msgid "duel.youjumped"
 msgstr "太早了！"
 
-#: app/components/PairingPanel.tsx:134
+#: app/components/PairingPanel.tsx:180
 msgid "net.qr.toobig"
 msgstr "内容过长，无法生成二维码——请使用下方的文本。"
 
@@ -1281,7 +1297,7 @@ msgstr "轮到"
 msgid "ultimate.title"
 msgstr "终极井字棋"
 
-#: app/components/PairingPanel.tsx:366
+#: app/components/PairingPanel.tsx:510
 msgid "net.use"
 msgstr "使用"
 
@@ -1302,7 +1318,7 @@ msgstr "等待变绿。手速最快的人赢下这一局。"
 msgid "duel.wait"
 msgstr "等待变绿……"
 
-#: app/components/PairingPanel.tsx:374
+#: app/components/PairingPanel.tsx:518
 msgid "net.waiting"
 msgstr "正在等待另一台手机……"
 

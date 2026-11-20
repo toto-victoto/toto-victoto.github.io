@@ -583,7 +583,11 @@ msgstr "Built with"
 msgid "piano.notes"
 msgstr "C D E F G A B"
 
-#: app/components/PairingPanel.tsx:413
+#: app/components/PairingPanel.tsx:473
+msgid "net.scan.denied"
+msgstr "Camera refused. Allow it for this site, or paste their code below."
+
+#: app/components/PairingPanel.tsx:557
 msgid "common.cancel"
 msgstr "Cancel"
 
@@ -634,23 +638,27 @@ msgstr "Confirm"
 msgid "rps.rpg.continue"
 msgstr "Continue"
 
-#: app/components/PairingPanel.tsx:381
+#: app/components/PairingPanel.tsx:525
 msgid "net.copied"
 msgstr "Copied."
 
-#: app/components/PairingPanel.tsx:179
+#: app/components/PairingPanel.tsx:225
 msgid "net.copy"
 msgstr "Copy"
 
-#: app/components/PairingPanel.tsx:384
+#: app/components/PairingPanel.tsx:528
 msgid "net.err.copy"
 msgstr "Couldn't copy — select it by hand."
 
-#: app/components/PairingPanel.tsx:387
+#: app/components/PairingPanel.tsx:531
 msgid "net.err.start"
 msgstr "Couldn't create an invite."
 
-#: app/components/PairingPanel.tsx:400
+#: app/components/PairingPanel.tsx:481
+msgid "net.scan.nocam"
+msgstr "Couldn't open the camera — paste their code below."
+
+#: app/components/PairingPanel.tsx:544
 msgid "net.err.connect"
 msgstr "Couldn't reach the other device. Both phones must be on the same Wi-Fi."
 
@@ -775,7 +783,7 @@ msgstr "In play"
 msgid "rps.splash.infinite"
 msgstr "Infinite"
 
-#: app/components/PairingPanel.tsx:277
+#: app/components/PairingPanel.tsx:385
 msgid "net.invite"
 msgstr "Invite"
 
@@ -783,7 +791,7 @@ msgstr "Invite"
 msgid "piano.wrong"
 msgstr "It was"
 
-#: app/components/PairingPanel.tsx:288
+#: app/components/PairingPanel.tsx:396
 msgid "net.join"
 msgstr "Join"
 
@@ -799,11 +807,11 @@ msgstr "left"
 msgid "about.section.legal"
 msgstr "Legal"
 
-#: app/components/PairingPanel.tsx:303
+#: app/components/PairingPanel.tsx:411
 msgid "net.show.reply"
 msgstr "Let the first phone scan this to finish."
 
-#: app/components/PairingPanel.tsx:298
+#: app/components/PairingPanel.tsx:406
 msgid "net.show.invite"
 msgstr "Let the other phone scan this, then scan their reply."
 
@@ -875,6 +883,10 @@ msgstr "No match"
 #: app/routes/roulette.tsx:484
 msgid "roulette.no_more_bets"
 msgstr "The bets are placed, no more bets"
+
+#: app/components/PairingPanel.tsx:465
+msgid "net.scan.none"
+msgstr "No QR scanner in this browser — paste their code below."
 
 #: app/routes/piano.tsx:610
 msgid "piano.length"
@@ -950,7 +962,7 @@ msgstr "Play a run"
 msgid "common.play_again"
 msgstr "Play again"
 
-#: app/components/PairingPanel.tsx:265
+#: app/components/PairingPanel.tsx:373
 msgid "net.intro"
 msgstr "Play against a friend on their own phone. One of you invites, the other scans."
 
@@ -1053,15 +1065,15 @@ msgstr "Round yours"
 msgid "rps.title"
 msgstr "RPS Saga"
 
-#: app/components/PairingPanel.tsx:346
+#: app/components/PairingPanel.tsx:454
 msgid "net.scan.start"
 msgstr "Scan QR"
 
-#: app/components/PairingPanel.tsx:323
+#: app/components/PairingPanel.tsx:431
 msgid "net.scan.invite"
 msgstr "Scan their invite"
 
-#: app/components/PairingPanel.tsx:321
+#: app/components/PairingPanel.tsx:429
 msgid "net.scan.reply"
 msgstr "Scan their reply"
 
@@ -1142,7 +1154,7 @@ msgstr "Stats"
 msgid "slots.stop"
 msgstr "Stop"
 
-#: app/components/PairingPanel.tsx:344
+#: app/components/PairingPanel.tsx:452
 msgid "net.scan.stop"
 msgstr "Stop camera"
 
@@ -1190,11 +1202,11 @@ msgstr "Tap to switch shape · drag to line it up"
 msgid "trias.won.timeattack"
 msgstr "Target smashed!"
 
-#: app/components/PairingPanel.tsx:390
+#: app/components/PairingPanel.tsx:534
 msgid "net.err.invite"
 msgstr "That isn't a valid invite for this game."
 
-#: app/components/PairingPanel.tsx:393
+#: app/components/PairingPanel.tsx:537
 msgid "net.err.reply"
 msgstr "That isn't a valid reply."
 
@@ -1223,9 +1235,13 @@ msgstr "They win the match."
 msgid "pong.lost"
 msgstr "They win."
 
-#: app/components/PairingPanel.tsx:250
+#: app/components/PairingPanel.tsx:358
 msgid "net.unsupported"
 msgstr "This browser can't open a link between two devices."
+
+#: app/components/PairingPanel.tsx:489
+msgid "net.scan.broken"
+msgstr "This phone can't read the QR — paste their code below."
 
 #: app/routes/threader.tsx:863
 msgid "threader.legend.bead"
@@ -1249,7 +1265,7 @@ msgstr "Time Attack"
 msgid "duel.youjumped"
 msgstr "Too early!"
 
-#: app/components/PairingPanel.tsx:134
+#: app/components/PairingPanel.tsx:180
 msgid "net.qr.toobig"
 msgstr "Too long for a QR code — use the text below."
 
@@ -1281,7 +1297,7 @@ msgstr "Turn:"
 msgid "ultimate.title"
 msgstr "Ultimate Tic-Tac-Toe"
 
-#: app/components/PairingPanel.tsx:366
+#: app/components/PairingPanel.tsx:510
 msgid "net.use"
 msgstr "Use"
 
@@ -1302,7 +1318,7 @@ msgstr "Wait for green. Fastest thumb takes the round."
 msgid "duel.wait"
 msgstr "Wait for green…"
 
-#: app/components/PairingPanel.tsx:374
+#: app/components/PairingPanel.tsx:518
 msgid "net.waiting"
 msgstr "Waiting for the other phone…"
 

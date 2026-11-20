@@ -24,11 +24,25 @@ type Step = "menu" | "invite" | "join" | "reply";
 // so we stop offering the picture and ask for copy/paste instead.
 const QR_LIMIT = 1800;
 
+// Why the camera work lives in an effect rather than in the click handler:
+// the <video> is only rendered while `scanning`, so reading the ref straight
+// after setting that flag races React's commit and can find nothing there —
+// leaving the camera on, no preview, and a button stuck on "Stop". An effect
+// runs after the commit, so the element is always there.
+type ScanFail = null | "denied" | "camera" | "detector";
+
+// A detector that fails on one frame means nothing; one that fails on every
+// frame is broken, and spinning on it in silence is the worst outcome.
+const DETECT_GIVE_UP = 30;
+
 function useScanner(onCode: (code: string) => void) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [scanning, setScanning] = useState(false);
   const [supported, setSupported] = useState(false);
-  const stopRef = useRef<() => void>(() => {});
+  const [failed, setFailed] = useState<ScanFail>(null);
+  // Rebuilt every render; kept in a ref so a new one can't restart the camera.
+  const onCodeRef = useRef(onCode);
+  onCodeRef.current = onCode;
 
   useEffect(() => {
     setSupported(
@@ -38,33 +52,44 @@ function useScanner(onCode: (code: string) => void) {
     );
   }, []);
 
-  const stop = useCallback(() => {
-    stopRef.current();
-    setScanning(false);
-  }, []);
-
-  const start = useCallback(async () => {
-    setScanning(true);
-    let stream: MediaStream | null = null;
-    let raf = 0;
+  useEffect(() => {
+    if (!scanning) return;
     let dead = false;
-    stopRef.current = () => {
-      dead = true;
-      cancelAnimationFrame(raf);
-      stream?.getTracks().forEach((t) => t.stop());
-    };
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
+    let raf = 0;
+    let stream: MediaStream | null = null;
+
+    void (async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+        });
+      } catch (e) {
+        // Every one of these used to be swallowed, so a refused permission
+        // looked exactly like a dead button.
+        if (dead) return;
+        setFailed(
+          (e as DOMException)?.name === "NotAllowedError" ? "denied" : "camera",
+        );
+        setScanning(false);
+        return;
+      }
       if (dead) {
         stream.getTracks().forEach((t) => t.stop());
         return;
       }
       const video = videoRef.current;
-      if (!video) return;
+      if (!video) {
+        setFailed("camera");
+        setScanning(false);
+        return;
+      }
       video.srcObject = stream;
-      await video.play();
+      try {
+        await video.play();
+      } catch {
+        // Some browsers refuse the play() promise but still decode frames,
+        // which is all the detector needs.
+      }
       const Detector = (
         window as unknown as {
           BarcodeDetector: new (o: { formats: string[] }) => {
@@ -72,32 +97,53 @@ function useScanner(onCode: (code: string) => void) {
           };
         }
       ).BarcodeDetector;
-      const detector = new Detector({ formats: ["qr_code"] });
+      let misses = 0;
+      let detector: { detect: (s: HTMLVideoElement) => Promise<{ rawValue: string }[]> };
+      try {
+        detector = new Detector({ formats: ["qr_code"] });
+      } catch {
+        setFailed("detector");
+        setScanning(false);
+        return;
+      }
       const tick = async () => {
         if (dead) return;
         try {
           const found = await detector.detect(video);
+          misses = 0;
           if (found.length > 0 && found[0].rawValue) {
-            stopRef.current();
             setScanning(false);
-            onCode(found[0].rawValue);
+            onCodeRef.current(found[0].rawValue);
             return;
           }
         } catch {
-          // a dropped frame is not worth ending the scan over
+          if (++misses > DETECT_GIVE_UP) {
+            setFailed("detector");
+            setScanning(false);
+            return;
+          }
         }
         raf = requestAnimationFrame(() => void tick());
       };
       void tick();
-    } catch {
-      stopRef.current();
-      setScanning(false);
-    }
-  }, [onCode]);
+    })();
 
-  useEffect(() => () => stopRef.current(), []);
-  return { videoRef, scanning, supported, start, stop };
+    return () => {
+      dead = true;
+      cancelAnimationFrame(raf);
+      stream?.getTracks().forEach((t) => t.stop());
+    };
+  }, [scanning]);
+
+  const start = useCallback(() => {
+    setFailed(null);
+    setScanning(true);
+  }, []);
+  const stop = useCallback(() => setScanning(false), []);
+
+  return { videoRef, scanning, supported, failed, start, stop };
 }
+
 
 function QrCode({ text }: { text: string }) {
   const [path, setPath] = useState<{ d: string; size: number } | null>(null);
@@ -398,7 +444,7 @@ export function PairingPanel({ game }: { game: string }) {
               <button
                 type="button"
                 onClick={() =>
-                  scanner.scanning ? scanner.stop() : void scanner.start()
+                  scanner.scanning ? scanner.stop() : scanner.start()
                 }
                 className="flex-1 rounded-full bg-neutral-800 px-4 py-2 text-sm font-semibold hover:bg-neutral-700"
               >
@@ -410,6 +456,42 @@ export function PairingPanel({ game }: { game: string }) {
               </button>
             )}
           </div>
+
+          {/* Every one of these used to fail silently, which is why the button
+              read as broken. Say which wall we hit, and point at the box that
+              always works. */}
+          {!scanner.supported && (
+            <p className="text-center text-xs text-neutral-500">
+              <Trans
+                id="net.scan.none"
+                message="No QR scanner in this browser — paste their code below."
+              />
+            </p>
+          )}
+          {scanner.failed === "denied" && (
+            <p className="text-center text-xs text-amber-300">
+              <Trans
+                id="net.scan.denied"
+                message="Camera refused. Allow it for this site, or paste their code below."
+              />
+            </p>
+          )}
+          {scanner.failed === "camera" && (
+            <p className="text-center text-xs text-amber-300">
+              <Trans
+                id="net.scan.nocam"
+                message="Couldn't open the camera — paste their code below."
+              />
+            </p>
+          )}
+          {scanner.failed === "detector" && (
+            <p className="text-center text-xs text-amber-300">
+              <Trans
+                id="net.scan.broken"
+                message="This phone can't read the QR — paste their code below."
+              />
+            </p>
+          )}
           <div className="flex items-center gap-2">
             <input
               value={typed}
